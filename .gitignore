@@ -1,0 +1,99 @@
+# Waketto プロジェクト - 全体用 .gitignore
+
+# ===== 依存関係 =====
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# PHP/Composer
+vendor/
+composer.lock
+
+# ===== 環境変数 =====
+.env
+.env.*
+!.env.example
+
+# ===== ビルド出力 =====
+# フロントエンド
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/out/
+
+# バックエンド
+backend/public/build/
+backend/public/hot/
+backend/public/storage/
+
+# ===== ストレージ・キャッシュ =====
+# Laravel
+backend/storage/*.key
+backend/storage/pail
+backend/bootstrap/cache/
+backend/.phpunit.cache
+backend/.phpunit.result.cache
+
+# ===== ログファイル =====
+*.log
+logs/
+storage/logs/
+
+# ===== IDE・エディタ =====
+.vscode/
+.idea/
+.fleet/
+.nova/
+.zed/
+*.swp
+*.swo
+*~
+
+# ===== OS生成ファイル =====
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===== Docker =====
+.dockerignore
+docker-compose.override.yml
+
+# ===== 一時ファイル =====
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# ===== テスト =====
+coverage/
+.nyc_output/
+.phpunit.cache/
+
+# ===== Laravel固有 =====
+Homestead.json
+Homestead.yaml
+auth.json
+.phpactor.json
+
+# ===== フロントエンド固有 =====
+.pnp
+.pnp.js
+.eslintcache
+
+# ===== データベース =====
+*.sqlite
+*.sqlite3
+*.db
+
+# ===== SSL証明書 =====
+*.pem
+*.key
+*.crt
+*.csr
