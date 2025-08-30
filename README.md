@@ -25,7 +25,7 @@ docker compose exec -it frontend bash
 pnpm eslint
 
 # 全ファイルの自動修正
-pnpm eslint:fix
+pnpm eslint --fix
 ```
 
 こんな使い方もできる
