@@ -5,6 +5,9 @@ cd inrfa
 docker compose up -d --build
 ```
 
+ページにアクセス
+http://localhost:3000/
+
 # コンテナ操作
 
 ```be

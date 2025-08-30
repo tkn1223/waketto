@@ -2,10 +2,13 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# pnpmをインストール
+RUN npm install -g pnpm
 
-RUN npm install
+COPY package*.json pnpm-lock.yaml ./
+
+RUN pnpm install
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "dev", "--hostname", "0.0.0.0"]

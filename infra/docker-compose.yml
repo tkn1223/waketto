@@ -11,7 +11,7 @@ services:
       - /app/node_modules
     environment: # ホットリロードのためのファイル監視（開発環境のみ）
       - CHOKIDAR_USEPOLLING=true
-    command: npm run dev -- --hostname 0.0.0.0
+    command: pnpm dev --hostname 0.0.0.0
     user: "${UID}:${GID}"
     networks:
       - app-network
