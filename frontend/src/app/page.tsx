@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Button } from "@/components/ui/button.tsx";
 
 export default function Home() {
   return (
@@ -17,7 +17,7 @@ export default function Home() {
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <label>本アプリはshadcn/uiを使って作成しています</label>
+          <p>本アプリはshadcn/uiを使って作成しています</p>
           <Button asChild variant="outline">
             <Link
               href="https://www.shadcn.net/ja/docs/components/button"
