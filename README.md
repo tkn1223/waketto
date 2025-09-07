@@ -1,8 +1,22 @@
 #　起動方法
 
-```
+## コンテナの立ち上げ
+
+```bash
 cd inrfa
 docker compose up -d --build
+```
+
+## バックエンドのコンテナに入る
+
+```bash
+docker compose exec backend bash
+```
+
+## Seed ファイルの実行
+
+```docker
+php artisan db:seed
 ```
 
 ページにアクセス
