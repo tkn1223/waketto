@@ -44,6 +44,7 @@ storage/logs/
 
 # ===== IDE・エディタ =====
 .vscode/
+.cursor/
 .idea/
 .fleet/
 .nova/

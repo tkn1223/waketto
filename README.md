@@ -51,3 +51,9 @@ pnpm eslint src/
 # 特定ファイルのみチェック
 pnpm eslint src/components/Button.tsx
 ```
+
+# 使用技術
+
+認証
+OIDC プロバイダ：Cognito
+フロントエンド：Auth.js
