@@ -22,7 +22,7 @@ export default function DashboardPage() {
       try {
         const authenticated = await isAuthenticated();
         if (!authenticated) {
-          router.push("/login");
+          router.push("/signin");
           return;
         }
 
@@ -72,7 +72,7 @@ export default function DashboardPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={() => router.push("/login")}>
+          <Button onClick={() => router.push("/signin")}>
             ログインページに戻る
           </Button>
         </div>
@@ -81,35 +81,20 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">ダッシュボード</h1>
-          <Button onClick={handleLogout} variant="outline">
-            ログアウト
-          </Button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen">
+      <main className="max-w-7xl mx-auto py-6 px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="px-4 py-5 sm:p-6">
-              <h2 className="text-lg font-medium text-gray-900 mb-4">
-                ユーザー情報
-              </h2>
-            </div>
-          </div>
-
-          <div className="mt-8 bg-white overflow-hidden shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <h2 className="text-lg font-medium text-gray-900 mb-4">
                 家計簿機能
               </h2>
               <p className="text-gray-600 mb-4">
-                認証が正常に動作しています！今後ここに家計簿の機能を追加していきます。
+                正しくログインが行えました！
+                <br />
+                今後ここに家計簿の機能を追加していきます。
               </p>
-              <div className="flex space-x-4">
+              <div className="mt-6 flex space-x-4">
                 <Button>収入を記録</Button>
                 <Button variant="outline">支出を記録</Button>
                 <Button variant="outline">レポートを見る</Button>

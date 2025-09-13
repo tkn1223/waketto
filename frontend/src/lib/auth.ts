@@ -114,7 +114,7 @@ export async function signOutUser() {
 
     // 必要に応じてページをリロードまたはリダイレクト
     if (typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.href = "/signin";
     }
   } catch (error) {
     console.error("Sign out error:", error);
