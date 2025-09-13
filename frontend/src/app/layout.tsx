@@ -9,7 +9,6 @@ import {
   signOutUser,
   type User,
 } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,10 +19,12 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@/components/ui/navigation-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Toggle } from "@/components/ui/toggle";
 
 import "./globals.css";
 import { useEffect, useState } from "react";
-import { LogOut, LogOutIcon, SettingsIcon } from "lucide-react";
+import { Bold, LogOut, LogOutIcon, SettingsIcon } from "lucide-react";
 
 export default function RootLayout({
   children,
@@ -74,7 +75,20 @@ export default function RootLayout({
 
               {!isLoading &&
                 (isAuth ? (
-                  <>
+                  <div className="flex items-center justify-between space-x-3">
+                    <Toggle aria-label="Toggle italic">
+                      <Bold className="h-4 w-4" />
+                    </Toggle>
+                    <Tabs defaultValue="expense">
+                      <TabsList className="w-45">
+                        <TabsTrigger className="w-1/2" value="expense">
+                          支出管理
+                        </TabsTrigger>
+                        <TabsTrigger className="w-1/2" value="budget">
+                          家計簿
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                     <NavigationMenu>
                       <NavigationMenuList>
                         <NavigationMenuItem>
@@ -109,7 +123,7 @@ export default function RootLayout({
                         </NavigationMenuItem>
                       </NavigationMenuList>
                     </NavigationMenu>
-                  </>
+                  </div>
                 ) : null)}
             </div>
           </header>
