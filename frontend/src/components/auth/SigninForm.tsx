@@ -3,23 +3,26 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signInWithCognito } from "@/lib/auth";
+import { Info } from "lucide-react";
 
 export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSigninLoading, setIsSigninLoading] = useState(false);
+  const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSigninLoading(true);
     setError("");
 
     try {
       const result = await signInWithCognito({ email, password });
 
       if (result.success) {
+        window.dispatchEvent(new CustomEvent("signedIn"));
         router.push("/dashboard");
       } else {
         setError(result.error || "ログインに失敗しました");
@@ -27,7 +30,7 @@ export default function SigninForm() {
     } catch (err) {
       setError("予期しないエラーが発生しました");
     } finally {
-      setIsLoading(false);
+      setIsSigninLoading(false);
     }
   };
 
@@ -101,10 +104,10 @@ export default function SigninForm() {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isSigninLoading}
               className="group relative mx-auto flex justify-center py-2 px-15 text-lg font-bold rounded-sm text-white bg-amber-600 hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "ログイン中..." : "ログイン"}
+              {isSigninLoading ? "ログイン中..." : "ログイン"}
             </button>
           </div>
         </form>
@@ -112,10 +115,10 @@ export default function SigninForm() {
         <div>
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isSignupLoading}
             className="mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading
+            {isSignupLoading
               ? "サインアップページへ移動中..."
               : "アカウントを新規作成"}
           </button>
@@ -123,22 +126,8 @@ export default function SigninForm() {
           <div className="mt-6 relative">
             <div className="bg-zinc-50 border border-zinc-200 rounded-lg p-4 shadow-sm">
               <div className="mx-auto flex items-start justify-center">
-                <div>
-                  <svg
-                    className="h-5 w-5 text-zinc-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-3">
+                <div className="ml-3 flex items-center gap-2">
+                  <Info className="w-4 h-4 text-zinc-700" />
                   <p className="text-sm text-zinc-700">
                     初めてご利用の方は、上記ボタンを押してアカウントを作成してください
                   </p>

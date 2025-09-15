@@ -56,4 +56,4 @@ pnpm eslint src/components/Button.tsx
 
 認証
 OIDC プロバイダ：Cognito
-フロントエンド：Auth.js
+フロントエンド：Amplify
