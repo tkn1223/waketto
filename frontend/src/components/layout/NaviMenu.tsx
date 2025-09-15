@@ -28,7 +28,9 @@ export function NaviMenu({ setIsAuth }: NaviMenuProps) {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger>メニュー</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="cursor-pointer">
+            メニュー
+          </NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[200px] gap-4">
               <li>

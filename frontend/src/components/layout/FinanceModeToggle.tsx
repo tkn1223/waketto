@@ -15,14 +15,14 @@ export function FinanceModeToggle({
     <Tabs defaultValue={finance}>
       <TabsList className="w-45">
         <TabsTrigger
-          className="w-1/2"
+          className="w-1/2 cursor-pointer"
           value="expense"
           onClick={() => setFinance("expense")}
         >
           支出管理
         </TabsTrigger>
         <TabsTrigger
-          className="w-1/2"
+          className="w-1/2 cursor-pointer"
           value="budget"
           onClick={() => setFinance("budget")}
         >
