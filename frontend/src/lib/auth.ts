@@ -1,6 +1,8 @@
 import {
   signIn,
   signOut,
+  signUp,
+  confirmSignUp,
   getCurrentUser,
   fetchAuthSession,
 } from "aws-amplify/auth";
@@ -25,6 +27,12 @@ export interface LoginCredentials {
   password: string;
 }
 
+// サインアップ情報の型定義
+export interface SignUpCredentials {
+  email: string;
+  password: string;
+}
+
 // 認証結果の型定義
 export interface AuthResult {
   success: boolean;
@@ -32,6 +40,126 @@ export interface AuthResult {
   idToken?: string;
   refreshToken?: string;
   error?: string;
+}
+
+/**
+ * Cognitoにサインアップしてユーザーを作成
+ */
+export async function signUpWithCognito(
+  credentials: SignUpCredentials
+): Promise<AuthResult> {
+  try {
+    const { isSignUpComplete, userId, nextStep } = await signUp({
+      username: credentials.email,
+      password: credentials.password,
+      options: {
+        userAttributes: {
+          email: credentials.email,
+        },
+        autoSignIn: false, // 自動ログインは無効
+      },
+    });
+
+    if (isSignUpComplete) {
+      return {
+        success: true,
+        error: undefined,
+      };
+    } else if (nextStep.signUpStep === "CONFIRM_SIGN_UP") {
+      return {
+        success: true,
+        error: "確認コードを送信しました。メールをご確認ください。",
+      };
+    }
+
+    return {
+      success: false,
+      error: "サインアップに失敗しました",
+    };
+  } catch (error: unknown) {
+    console.error("Cognito sign up error:", error);
+
+    let errorMessage = "サインアップに失敗しました";
+
+    if (error instanceof Error) {
+      if (error.name === "UsernameExistsException") {
+        errorMessage = "このメールアドレスは既に使用されています";
+      } else if (error.name === "InvalidPasswordException") {
+        errorMessage = "パスワードが要件を満たしていません";
+      } else if (error.name === "InvalidParameterException") {
+        errorMessage = "入力内容に問題があります";
+      }
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * 確認コードでサインアップを完了
+ */
+export async function confirmSignUpWithCognito(
+  email: string,
+  code: string
+): Promise<AuthResult> {
+  try {
+    const { isSignUpComplete } = await confirmSignUp({
+      username: email,
+      confirmationCode: code,
+    });
+
+    if (isSignUpComplete) {
+      // バックエンドAPIでユーザー情報を取得/作成
+      try {
+        const userResponse = await createAuthenticatedRequest("/user");
+        if (userResponse.ok) {
+          return {
+            success: true,
+            error: undefined,
+          };
+        } else {
+          console.error("Backend API error:", userResponse.status);
+          return {
+            success: false,
+            error: "ユーザー情報の取得に失敗しました",
+          };
+        }
+      } catch (apiError) {
+        console.error("Backend API connection error:", apiError);
+        return {
+          success: false,
+          error: `サーバーとの通信に失敗しました: ${apiError instanceof Error ? apiError.message : "Unknown error"}`,
+        };
+      }
+    }
+
+    return {
+      success: false,
+      error: "確認コードが正しくありません",
+    };
+  } catch (error: unknown) {
+    console.error("Cognito confirm sign up error:", error);
+
+    let errorMessage = "確認に失敗しました";
+
+    if (error instanceof Error) {
+      if (error.name === "CodeMismatchException") {
+        errorMessage = "確認コードが正しくありません";
+      } else if (error.name === "ExpiredCodeException") {
+        errorMessage = "確認コードの有効期限が切れています";
+      } else if (error.name === "NotAuthorizedException") {
+        errorMessage = "ユーザーが見つかりません";
+      }
+    }
+
+    return {
+      success: false,
+      error: errorMessage,
+    };
+  }
 }
 
 /**
@@ -141,10 +269,13 @@ export async function createAuthenticatedRequest(
       headers.Authorization = `Bearer ${idToken}`;
     }
 
-    const response = await fetch(`${COGNITO_CONFIG.apiBaseUrl}${endpoint}`, {
-      ...options,
-      headers,
-    });
+    const response = await fetch(
+      `${COGNITO_CONFIG.apiBaseUrl}/api${endpoint}`,
+      {
+        ...options,
+        headers,
+      }
+    );
 
     // 401エラー時に自動ログアウト
     if (response.status === 401) {
