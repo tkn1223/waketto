@@ -20,7 +20,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
+        'cognito_sub',
     ];
 
     /**
@@ -29,8 +29,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        // Cognito認証を使用するため、password関連フィールドは削除済み
     ];
 
     /**
@@ -41,8 +40,24 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            // Cognito認証を使用するため、password関連フィールドは削除済み
         ];
+    }
+
+    /**
+     * Cognito SubでユーザーをIDで検索、存在しない場合は作成
+     */
+    public static function findOrCreateByCognitoSub(string $cognitoSub, array $userData): self
+    {
+        $user = User::where('cognito_sub', $cognitoSub)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'cognito_sub' => $cognitoSub,
+                'name' => $userData['name'] ?? '',
+            ]);
+        }
+
+        return $user;
     }
 }
