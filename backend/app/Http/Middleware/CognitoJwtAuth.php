@@ -15,9 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 class CognitoJwtAuth
 {
     /**
-     * Cognito JWTトークンによる認証
+     * Cognito JWTによる認証
      *
-     * リクエストヘッダーのJWTトークンを検証し
+     * リクエストヘッダーのJWTを検証し
      * 認証されたユーザー情報をリクエストに追加する
      * 
      * @param Request $request 受信したHTTPリクエスト
@@ -67,7 +67,7 @@ class CognitoJwtAuth
     }
 
     /**
-     * JWTトークンを検証してユーザーを取得
+     * JWTを検証してユーザーを取得
      */
     private function validateTokenAndGetUser(string $token): ?User
     {
