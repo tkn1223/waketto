@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'cognito' => [
+        'user_pool_id' => env('COGNITO_USER_POOL_ID'),
+        'client_id' => env('COGNITO_CLIENT_ID'),
+        'region' => env('COGNITO_REGION', 'ap-northeast-1'),
+    ],
+
 ];

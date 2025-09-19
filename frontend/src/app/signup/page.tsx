@@ -97,7 +97,11 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const result = await confirmSignUpWithCognito(email, confirmationCode);
+      const result = await confirmSignUpWithCognito(
+        email,
+        confirmationCode,
+        password
+      );
 
       if (result.success) {
         window.dispatchEvent(new CustomEvent("signedUp"));

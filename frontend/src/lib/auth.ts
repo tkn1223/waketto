@@ -103,7 +103,8 @@ export async function signUpWithCognito(
  */
 export async function confirmSignUpWithCognito(
   email: string,
-  code: string
+  code: string,
+  password: string
 ): Promise<AuthResult> {
   try {
     const { isSignUpComplete } = await confirmSignUp({
@@ -112,37 +113,42 @@ export async function confirmSignUpWithCognito(
     });
 
     if (isSignUpComplete) {
-      // バックエンドAPIでユーザー情報を取得/作成
-      try {
-        const userResponse = await createAuthenticatedRequest("/user");
-        if (userResponse.ok) {
-          return {
-            success: true,
-            error: undefined,
-          };
-        } else {
-          console.error("Backend API error:", userResponse.status);
-          return {
-            success: false,
-            error: "ユーザー情報の取得に失敗しました",
-          };
-        }
-      } catch (apiError) {
-        console.error("Backend API connection error:", apiError);
+      // サインアップ完了後、自動的にログインを実行
+      const signInResult = await signIn({
+        username: email,
+        password: password,
+      });
+
+      if (!signInResult.isSignedIn) {
         return {
           success: false,
-          error: `サーバーとの通信に失敗しました: ${apiError instanceof Error ? apiError.message : "Unknown error"}`,
+          error: "ログインに失敗しました",
+        };
+      }
+
+      // バックエンドAPIでユーザー情報を取得/作成
+      const userResponse = await createAuthenticatedRequest("/user", {
+        method: "GET",
+      });
+      if (userResponse.ok) {
+        return {
+          success: true,
+          error: undefined,
+        };
+      } else {
+        return {
+          success: false,
+          error: "ユーザー情報の取得に失敗しました",
         };
       }
     }
 
     return {
+      // このエラーの可能性ある？だって入力したときの値のはずだから
       success: false,
       error: "確認コードが正しくありません",
     };
   } catch (error: unknown) {
-    console.error("Cognito confirm sign up error:", error);
-
     let errorMessage = "確認に失敗しました";
 
     if (error instanceof Error) {
@@ -152,9 +158,12 @@ export async function confirmSignUpWithCognito(
         errorMessage = "確認コードの有効期限が切れています";
       } else if (error.name === "NotAuthorizedException") {
         errorMessage = "ユーザーが見つかりません";
+      } else {
+        errorMessage = "API接続に失敗しました";
       }
     }
 
+    console.error("Backend API connection error:", errorMessage);
     return {
       success: false,
       error: errorMessage,
@@ -257,25 +266,34 @@ export async function createAuthenticatedRequest(
   options: RequestInit = {}
 ): Promise<Response> {
   try {
+    // congnitoのidトークンを取得
     const session = await fetchAuthSession();
     const idToken = session.tokens?.idToken?.toString();
 
-    const headers: Record<string, string> = {
+    const defaultHeaders: Record<string, string> = {
       "Content-Type": "application/json",
-      ...(options.headers as Record<string, string>),
     };
 
     if (idToken) {
-      headers.Authorization = `Bearer ${idToken}`;
+      defaultHeaders.Authorization = `Bearer ${idToken}`;
+    } else {
+      throw new Error("IDトークンが取得できませんでした");
+      // 取得できなかった時のエラーハンドリングが必要
     }
 
-    const response = await fetch(
-      `${COGNITO_CONFIG.apiBaseUrl}/api${endpoint}`,
-      {
-        ...options,
-        headers,
-      }
-    );
+    // ヘッダー情報が上書きされないよう事前にマージする
+    const mergedHeaders: Record<string, string> = {
+      ...defaultHeaders,
+      // 将来的な拡張のため、オプションでヘッダーを追加可能にする
+      ...(options.headers as Record<string, string>),
+    };
+
+    const url = `${COGNITO_CONFIG.apiBaseUrl}/api${endpoint}`;
+
+    const response = await fetch(url, {
+      ...options,
+      headers: mergedHeaders,
+    });
 
     // 401エラー時に自動ログアウト
     if (response.status === 401) {
@@ -295,7 +313,9 @@ export async function createAuthenticatedRequest(
  */
 export async function getCurrentUserInfo(): Promise<User | null> {
   try {
-    const response = await createAuthenticatedRequest("/user");
+    const response = await createAuthenticatedRequest("/user", {
+      method: "GET",
+    });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
