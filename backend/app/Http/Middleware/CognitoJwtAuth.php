@@ -124,11 +124,8 @@ class CognitoJwtAuth
     private function getUserFromPayload(object $payload): ?User
     {
         $cognitoSub = $payload->sub;
-        $userData = [
-            'name' => $payload->username ?? $payload->{'cognito:username'} ?? '',
-        ];
 
-        return User::findOrCreateByCognitoSub($cognitoSub, $userData);
+        return User::findOrCreateByCognitoSub($cognitoSub);
     }
 
     /**
