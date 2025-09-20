@@ -96,22 +96,18 @@ export default function DashboardPage() {
           return;
         }
 
-        // Laravel API未実装のため、認証確認後にローディング解除
-        setIsLoading(false);
+        // ユーザー情報を取得
+        try {
+          const userData = await getCurrentUserInfo();
 
-        // ユーザー情報を取得（laravelAPI実装後に有効化）
-        // try {
-        //   const userData = await getCurrentUserInfo();
-
-        //   if (userData) {
-        //     setUser(userData);
-        //   } else {
-        //     setError("ユーザー情報の取得に失敗しました");
-        //   }
-        // } catch (error) {
-        //   setError("ユーザー情報の取得に失敗しました");
-        //   console.error("Failed to fetch user:", error);
-        // }
+          if (userData) {
+            setUser(userData);
+            setIsLoading(false);
+          }
+        } catch (error) {
+          setError("ユーザー情報の取得に失敗しました");
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error("Authentication check failed:", error);
         setError("認証チェックに失敗しました");
@@ -177,7 +173,7 @@ export default function DashboardPage() {
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <Card>
               <CardHeader>
-                <CardTitle>支出管理表</CardTitle>
+                <CardTitle>{user?.name} の支出管理表</CardTitle>
               </CardHeader>
               <CardContent>
                 {/* 2x2グリッドレイアウト */}

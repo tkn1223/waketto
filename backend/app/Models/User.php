@@ -43,7 +43,7 @@ class User extends Authenticatable
     /**
      * ユーザーIDを生成
      */
-    private function generateUserId(): string
+    private static function generateUserId(): string
     {
         $chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
         $length = 10;
