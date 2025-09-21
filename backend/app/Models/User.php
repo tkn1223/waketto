@@ -18,7 +18,6 @@ class User extends Authenticatable
         'cognito_sub',
         'couple_id',
         'pair_index',
-
     ];
 
     /**
