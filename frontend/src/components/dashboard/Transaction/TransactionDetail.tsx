@@ -1,32 +1,33 @@
 "use client";
 
-import { useState } from "react";
-import { Store, NotebookPen } from "lucide-react";
+import { useState, useEffect } from "react";
 import { type User } from "@/lib/auth";
 
 import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate";
 import { CategoryList } from "@/components/dashboard/Transaction/CategoryList";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { type TabKey } from "@/components/dashboard/Transaction/Category/categories";
 import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect";
 import { ShopInfo } from "@/components/dashboard/Transaction/ShopInfo";
 import { Memo } from "@/components/dashboard/Transaction/Memo";
 import { Amount } from "./Amount";
+import { getCategories } from "@/lib/api";
+import { CategoryData, CategorySelection } from "@/types/category";
 
 interface TransactionData {
   user: User;
   amount: number;
   date: Date;
-  category: { type: TabKey; value: string } | null;
+  category: CategorySelection | null;
   payer: string;
   shop_name: string;
   memo: string;
 }
 
 export function TransactionDetail({ user }: { user: User }) {
-  // 状態管理と初期値設定
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [categories, setCategories] = useState<CategoryData>({});
   const [transactionData, setTransactionData] = useState<TransactionData>({
     user: user,
     amount: 0,
@@ -37,6 +38,24 @@ export function TransactionDetail({ user }: { user: User }) {
     memo: "",
   });
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setIsLoading(true);
+      try {
+        const response = await getCategories();
+        if (response.status) {
+          setCategories(response.data);
+          console.log(response);
+        }
+      } catch (error) {
+        console.error("カテゴリーの取得に失敗しました", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
   };
@@ -45,9 +64,7 @@ export function TransactionDetail({ user }: { user: User }) {
     setTransactionData((prev) => ({ ...prev, date }));
   };
 
-  const handleCategoryChange = (
-    category: { type: TabKey; value: string } | null
-  ) => {
+  const handleCategoryChange = (category: CategorySelection | null) => {
     setTransactionData((prev) => ({ ...prev, category }));
   };
 
@@ -93,6 +110,7 @@ export function TransactionDetail({ user }: { user: User }) {
             {/* カテゴリー */}
             <div className="w-1/2">
               <CategoryList
+                categories={categories}
                 selected={transactionData.category}
                 onSelectionChange={handleCategoryChange}
               />

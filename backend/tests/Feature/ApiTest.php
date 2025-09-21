@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\User;
 
 class ApiTest extends TestCase
 {
@@ -14,6 +15,19 @@ class ApiTest extends TestCase
     {
         $response = $this->get('/api/health');
         $response->assertStatus(200);
+    }
+
+    /**
+     * APIのテスト
+     */
+    public function test_api_return_success(): void
+    {
+        $user = User::factory()->create();
+        $this->withoutMiddleware();
+        $this->app['request']->attributes->set('auth_user', $user);
+
+        $categoriesResponse = $this->get('/api/categories');
+        $categoriesResponse->assertStatus(200);
     }
 
     /**

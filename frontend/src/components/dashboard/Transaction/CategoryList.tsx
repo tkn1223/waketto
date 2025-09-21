@@ -13,26 +13,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import {
-  tabItems,
-  optionsByKey,
-  type TabKey,
-} from "@/components/dashboard/Transaction/Category/categories";
-
-interface CategoryListProps {
-  selected: {
-    type: TabKey;
-    value: string;
-  } | null;
-  onSelectionChange: (
-    selected: {
-      type: TabKey;
-      value: string;
-    } | null
-  ) => void;
-}
+import { CategoryListProps, CategorySelection } from "@/types/category";
 
 export function CategoryList({
+  categories,
   selected,
   onSelectionChange,
 }: CategoryListProps) {
@@ -43,6 +27,15 @@ export function CategoryList({
     setCategoryOpen(false);
   };
 
+  // カテゴリーデータからタブアイテムを生成
+  const tabItems = Object.entries(categories).map(([groupCode, groupData]) => ({
+    key: groupCode,
+    label: groupData.group_name,
+  }));
+
+  // デフォルトタブを設定（最初のタブ）
+  const defaultTab = tabItems.length > 0 ? tabItems[0].key : "";
+
   return (
     <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
       {/* カテゴリー選択ボタン */}
@@ -52,13 +45,14 @@ export function CategoryList({
           className="inline-flex w-full items-center justify-between gap-2 truncate"
         >
           <Folder />
-          {selected ? `${selected.value}` : "未分類"}
+          {selected ? getSelectedCategoryName(categories, selected) : "未分類"}
           <ChevronDown className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
+      
       {/* カテゴリー選択ポップオーバー */}
       <PopoverContent align="end" className="w-[300px] p-0">
-        <Tabs defaultValue="monthly_fixed_cost" className="w-full">
+        <Tabs defaultValue={defaultTab} className="w-full">
           {/* タブ上部：タブリスト */}
           <div className="sticky top-0 z-10 bg-gray-200 rounded-t-md">
             <TabsList className="grid w-full grid-cols-3 grid-rows-2 gap-1 p-1 bg-transparent h-auto">
@@ -82,14 +76,14 @@ export function CategoryList({
                   }}
                 >
                   <ul className="space-y-1">
-                    {optionsByKey[t.key].map((opt) => (
-                      <li key={opt}>
+                    {categories[t.key]?.categories.map((category) => (
+                      <li key={category.code}>
                         <label
                           className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 hover:bg-accent"
-                          htmlFor={`${t.key}-${opt}`}
+                          htmlFor={`${t.key}-${category.code}`}
                         >
-                          <RadioGroupItem id={`${t.key}-${opt}`} value={opt} />
-                          <span className="flex-1 text-sm">{opt}</span>
+                          <RadioGroupItem id={`${t.key}-${category.code}`} value={category.code} />
+                          <span className="flex-1 text-sm">{category.name}</span>
                         </label>
                       </li>
                     ))}
@@ -99,7 +93,7 @@ export function CategoryList({
             </TabsContent>
           ))}
 
-          {/* タブ下部：ボタン （必要なら追って追加） */}
+          {/* タブ下部：ボタン */}
           <Separator />
           <div className="flex items-center justify-between px-3 py-2">
             <Button variant="ghost" size="sm" onClick={() => clearSelections()}>
@@ -110,4 +104,13 @@ export function CategoryList({
       </PopoverContent>
     </Popover>
   );
+}
+
+// 選択されたカテゴリーの名前を取得するヘルパー関数
+function getSelectedCategoryName(categories: any, selected: CategorySelection): string {
+  const group = categories[selected.type];
+  if (!group) return "未分類";
+  
+  const category = group.categories.find((cat: any) => cat.code === selected.value);
+  return category ? category.name : "未分類";
 }
