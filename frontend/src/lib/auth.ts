@@ -16,6 +16,7 @@ const COGNITO_CONFIG = {
 export interface User {
   id: number;
   name: string;
+  user_id: string;
   email: string;
   cognito_sub: string;
   created_at: string;
