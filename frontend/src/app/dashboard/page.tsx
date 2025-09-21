@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { getCurrentUserInfo, isAuthenticated, type User } from "@/lib/auth";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -205,7 +205,7 @@ export default function DashboardPage() {
         </div>
         {/* 取引明細カード */}
         <div className="lg:col-span-1">
-          <TransactionDetail />
+          <TransactionDetail user={user!} />
         </div>
         {/* 予算消化率 */}
         <div className="col-span-3 space-y-3">
