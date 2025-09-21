@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { type User } from "@/lib/auth";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -16,7 +13,7 @@ export function PayerSelect({ user, payer, onPayerChange }: PayerSelectProps) {
 
   return (
     <>
-      <div>支払った人</div>
+      <p>支払った人</p>
 
       <ToggleGroup
         className="flex overflow-hidden rounded-xl border shadow-sm"
