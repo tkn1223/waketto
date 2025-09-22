@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signOutUser } from "@/lib/auth";
+import { LogOutIcon, SettingsIcon } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,8 +9,8 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { SettingsIcon, LogOutIcon } from "lucide-react";
+} from "@/components/ui/navigation-menu.tsx";
+import { signOutUser } from "@/lib/auth.ts";
 
 interface NaviMenuProps {
   setIsAuth: (isAuth: boolean) => void;
@@ -24,6 +24,7 @@ export function NaviMenu({ setIsAuth }: NaviMenuProps) {
     // localStorageをクリア
     localStorage.clear();
   };
+
   return (
     <NavigationMenu>
       <NavigationMenuList>
@@ -43,7 +44,7 @@ export function NaviMenu({ setIsAuth }: NaviMenuProps) {
                 <NavigationMenuLink asChild>
                   <Link
                     href="#"
-                    onClick={handleSignOut}
+                    onClick={() => void handleSignOut()}
                     className="flex-row items-center gap-2"
                   >
                     <LogOutIcon />

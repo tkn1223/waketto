@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { format } from "date-fns";
 import { CalendarIcon, ChevronDownIcon } from "lucide-react";
+import { Button } from "@/components/ui/button.tsx";
+import { Calendar } from "@/components/ui/calendar.tsx";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
-import { Button } from "@/components/ui/button";
+  PopoverTrigger,
+} from "@/components/ui/popover.tsx";
 
 interface RegisteredDateProps {
   date: Date;

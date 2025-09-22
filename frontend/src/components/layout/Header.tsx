@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FinanceModeToggle } from "./FinanceModeToggle";
-import { NaviMenu } from "./NaviMenu";
-import { UserModeToggle } from "./UserModeToggle";
+import { FinanceModeToggle } from "./FinanceModeToggle.tsx";
+import { NaviMenu } from "./NaviMenu.tsx";
+import { UserModeToggle } from "./UserModeToggle.tsx";
 
 interface HeaderProps {
   isLoading: boolean;

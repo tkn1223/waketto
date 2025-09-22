@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentUserInfo, isAuthenticated, type User } from "@/lib/auth";
-
-import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail";
+import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import { getCurrentUserInfo, isAuthenticated, type User } from "@/lib/auth.ts";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User>();
@@ -22,8 +25,10 @@ export default function DashboardPage() {
     const checkAuth = async () => {
       try {
         const authenticated = await isAuthenticated();
+
         if (!authenticated) {
           router.push("/signin");
+
           return;
         }
 
@@ -35,7 +40,7 @@ export default function DashboardPage() {
             setUser(userData);
             setIsLoading(false);
           }
-        } catch (error) {
+        } catch (_error) {
           setError("ユーザー情報の取得に失敗しました");
           setIsLoading(false);
         }

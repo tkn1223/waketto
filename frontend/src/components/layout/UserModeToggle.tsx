@@ -1,8 +1,7 @@
 "use client";
 
-import { Toggle } from "@/components/ui/toggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Users } from "lucide-react";
+import { Toggle } from "@/components/ui/toggle.tsx";
 
 interface UserModeToggleProps {
   user: string;

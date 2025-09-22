@@ -1,18 +1,17 @@
 "use client";
 
-import { signUpWithCognito, confirmSignUpWithCognito } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useRef } from "react";
-import { Eye, EyeOff } from "lucide-react";
-
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { Eye, EyeOff } from "lucide-react";
+import { Button } from "@/components/ui/button.tsx";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp";
+} from "@/components/ui/input-otp.tsx";
+import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -47,7 +46,7 @@ export default function SignupPage() {
       } else {
         setError(result.error || "アカウント作成に失敗しました");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("アカウント作成中に、予期しないエラーが発生しました");
     } finally {
       setIsSignupLoading(false);
@@ -88,21 +87,26 @@ export default function SignupPage() {
     if (password.length < 8) {
       errors.push("8文字以上で入力してください");
     }
+
     if (!/\d/.test(password)) {
       errors.push("少なくとも1つの数字を含めてください");
     }
     const specialChars = /[$*.[\]{}()?\-"!@#%&/\\,><':;|_~`+=]/;
+
     if (!specialChars.test(password)) {
       errors.push(
         "少なくとも1つの特殊文字を含めてください（例: ~ $ * . [ ] { } ( ) ? - \" ! @ # % & / \\ , > < ' : ; | _ ` + =）"
       );
     }
+
     if (!/[A-Z]/.test(password)) {
       errors.push("少なくとも1つの大文字を含めてください");
     }
+
     if (!/[a-z]/.test(password)) {
       errors.push("少なくとも1つの小文字を含めてください");
     }
+
     return errors;
   };
 
@@ -131,7 +135,7 @@ export default function SignupPage() {
           <h1 className="text-2xl font-bold text-center">メールアドレス認証</h1>
 
           <form
-            onSubmit={handleConfirmSubmit}
+            onSubmit={(e) => void handleConfirmSubmit(e)}
             className="px-10 py-8 rounded-sm shadow-sm bg-sky-50"
           >
             <div className="mb-12 flex flex-col items-center">
@@ -222,7 +226,7 @@ export default function SignupPage() {
         </div>
         <form
           className="px-10 py-8 rounded-sm shadow-sm bg-sky-50 mb-15"
-          onSubmit={handleSubmit}
+          onSubmit={(e) => void handleSubmit(e)}
         >
           <div>
             <div className="mb-6">
