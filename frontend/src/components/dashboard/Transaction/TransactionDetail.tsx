@@ -1,18 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { type User } from "@/lib/auth";
-
-import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate";
-import { CategoryList } from "@/components/dashboard/Transaction/CategoryList";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect";
-import { ShopInfo } from "@/components/dashboard/Transaction/ShopInfo";
-import { Memo } from "@/components/dashboard/Transaction/Memo";
-import { Amount } from "./Amount";
-import { getCategories } from "@/lib/api";
-import { CategoryData, CategorySelection } from "@/types/category";
+import { useEffect, useState } from "react";
+import { CategoryList } from "@/components/dashboard/Transaction/CategoryList.tsx";
+import { Memo } from "@/components/dashboard/Transaction/Memo.tsx";
+import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect.tsx";
+import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate.tsx";
+import { ShopInfo } from "@/components/dashboard/Transaction/ShopInfo.tsx";
+import { Button } from "@/components/ui/button.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
+import { getCategories } from "@/lib/api.ts";
+import { type User } from "@/lib/auth.ts";
+import type { CategoryData, CategorySelection } from "@/types/category.ts";
+import { Amount } from "./Amount.tsx";
 
 interface TransactionData {
   user: User;
@@ -25,8 +29,8 @@ interface TransactionData {
 }
 
 export function TransactionDetail({ user }: { user: User }) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [_isLoading, setIsLoading] = useState(false);
+  const [_error, _setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryData>({});
   const [transactionData, setTransactionData] = useState<TransactionData>({
     user: user,
@@ -43,6 +47,7 @@ export function TransactionDetail({ user }: { user: User }) {
       setIsLoading(true);
       try {
         const response = await getCategories();
+
         if (response.status) {
           setCategories(response.data);
           console.log(response);
@@ -53,7 +58,7 @@ export function TransactionDetail({ user }: { user: User }) {
         setIsLoading(false);
       }
     };
-    fetchCategories();
+    void fetchCategories();
   }, []);
 
   const handleAmountChange = (amount: number) => {

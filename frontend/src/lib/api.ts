@@ -1,24 +1,21 @@
 import { fetchAuthSession } from "aws-amplify/auth";
+import type { CategoryData } from "@/types/category.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
 };
 
-interface JsonResponse {
-  [key: string]: any;
-}
-
 interface CategoriesResponse {
   status: boolean;
-  data: any;
+  data: CategoryData;
 }
 
 export async function getCategories(): Promise<CategoriesResponse> {
   return await fetchApi<CategoriesResponse>("/categories");
 }
 
-export async function fetchApi<T extends JsonResponse = JsonResponse>(
+export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
@@ -55,5 +52,5 @@ export async function fetchApi<T extends JsonResponse = JsonResponse>(
     throw new Error(`APIリクエストに失敗しました: ${response.statusText}`);
   }
 
-  return await response.json();
+  return response.json() as T;
 }

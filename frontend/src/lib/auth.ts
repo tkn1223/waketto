@@ -1,10 +1,10 @@
 import {
+  confirmSignUp,
+  fetchAuthSession,
+  getCurrentUser,
   signIn,
   signOut,
   signUp,
-  confirmSignUp,
-  getCurrentUser,
-  fetchAuthSession,
 } from "aws-amplify/auth";
 
 // 環境変数の型定義
@@ -50,7 +50,7 @@ export async function signUpWithCognito(
   credentials: SignUpCredentials
 ): Promise<AuthResult> {
   try {
-    const { isSignUpComplete, userId, nextStep } = await signUp({
+    const { isSignUpComplete, nextStep } = await signUp({
       username: credentials.email,
       password: credentials.password,
       options: {
@@ -131,6 +131,7 @@ export async function confirmSignUpWithCognito(
       const userResponse = await createAuthenticatedRequest("/user", {
         method: "GET",
       });
+
       if (userResponse.ok) {
         return {
           success: true,
@@ -165,6 +166,7 @@ export async function confirmSignUpWithCognito(
     }
 
     console.error("Backend API connection error:", errorMessage);
+
     return {
       success: false,
       error: errorMessage,
@@ -237,6 +239,7 @@ export async function signInWithCognito(
 export async function isAuthenticated(): Promise<boolean> {
   try {
     const user = await getCurrentUser();
+
     return !!user;
   } catch {
     return false;
@@ -322,10 +325,12 @@ export async function getCurrentUserInfo(): Promise<User | null> {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const user = await response.json();
-    return user as User;
+    const user = (await response.json()) as User;
+
+    return user;
   } catch (error) {
     console.error("Failed to get current user:", error);
+
     return null;
   }
 }

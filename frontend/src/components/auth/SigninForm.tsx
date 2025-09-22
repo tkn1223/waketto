@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signInWithCognito } from "@/lib/auth";
 import { Info } from "lucide-react";
+import { signInWithCognito } from "@/lib/auth.ts";
 
 export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSigninLoading, setIsSigninLoading] = useState(false);
-  const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const [isSignupLoading, _setIsSignupLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
 
@@ -27,7 +27,7 @@ export default function SigninForm() {
       } else {
         setError(result.error || "ログインに失敗しました");
       }
-    } catch (err) {
+    } catch (_err) {
       setError("予期しないエラーが発生しました");
     } finally {
       setIsSigninLoading(false);
@@ -58,7 +58,7 @@ export default function SigninForm() {
         </div>
         <form
           className="px-10 py-8 rounded-sm shadow-sm bg-sky-50 mb-15"
-          onSubmit={handleSubmit}
+          onSubmit={(e) => void handleSubmit(e)}
         >
           <div>
             <div className="mb-6">
@@ -114,11 +114,9 @@ export default function SigninForm() {
 
         <div>
           <button
-            type="submit"
+            type="button"
             disabled={isSignupLoading}
-            onClick={() => {
-              router.push("/signup");
-            }}
+            onClick={() => router.push("/signup")}
             className="mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSignupLoading

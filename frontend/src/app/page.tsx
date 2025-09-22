@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth.ts";
 
 export default function Home() {
   const router = useRouter();
@@ -11,6 +11,7 @@ export default function Home() {
     // 認証チェックとリダイレクト
     const checkAuthAndRedirect = async () => {
       const authenticated = await isAuthenticated();
+
       if (authenticated) {
         // 認証済みの場合はダッシュボードにリダイレクト
         router.push("/dashboard");

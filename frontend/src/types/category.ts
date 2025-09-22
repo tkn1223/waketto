@@ -10,9 +10,7 @@ export interface CategoryGroup {
   categories: Category[];
 }
 
-export interface CategoryData {
-  [groupCode: string]: CategoryGroup;
-}
+export type CategoryData = Record<string, CategoryGroup>;
 
 export interface CategorySelection {
   type: string; // group_code

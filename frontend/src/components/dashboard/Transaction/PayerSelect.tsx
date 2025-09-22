@@ -1,6 +1,5 @@
-import { type User } from "@/lib/auth";
-
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
+import { type User } from "@/lib/auth.ts";
 
 interface PayerSelectProps {
   user: User;

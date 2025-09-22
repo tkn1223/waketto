@@ -28,6 +28,7 @@ export function Amount({ amount, onAmountChange }: AmountProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // カンマを削除して数値のみを取得
     const value = e.target.value.replace(/,/g, "");
+
     if (/^[0-9]*$/.test(value)) {
       const numericValue = parseInt(value || "0", 10);
       setDisplayValue(formatNumber(numericValue));

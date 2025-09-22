@@ -1,19 +1,28 @@
 "use client";
 
-import { Folder, ChevronDown } from "lucide-react";
 import { useState } from "react";
-
+import { ChevronDown, Folder } from "lucide-react";
+import { Button } from "@/components/ui/button.tsx";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
-} from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { CategoryListProps, CategorySelection } from "@/types/category";
+  PopoverTrigger,
+} from "@/components/ui/popover.tsx";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.tsx";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import { Separator } from "@/components/ui/separator.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs.tsx";
+import type {
+  Category,
+  CategoryData,
+  CategoryListProps,
+  CategorySelection,
+} from "@/types/category.ts";
 
 export function CategoryList({
   categories,
@@ -49,7 +58,7 @@ export function CategoryList({
           <ChevronDown className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      
+
       {/* カテゴリー選択ポップオーバー */}
       <PopoverContent align="end" className="w-[300px] p-0">
         <Tabs defaultValue={defaultTab} className="w-full">
@@ -82,8 +91,13 @@ export function CategoryList({
                           className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 hover:bg-accent"
                           htmlFor={`${t.key}-${category.code}`}
                         >
-                          <RadioGroupItem id={`${t.key}-${category.code}`} value={category.code} />
-                          <span className="flex-1 text-sm">{category.name}</span>
+                          <RadioGroupItem
+                            id={`${t.key}-${category.code}`}
+                            value={category.code}
+                          />
+                          <span className="flex-1 text-sm">
+                            {category.name}
+                          </span>
                         </label>
                       </li>
                     ))}
@@ -96,7 +110,11 @@ export function CategoryList({
           {/* タブ下部：ボタン */}
           <Separator />
           <div className="flex items-center justify-between px-3 py-2">
-            <Button variant="ghost" size="sm" onClick={() => clearSelections()}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void clearSelections()}
+            >
               クリア
             </Button>
           </div>
@@ -107,10 +125,17 @@ export function CategoryList({
 }
 
 // 選択されたカテゴリーの名前を取得するヘルパー関数
-function getSelectedCategoryName(categories: any, selected: CategorySelection): string {
+function getSelectedCategoryName(
+  categories: CategoryData,
+  selected: CategorySelection
+): string {
   const group = categories[selected.type];
+
   if (!group) return "未分類";
-  
-  const category = group.categories.find((cat: any) => cat.code === selected.value);
+
+  const category = group.categories.find(
+    (cat: Category) => cat.code === selected.value
+  );
+
   return category ? category.name : "未分類";
 }

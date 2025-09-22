@@ -1,12 +1,12 @@
 "use client";
 
-import AmplifyProvider from "@/components/auth/AmplifyProvider";
-import { getCurrentUserInfo, isAuthenticated, type User } from "@/lib/auth";
-import { Footer } from "@/components/layout/Footer";
-import { Header } from "@/components/layout/Header";
+import { useEffect, useState } from "react";
+import AmplifyProvider from "@/components/auth/AmplifyProvider.tsx";
+import { Footer } from "@/components/layout/Footer.tsx";
+import { Header } from "@/components/layout/Header.tsx";
+import { isAuthenticated } from "@/lib/auth.ts";
 
 import "./globals.css";
-import { useEffect, useState } from "react";
 
 export default function RootLayout({
   children,
@@ -19,12 +19,14 @@ export default function RootLayout({
     if (typeof window !== "undefined") {
       return localStorage.getItem("userMode") || "alone";
     }
+
     return "alone"; // alone or common （個人 or 共有）
   });
   const [finance, setFinance] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("financeMode") || "expense";
     }
+
     return "expense";
   });
 
@@ -37,10 +39,10 @@ export default function RootLayout({
 
     void checkAuth();
     // 初回ログイン後にメニューが表示されるため
-    window.addEventListener("signedIn", checkAuth);
+    window.addEventListener("signedIn", () => void checkAuth());
 
     return () => {
-      window.removeEventListener("signedIn", checkAuth);
+      window.removeEventListener("signedIn", () => void checkAuth());
     };
   }, []);
 

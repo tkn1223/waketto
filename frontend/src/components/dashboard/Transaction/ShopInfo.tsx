@@ -1,6 +1,5 @@
 import { Store } from "lucide-react";
-
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/input.tsx";
 
 interface ShopInfoProps {
   shop_name: string;
@@ -13,6 +12,7 @@ export function ShopInfo({ shop_name, onShopNameChange }: ShopInfoProps) {
       e.currentTarget.blur();
     }
   };
+
   return (
     <>
       <Store className="size-6 text-gray-500" />
