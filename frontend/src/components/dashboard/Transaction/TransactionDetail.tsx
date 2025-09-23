@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { format } from "date-fns";
 import { CategoryList } from "@/components/dashboard/Transaction/CategoryList.tsx";
 import { Memo } from "@/components/dashboard/Transaction/Memo.tsx";
 import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect.tsx";
@@ -15,18 +16,13 @@ import {
 } from "@/components/ui/card.tsx";
 import { getCategories } from "@/lib/api.ts";
 import { type User } from "@/lib/auth.ts";
-import type { CategoryData, CategorySelection } from "@/types/category.ts";
+import type {
+  TransactionData,
+  CategoryData,
+  CategorySelection,
+} from "@/types/transaction.ts";
 import { Amount } from "./Amount.tsx";
-
-interface TransactionData {
-  user: User;
-  amount: number;
-  date: Date;
-  category: CategorySelection | null;
-  payer: string;
-  shop_name: string;
-  memo: string;
-}
+import { postTransaction } from "@/lib/api.ts";
 
 export function TransactionDetail({ user }: { user: User }) {
   const [_isLoading, setIsLoading] = useState(false);
@@ -52,8 +48,8 @@ export function TransactionDetail({ user }: { user: User }) {
           setCategories(response.data);
           console.log(response);
         }
-      } catch (error) {
-        console.error("カテゴリーの取得に失敗しました", error);
+      } catch (err) {
+        console.error("カテゴリーの取得に失敗しました", err);
       } finally {
         setIsLoading(false);
       }
@@ -85,8 +81,23 @@ export function TransactionDetail({ user }: { user: User }) {
     setTransactionData((prev) => ({ ...prev, memo }));
   };
 
-  const handleSave = () => {
-    console.log(transactionData);
+  const isSaveDisabled =
+    transactionData.amount <= 0 || transactionData.category === null;
+
+  const handleSave = async () => {
+    const requestData = {
+      ...transactionData,
+      date: format(transactionData.date, "yyyy-MM-dd"),
+      category: parseInt(transactionData.category?.value || ""),
+    };
+
+    const response = await postTransaction(requestData);
+
+    if (response.status) {
+      console.log("取引明細を保存しました");
+    } else {
+      console.error("取引明細の保存に失敗しました");
+    }
   };
 
   return (
@@ -133,7 +144,7 @@ export function TransactionDetail({ user }: { user: User }) {
           <div className="bg-gray-100 p-2 text-center">支出の詳細</div>
 
           {/* お店の名前 */}
-          <div className="flex justify-between items-center gap-3">
+          <div>
             <ShopInfo
               shop_name={transactionData.shop_name}
               onShopNameChange={handleShopNameChange}
@@ -141,11 +152,15 @@ export function TransactionDetail({ user }: { user: User }) {
           </div>
 
           {/* メモ */}
-          <div className="flex justify-between items-center gap-3">
+          <div>
             <Memo memo={transactionData.memo} onMemoChange={handleMemoChange} />
           </div>
 
-          <Button className="w-full text-xl h-12" onClick={handleSave}>
+          <Button
+            className="w-full text-xl h-12"
+            onClick={handleSave}
+            disabled={isSaveDisabled}
+          >
             保存する
           </Button>
         </CardContent>

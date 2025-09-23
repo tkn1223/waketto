@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $categories = Category::select('name', 'code', 'group_code')
+        $categories = Category::select('id', 'name', 'code', 'group_code')
             ->with('categoryGroup:code,name')
             ->get();
         
@@ -33,6 +33,7 @@ class CategoryController extends Controller
             }
             
             $groupedData[$groupCode]['categories'][] = [
+                'id' => $category->id,
                 'name' => $category->name,
                 'code' => $category->code
             ];

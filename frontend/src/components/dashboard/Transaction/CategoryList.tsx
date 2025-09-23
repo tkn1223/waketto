@@ -22,7 +22,7 @@ import type {
   CategoryData,
   CategoryListProps,
   CategorySelection,
-} from "@/types/category.ts";
+} from "@/types/transaction.ts";
 
 export function CategoryList({
   categories,
@@ -86,14 +86,14 @@ export function CategoryList({
                 >
                   <ul className="space-y-1">
                     {categories[t.key]?.categories.map((category) => (
-                      <li key={category.code}>
+                      <li key={category.id}>
                         <label
                           className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1 hover:bg-accent"
-                          htmlFor={`${t.key}-${category.code}`}
+                          htmlFor={`${t.key}-${category.id}`}
                         >
                           <RadioGroupItem
-                            id={`${t.key}-${category.code}`}
-                            value={category.code}
+                            id={`${t.key}-${category.id}`}
+                            value={category.id.toString()}
                           />
                           <span className="flex-1 text-sm">
                             {category.name}
@@ -134,7 +134,7 @@ function getSelectedCategoryName(
   if (!group) return "未分類";
 
   const category = group.categories.find(
-    (cat: Category) => cat.code === selected.value
+    (cat: Category) => cat.id.toString() === selected.value
   );
 
   return category ? category.name : "未分類";
