@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface AmountProps {
   amount: number;
@@ -17,6 +17,11 @@ const parseNumber = (str: string): number => {
 
 export function Amount({ amount, onAmountChange }: AmountProps) {
   const [displayValue, setDisplayValue] = useState(() => formatNumber(amount));
+
+  // 金額が変更されたときに表示を更新（リセット時に必須）
+  useEffect(() => {
+    setDisplayValue(formatNumber(amount));
+  }, [amount]);
 
   // フォーカスが外れたときに数値を保存
   const handleBlur = () => {
