@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Toaster } from "@/components/ui/sonner.tsx";
 import AmplifyProvider from "@/components/auth/AmplifyProvider.tsx";
 import { Footer } from "@/components/layout/Footer.tsx";
 import { Header } from "@/components/layout/Header.tsx";
@@ -74,6 +75,7 @@ export default function RootLayout({
             setFinance={setFinance}
           />
           {children}
+          <Toaster position="top-center" richColors />
           <Footer />
         </AmplifyProvider>
       </body>

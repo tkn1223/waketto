@@ -23,9 +23,9 @@ import type {
 } from "@/types/transaction.ts";
 import { Amount } from "./Amount.tsx";
 import { postTransaction } from "@/lib/api.ts";
+import { toast } from "sonner";
 
 export function TransactionDetail({ user }: { user: User }) {
-  const [_isLoading, setIsLoading] = useState(false);
   const [_error, _setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryData>({});
   const [transactionData, setTransactionData] = useState<TransactionData>({
@@ -40,18 +40,16 @@ export function TransactionDetail({ user }: { user: User }) {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      setIsLoading(true);
       try {
         const response = await getCategories();
 
         if (response.status) {
           setCategories(response.data);
-          console.log(response);
         }
       } catch (err) {
-        console.error("カテゴリーの取得に失敗しました", err);
-      } finally {
-        setIsLoading(false);
+        toast.error("カテゴリーの取得に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
       }
     };
     void fetchCategories();
@@ -85,18 +83,38 @@ export function TransactionDetail({ user }: { user: User }) {
     transactionData.amount <= 0 || transactionData.category === null;
 
   const handleSave = async () => {
-    const requestData = {
-      ...transactionData,
-      date: format(transactionData.date, "yyyy-MM-dd"),
-      category: parseInt(transactionData.category?.value || ""),
-    };
+    try {
+      const requestData = {
+        ...transactionData,
+        date: format(transactionData.date, "yyyy-MM-dd"),
+        category: parseInt(transactionData.category?.value || ""),
+      };
 
-    const response = await postTransaction(requestData);
+      const response = await postTransaction(requestData);
 
-    if (response.status) {
-      console.log("取引明細を保存しました");
-    } else {
-      console.error("取引明細の保存に失敗しました");
+      if (response.status) {
+        toast.success("取引明細を保存しました", {
+          className: "!bg-yellow-600 !text-white !border-yellow-800",
+        });
+      } else {
+        toast.error("取引明細の保存に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
+      }
+    } catch (error) {
+      toast.error("取引明細の保存に失敗しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
+    } finally {
+      setTransactionData((prev) => ({
+        ...prev,
+        amount: 0,
+        date: new Date(),
+        category: null,
+        payer: user.user_id,
+        shop_name: "",
+        memo: "",
+      }));
     }
   };
 
