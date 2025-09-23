@@ -40,12 +40,12 @@ export default function DashboardPage() {
             setUser(userData);
             setIsLoading(false);
           }
-        } catch (_error) {
+        } catch (_err) {
           setError("ユーザー情報の取得に失敗しました");
           setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Authentication check failed:", error);
+      } catch (err) {
+        console.error("Authentication check failed:", err);
         setError("認証チェックに失敗しました");
         setIsLoading(false);
       }
