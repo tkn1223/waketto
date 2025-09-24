@@ -23,11 +23,20 @@ class ApiTest extends TestCase
     public function test_api_return_success(): void
     {
         $user = User::factory()->create();
-        $this->withoutMiddleware();
-        $this->app['request']->attributes->set('auth_user', $user);
+
+        // ミドルウェアをモック
+        $this->mock(\App\Http\Middleware\CognitoJwtAuth::class, function ($mock) use ($user) {
+            $mock->shouldReceive('handle')
+                ->andReturnUsing(function ($request, $next) use ($user) {
+                    $request->attributes->set('auth_user', $user);
+                    return $next($request);
+                });
+        });
 
         $categoriesResponse = $this->get('/api/categories');
+        $expenseReportResponse = $this->get('/api/expense-report');
         $categoriesResponse->assertStatus(200);
+        $expenseReportResponse->assertStatus(200);
     }
 
     /**

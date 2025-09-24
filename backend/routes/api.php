@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ExpenseReportController;
 use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -27,8 +28,17 @@ Route::middleware('cognito')->get('/user', function (Request $request) {
 Route::middleware('cognito')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
+
+    // 初回表示時のルート
     Route::get('/categories', [CategoryController::class, 'index']);
-    Route::post('/transactions', [TransactionController::class, 'store']);
+
+    // 取引明細関連のルート
+    Route::prefix('transaction')->group(function () {
+        Route::post('/', [TransactionController::class, 'store']);
+    });
+
+    // 支出管理表関連のルート
+    Route::get('/expense-report', [ExpenseReportController::class, 'index']);
 });
 
 // パブリックルート（認証不要）

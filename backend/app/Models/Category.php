@@ -22,6 +22,6 @@ class Category extends Model
 
     public function payment()
     {
-        return $this->hasMany(Payment::class, 'category_id', 'code');
+        return $this->hasMany(Payment::class, 'category_id', 'id');
     }
 }

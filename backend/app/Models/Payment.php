@@ -21,7 +21,7 @@ class Payment extends Model
 
   public function category()
   {
-      return $this->belongsTo(Category::class, 'category_id', 'code');
+      return $this->belongsTo(Category::class, 'category_id', 'id');
   }
 
   public static function newPaymentRecord($data, $user_id)
