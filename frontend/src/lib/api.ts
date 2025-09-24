@@ -18,11 +18,16 @@ export async function getCategories(): Promise<CategoriesResponse> {
   return await fetchApi<CategoriesResponse>("/categories");
 }
 
+// 支出管理表の一覧を取得
+export async function getExpenseReport(): Promise<any> {
+  return await fetchApi<any>("/expense-report");
+}
+
 // 取引明細を保存
 export async function postTransaction(
   requestData: TransactionRequestData
 ): Promise<Response> {
-  return await fetchApi<Response>("/transactions", {
+  return await fetchApi<Response>("/transaction", {
     method: "POST",
     body: JSON.stringify(requestData),
   });

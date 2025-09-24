@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { getCurrentUserInfo, isAuthenticated, type User } from "@/lib/auth.ts";
+import { getExpenseReport } from "@/lib/api.ts";
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User>();
@@ -53,6 +54,18 @@ export default function DashboardPage() {
 
     void checkAuth();
   }, [router]);
+
+  useEffect(() => {
+    const fetchExpenseReport = async () => {
+      const response = await getExpenseReport();
+      if (response.status) {
+        console.log(response.data);
+      } else {
+        console.error("支出管理表の取得に失敗しました");
+      }
+    };
+    void fetchExpenseReport();
+  }, []);
 
   if (isLoading) {
     return (
