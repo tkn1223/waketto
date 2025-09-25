@@ -3,6 +3,7 @@ import type {
   TransactionRequestData,
   CategoriesResponse,
 } from "@/types/transaction.ts";
+import { signOutUser } from "@/lib/auth.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
@@ -40,8 +41,11 @@ export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // セッションを強制的にリフレッシュ
+  const session = await fetchAuthSession({
+    forceRefresh: true,
+  });
   // congnitoのidトークンを取得
-  const session = await fetchAuthSession();
   const idToken = session.tokens?.idToken?.toString();
 
   const defaultHeaders: Record<string, string> = {
@@ -51,8 +55,8 @@ export async function fetchApi<T>(
   if (idToken) {
     defaultHeaders.Authorization = `Bearer ${idToken}`;
   } else {
-    throw new Error("IDトークンが取得できませんでした");
-    // 取得できなかった時のエラーハンドリングが必要
+    console.error("IDトークンが取得できませんでした");
+    await signOutUser();
   }
 
   // ヘッダー情報が上書きされないよう事前にマージする
