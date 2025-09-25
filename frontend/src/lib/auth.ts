@@ -253,6 +253,9 @@ export async function signOutUser() {
   try {
     await signOut();
 
+    localStorage.clear();
+    sessionStorage.clear();
+
     // 必要に応じてページをリロードまたはリダイレクト
     if (typeof window !== "undefined") {
       window.location.href = "/signin";
