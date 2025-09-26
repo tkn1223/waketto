@@ -41,11 +41,8 @@ export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  // セッションを強制的にリフレッシュ
-  const session = await fetchAuthSession({
-    forceRefresh: true,
-  });
-  // congnitoのidトークンを取得
+  // セッションを取得（トークンが期限切れの場合新しいトークンを自動取得）
+  const session = await fetchAuthSession();
   const idToken = session.tokens?.idToken?.toString();
 
   const defaultHeaders: Record<string, string> = {

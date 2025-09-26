@@ -10,19 +10,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu.tsx";
-import { signOutUser } from "@/lib/auth.ts";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
-interface NaviMenuProps {
-  setIsAuth: (isAuth: boolean) => void;
-}
+export function NaviMenu() {
+  const { signOut } = useAuth();
 
-export function NaviMenu({ setIsAuth }: NaviMenuProps) {
-  // ログアウト時に、loadingを引き継ぐ？
-  const handleSignOut = async () => {
-    await signOutUser();
-    setIsAuth(false);
-    // localStorageをクリア
-    localStorage.clear();
+  const handleSignOut = () => {
+    void signOut();
   };
 
   return (
@@ -44,7 +38,7 @@ export function NaviMenu({ setIsAuth }: NaviMenuProps) {
                 <NavigationMenuLink asChild>
                   <Link
                     href="#"
-                    onClick={() => void handleSignOut()}
+                    onClick={handleSignOut}
                     className="flex-row items-center gap-2"
                   >
                     <LogOutIcon />

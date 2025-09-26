@@ -47,7 +47,10 @@ class CognitoJwtAuth
             return $next($request);
             
         } catch (\Exception $e) {
-            Log::error('JWT認証エラー: ' . $e->getMessage());
+            Log::error('JWT認証エラー', [
+                'error' => $e->getMessage(),
+                'error_type' => get_class($e)
+            ]);
             return $this->unauthorizedResponse('認証に失敗しました');
         }
     }
@@ -73,8 +76,19 @@ class CognitoJwtAuth
     {
         try {
             // JWTのヘッダーからkidを取得
-            $header = JWT::jsonDecode(JWT::urlsafeB64Decode(explode('.', $token)[0]));
+            $tokenParts = explode('.', $token);
+            if (count($tokenParts) !== 3) {
+                Log::error('無効なJWTトークン形式です', ['token_parts' => count($tokenParts)]);
+                return null;
+            }
+
+            $header = JWT::jsonDecode(JWT::urlsafeB64Decode($tokenParts[0]));
+
             $kid = $header->kid;
+            if (!$kid) {
+                Log::error('JWTヘッダーにkidが存在しません', ['header' => $header]);
+                return null;
+            }
 
             // Cognitoの公開鍵を取得
             $publicKey = $this->getCognitoPublicKey($kid);
@@ -82,11 +96,23 @@ class CognitoJwtAuth
             // JWTの改ざん検証を行い、ペイロードを取得
             $payload = JWT::decode($token, $publicKey);
 
+            if (isset($payload->exp) && $payload->exp < time()) {
+                Log::error('JWTトークンの有効期限が切れています', [
+                    'payload' => $payload,
+                    'current_time' => time(),
+                    'exp' => $payload->exp
+                ]);
+                return null;
+            }
+
             // ユーザーを取得または作成
             return $this->getUserFromPayload($payload);
             
         } catch (\Exception $e) {
-            Log::error('JWT検証エラー: ' . $e->getMessage());
+            Log::error('JWT検証エラー', [
+                'error' => $e->getMessage(),
+                'error_type' => get_class($e)
+            ]);
             return null;
         }
     }
@@ -112,7 +138,10 @@ class CognitoJwtAuth
             
             return $keySet[$kid];
         } catch (\Exception $e) {
-            Log::error('JWKS解析エラー: ' . $e->getMessage());
+            Log::error('JWKS解析エラー', [
+                'error' => $e->getMessage(),
+                'error_type' => get_class($e)
+            ]);
             throw new \Exception('公開鍵の取得に失敗しました: ' . $e->getMessage());
         }
     }
@@ -125,7 +154,15 @@ class CognitoJwtAuth
     {
         $cognitoSub = $payload->sub;
 
-        return User::findOrCreateByCognitoSub($cognitoSub);
+        try {
+            return User::findOrCreateByCognitoSub($cognitoSub);
+        } catch (\Exception $e) {
+            Log::error('ユーザー取得/作成エラー', [
+                'error' => $e->getMessage(),
+                'error_type' => get_class($e)
+            ]);
+            return null;
+        }
     }
 
     /**

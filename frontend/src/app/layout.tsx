@@ -1,21 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner.tsx";
 import AmplifyProvider from "@/components/auth/AmplifyProvider.tsx";
+import { AuthProvider } from "@/contexts/AuthContext.tsx";
 import { Footer } from "@/components/layout/Footer.tsx";
 import { Header } from "@/components/layout/Header.tsx";
-import { isAuthenticated } from "@/lib/auth.ts";
 
 import "./globals.css";
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const [isAuth, setIsAuth] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+export default function RootLayout({ children }: { children: ReactNode }) {
   const [user, setUser] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("userMode") || "alone";
@@ -30,22 +24,6 @@ export default function RootLayout({
 
     return "expense";
   });
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      const authenticated = await isAuthenticated();
-      setIsAuth(authenticated);
-      setIsLoading(false);
-    };
-
-    void checkAuth();
-    // 初回ログイン後にメニューが表示されるため
-    window.addEventListener("signedIn", () => void checkAuth());
-
-    return () => {
-      window.removeEventListener("signedIn", () => void checkAuth());
-    };
-  }, []);
 
   // localStorageに保存（ユーザーモード）
   useEffect(() => {
@@ -65,18 +43,20 @@ export default function RootLayout({
     <html lang="ja">
       <body className="antialiased">
         <AmplifyProvider>
-          <Header
-            isLoading={isLoading}
-            isAuth={isAuth}
-            setIsAuth={setIsAuth}
-            user={user}
-            setUser={setUser}
-            finance={finance}
-            setFinance={setFinance}
-          />
-          {children}
-          <Toaster position="top-center" richColors />
-          <Footer />
+          <AuthProvider>
+            <Header
+              // isLoading={isLoading}
+              // isAuth={isAuth}
+              // setIsAuth={setIsAuth}
+              // user={user}
+              // setUser={setUser}
+              finance={finance}
+              setFinance={setFinance}
+            />
+            {children}
+            <Toaster position="top-center" richColors />
+            <Footer />
+          </AuthProvider>
         </AmplifyProvider>
       </body>
     </html>
