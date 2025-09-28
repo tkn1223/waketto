@@ -23,7 +23,7 @@ export interface User {
 }
 
 // ログイン情報の型定義
-export interface LoginCredentials {
+export interface InfomationForLogin {
   email: string;
   password: string;
 }
@@ -178,19 +178,21 @@ export async function confirmSignUpWithCognito(
  * Cognitoにログインしてトークンを取得
  */
 export async function signInWithCognito(
-  credentials: LoginCredentials
+  infomation: InfomationForLogin
 ): Promise<AuthResult> {
-  try {
-    // 既存のセッションがある場合は先にサインアウト
-    try {
-      await signOut();
-    } catch {
-      // サインアウトに失敗しても続行（セッションがない場合など）
-    }
+  // ログインの有無を確認
+  const isAlreadySignedIn = await isAuthenticated();
+  if (isAlreadySignedIn) {
+    return {
+      success: true,
+      error: undefined,
+    };
+  }
 
+  try {
     const { isSignedIn } = await signIn({
-      username: credentials.email, // メールアドレスでログイン
-      password: credentials.password,
+      username: infomation.email, // メールアドレスでログイン
+      password: infomation.password,
     });
 
     if (isSignedIn) {

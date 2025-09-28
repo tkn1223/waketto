@@ -18,43 +18,35 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 export default function DashboardPage() {
   const router = useRouter();
   const [expenseReport, setExpenseReport] = useState<any>();
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   // AuthContext からユーザー情報を取得
-  const { user, isAuth, isLoading: authLoading } = useAuth();
+  const { user, isAuth, isLoading } = useAuth();
 
   useEffect(() => {
     const fetchExpenseReport = async () => {
       try {
-        setIsLoading(true);
         const response = await getExpenseReport();
         setExpenseReport(response);
-        setIsLoading(false);
       } catch (error) {
         console.error("支出管理表の取得に失敗しました:", error);
         setError("支出管理表の取得に失敗しました");
-        setIsLoading(false);
       }
     };
 
     // 認証済みかつ認証ローディング完了後にデータ取得を実行
-    if (isAuth && !authLoading) {
+    if (isAuth && !isLoading) {
       void fetchExpenseReport();
-    } else if (!authLoading && !isAuth) {
-      // 認証失敗時はローディングを停止
-      setIsLoading(false);
     }
-  }, [isAuth, authLoading]); // 認証状態が変更された時に実行
+  }, [isAuth, isLoading]);
 
   // 認証失敗時のリダイレクト
   useEffect(() => {
-    if (!authLoading && !isAuth) {
+    if (!isAuth && !isLoading) {
       router.push("/signin");
     }
-  }, [isAuth, authLoading, router]);
+  }, [isAuth, isLoading, router]);
 
-  if (authLoading || isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -96,7 +88,7 @@ export default function DashboardPage() {
         </div>
         {/* 取引明細カード */}
         <div className="lg:col-span-1">
-          <TransactionDetail user={user!} />
+          <TransactionDetail user={user} />
         </div>
         {/* 予算消化率 */}
         <div className="col-span-3 space-y-3">

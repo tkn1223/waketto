@@ -1,36 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
-import { signInWithCognito } from "@/lib/auth.ts";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSigninLoading, setIsSigninLoading] = useState(false);
+  const { isAuth, isLoading, error, signIn } = useAuth();
   const [isSignupLoading, _setIsSignupLoading] = useState(false);
-  const [error, setError] = useState("");
   const router = useRouter();
+
+  useEffect(() => {
+    if (isAuth) {
+      router.push("/dashboard");
+    }
+  }, [isAuth, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSigninLoading(true);
-    setError("");
 
     try {
-      const result = await signInWithCognito({ email, password });
-
-      if (result.success) {
-        window.dispatchEvent(new CustomEvent("signedIn"));
-        router.push("/dashboard");
-      } else {
-        setError(result.error || "ログインに失敗しました");
-      }
-    } catch (_err) {
-      setError("予期しないエラーが発生しました");
-    } finally {
-      setIsSigninLoading(false);
+      await signIn({ email, password });
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
 
@@ -104,10 +99,10 @@ export default function SigninForm() {
           <div>
             <button
               type="submit"
-              disabled={isSigninLoading}
+              disabled={isLoading}
               className="group relative mx-auto flex justify-center py-2 px-15 text-lg font-bold rounded-sm text-white bg-amber-600 hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSigninLoading ? "ログイン中..." : "ログイン"}
+              {isLoading ? "ログイン中..." : "ログイン"}
             </button>
           </div>
         </form>
@@ -119,7 +114,7 @@ export default function SigninForm() {
             onClick={() => router.push("/signup")}
             className="mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignupLoading
+            {isLoading
               ? "サインアップページへ移動中..."
               : "アカウントを新規作成"}
           </button>

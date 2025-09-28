@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Amplify } from "aws-amplify";
 
 const amplifyConfig = {
@@ -11,7 +11,7 @@ const amplifyConfig = {
       region: process.env.NEXT_PUBLIC_COGNITO_REGION!,
       loginWith: {
         email: true,
-        username: false, // メールアドレスログインを使用
+        username: false,
       },
       signUpVerificationMethod: "code" as const,
     },
@@ -23,10 +23,21 @@ interface AmplifyProviderProps {
 }
 
 export default function AmplifyProvider({ children }: AmplifyProviderProps) {
+  const [isConfigured, setIsConfigured] = useState(false);
+
   useEffect(() => {
-    // SSR対応でAmplifyを初期化
-    Amplify.configure(amplifyConfig, { ssr: true });
+    try {
+      Amplify.configure(amplifyConfig, { ssr: true });
+      setIsConfigured(true);
+    } catch (error) {
+      console.error("Amplify設定エラー:", error);
+    }
   }, []);
+
+  // Amplifyの設定が完了するまで子コンポーネントをレンダリングしない
+  if (!isConfigured) {
+    return <></>;
+  }
 
   return <>{children}</>;
 }
