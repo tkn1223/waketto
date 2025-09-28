@@ -3,26 +3,15 @@ import Link from "next/link";
 import { FinanceModeToggle } from "./FinanceModeToggle.tsx";
 import { NaviMenu } from "./NaviMenu.tsx";
 import { UserModeToggle } from "./UserModeToggle.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
 interface HeaderProps {
-  isLoading: boolean;
-  user: string;
-  isAuth: boolean;
-  setIsAuth: (isAuth: boolean) => void;
-  setUser: (user: string) => void;
   finance: string;
   setFinance: (finance: string) => void;
 }
 
-export function Header({
-  isLoading,
-  user,
-  isAuth,
-  setIsAuth,
-  setUser,
-  finance,
-  setFinance,
-}: HeaderProps) {
+export function Header({ finance, setFinance }: HeaderProps) {
+  const { isLoading, isAuth, user } = useAuth();
   return (
     <header className="max-w-screen-x1 bg-emerald-100">
       <div className="flex items-center justify-between h-14 px-5">
@@ -40,9 +29,10 @@ export function Header({
         {!isLoading &&
           (isAuth ? (
             <div className="flex items-center justify-between space-x-3">
-              <UserModeToggle user={user} setUser={setUser} />
+              {/* 改善：userはappsettingscontextで管理する */}
+              <UserModeToggle user="alone" setUser={() => {}} />
               <FinanceModeToggle finance={finance} setFinance={setFinance} />
-              <NaviMenu setIsAuth={setIsAuth} />
+              <NaviMenu />
             </div>
           ) : null)}
       </div>
