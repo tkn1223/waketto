@@ -1,9 +1,7 @@
-import type { User } from "@/lib/auth.ts";
-
 // 取引明細の型定義
 
 export interface TransactionData {
-  user: User;
+  user: string;
   amount: number;
   date: Date;
   category: CategorySelection | null;
@@ -14,7 +12,7 @@ export interface TransactionData {
 
 // API送信用の型（日付は文字列）
 export interface TransactionRequestData {
-  user: User;
+  user: string;
   amount: number;
   date: string;
   category: number;

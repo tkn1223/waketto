@@ -12,12 +12,11 @@ import {
   getCurrentUserInfo,
   signInWithCognito,
   signOutUser,
-  type User,
 } from "@/lib/auth.ts";
-import { InfomationForLogin } from "@/lib/auth.ts";
+import { InfomationForLogin } from "@/types/auth.ts";
 
 interface AuthContextType {
-  user: User | null;
+  userInfo: { user_id: string; name: string };
   isAuth: boolean;
   isLoading: boolean;
   error: string | null;
@@ -30,11 +29,15 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    user_id: string;
+    name: string;
+  }>({ user_id: "", name: "" });
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
     try {
       setIsLoading(true);
@@ -42,9 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const result = await signInWithCognito(infomation);
       if (result.success) {
-        const userData = await getCurrentUserInfo();
-        if (userData) {
-          setUser(userData);
+        const userInfo = await getCurrentUserInfo();
+        if (userInfo) {
+          setUserInfo(userInfo);
           setIsAuth(true);
         } else {
           throw new Error("ユーザー情報の取得に失敗しました");
@@ -57,14 +60,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error instanceof Error ? error.message : "ログインに失敗しました"
       );
       setIsAuth(false);
-      setUser(null);
+      setUserInfo({ user_id: "", name: "" });
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ログアウト処理を Context 内に集約
+  // ログアウト処理
   const signOut = async () => {
     setIsLoading(true);
     setError(null);
@@ -72,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signOutUser();
       setIsAuth(false);
-      setUser(null);
+      setUserInfo({ user_id: "", name: "" });
       localStorage.clear();
     } catch (error) {
       setError(
@@ -86,34 +89,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Amplifyが設定されているかチェック
-        try {
-          const { Amplify } = await import("aws-amplify");
-          const config = Amplify.getConfig();
-          if (!config.Auth?.Cognito?.userPoolId) {
-            console.warn(
-              "⚠️ Amplifyが正しく設定されていません。少し待ってから再試行します..."
-            );
-            setTimeout(() => {
-              void checkAuth();
-            }, 1000);
-            return;
-          }
-        } catch (configErr) {
-          console.error("Amplify設定チェックエラー:", configErr);
-          setError("アプリケーションの初期化に失敗しました");
-          setIsLoading(false);
-          return;
-        }
-
         const authenticated = await isAuthenticated();
         setIsAuth(authenticated);
 
         if (authenticated) {
           try {
-            const userData = await getCurrentUserInfo();
-            if (userData) {
-              setUser(userData);
+            const userId = await getCurrentUserInfo();
+            if (userId) {
+              setUserInfo(userId);
             } else {
               console.warn("ユーザー情報が取得できませんでした");
               setIsAuth(false);
@@ -121,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } catch (userErr) {
             console.error("ユーザー情報取得エラー:", userErr);
             setIsAuth(false);
-            setUser(null);
+            setUserInfo({ user_id: "", name: "" });
           }
         }
       } catch (err) {
@@ -136,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
   return (
     <AuthContext.Provider
-      value={{ user, isAuth, isLoading, error, signIn, signOut }}
+      value={{ userInfo, isAuth, isLoading, error, signIn, signOut }}
     >
       {children}
     </AuthContext.Provider>
