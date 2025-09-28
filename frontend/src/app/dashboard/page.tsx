@@ -19,8 +19,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const [expenseReport, setExpenseReport] = useState<any>();
   const [error, setError] = useState<string | null>(null);
-  // AuthContext からユーザー情報を取得
-  const { user, isAuth, isLoading } = useAuth();
+  const { userInfo, isAuth, isLoading } = useAuth();
 
   useEffect(() => {
     const fetchExpenseReport = async () => {
@@ -46,7 +45,7 @@ export default function DashboardPage() {
     }
   }, [isAuth, isLoading, router]);
 
-  if (isLoading || !user) {
+  if (isLoading || !userInfo) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -78,7 +77,7 @@ export default function DashboardPage() {
           <div className="bg-white overflow-hidden shadow rounded-lg">
             <Card>
               <CardHeader>
-                <CardTitle>{user?.name} の支出管理表</CardTitle>
+                <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
               </CardHeader>
               <CardContent>
                 <ExpenseTable expenseReport={expenseReport} />
@@ -88,7 +87,7 @@ export default function DashboardPage() {
         </div>
         {/* 取引明細カード */}
         <div className="lg:col-span-1">
-          <TransactionDetail user={user} />
+          <TransactionDetail />
         </div>
         {/* 予算消化率 */}
         <div className="col-span-3 space-y-3">

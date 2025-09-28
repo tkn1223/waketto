@@ -6,42 +6,17 @@ import {
   signOut,
   signUp,
 } from "aws-amplify/auth";
+import {
+  SignUpCredentials,
+  AuthResult,
+  InfomationForLogin,
+  User,
+} from "@/types/auth.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
 };
-
-// ユーザー情報の型定義
-export interface User {
-  id: number;
-  name: string;
-  user_id: string;
-  email: string;
-  cognito_sub: string;
-  created_at: string;
-}
-
-// ログイン情報の型定義
-export interface InfomationForLogin {
-  email: string;
-  password: string;
-}
-
-// サインアップ情報の型定義
-export interface SignUpCredentials {
-  email: string;
-  password: string;
-}
-
-// 認証結果の型定義
-export interface AuthResult {
-  success: boolean;
-  accessToken?: string;
-  idToken?: string;
-  refreshToken?: string;
-  error?: string;
-}
 
 /**
  * Cognitoにサインアップしてユーザーを作成
@@ -320,7 +295,10 @@ export async function createAuthenticatedRequest(
 /**
  * ユーザー情報を取得
  */
-export async function getCurrentUserInfo(): Promise<User | null> {
+export async function getCurrentUserInfo(): Promise<{
+  user_id: string;
+  name: string;
+} | null> {
   try {
     const response = await createAuthenticatedRequest("/user", {
       method: "GET",
@@ -331,8 +309,12 @@ export async function getCurrentUserInfo(): Promise<User | null> {
     }
 
     const user = (await response.json()) as User;
+    const userInfo = {
+      user_id: user.user_id,
+      name: user.name,
+    };
 
-    return user;
+    return userInfo;
   } catch (error) {
     console.error("Failed to get current user:", error);
 

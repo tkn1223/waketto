@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Info } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext.tsx";
@@ -8,25 +8,23 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { isAuth, isLoading, error, signIn } = useAuth();
-  const [isSignupLoading, _setIsSignupLoading] = useState(false);
+  const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const { isLoading, error, signIn } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    if (isAuth) {
-      router.push("/dashboard");
-    }
-  }, [isAuth, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       await signIn({ email, password });
       router.push("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
     }
+  };
+
+  const ChangeSignupPage = () => {
+    setIsSignupLoading(true);
+    router.push("/signup");
   };
 
   return (
@@ -111,10 +109,10 @@ export default function SigninForm() {
           <button
             type="button"
             disabled={isSignupLoading}
-            onClick={() => router.push("/signup")}
+            onClick={ChangeSignupPage}
             className="mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading
+            {isSignupLoading
               ? "サインアップページへ移動中..."
               : "アカウントを新規作成"}
           </button>

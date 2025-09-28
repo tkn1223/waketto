@@ -15,7 +15,6 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { getCategories } from "@/lib/api.ts";
-import { type User } from "@/lib/auth.ts";
 import type {
   TransactionData,
   CategoryData,
@@ -24,16 +23,18 @@ import type {
 import { Amount } from "./Amount.tsx";
 import { postTransaction } from "@/lib/api.ts";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
-export function TransactionDetail({ user }: { user: User }) {
+export function TransactionDetail() {
   const [_error, _setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryData>({});
+  const { userInfo } = useAuth();
   const [transactionData, setTransactionData] = useState<TransactionData>({
-    user: user,
+    user: userInfo.user_id,
     amount: 0,
     date: new Date(),
     category: null,
-    payer: user.user_id,
+    payer: userInfo.user_id,
     shop_name: "",
     memo: "",
   });
@@ -111,7 +112,7 @@ export function TransactionDetail({ user }: { user: User }) {
         amount: 0,
         date: new Date(),
         category: null,
-        payer: user.user_id,
+        payer: userInfo.user_id,
         shop_name: "",
         memo: "",
       }));
@@ -122,7 +123,7 @@ export function TransactionDetail({ user }: { user: User }) {
     <div className="bg-white overflow-hidden shadow rounded-lg">
       <Card>
         <CardHeader>
-          <CardTitle>{user.name} の取引明細</CardTitle>
+          <CardTitle>{userInfo.name} の取引明細</CardTitle>
         </CardHeader>
         <CardContent className="space-y-7">
           {/* 金額 */}
@@ -154,7 +155,7 @@ export function TransactionDetail({ user }: { user: User }) {
           {/* 支払者 */}
           <div className="flex justify-between items-center">
             <PayerSelect
-              user={user}
+              userInfo={userInfo}
               payer={transactionData.payer}
               onPayerChange={handlePayerChange}
             />
