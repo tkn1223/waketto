@@ -28,7 +28,7 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 export function TransactionDetail() {
   const [_error, _setError] = useState<string | null>(null);
   const [categories, setCategories] = useState<CategoryData>({});
-  const { userInfo } = useAuth();
+  const { userInfo, isAuth } = useAuth();
   const [transactionData, setTransactionData] = useState<TransactionData>({
     user: userInfo.user_id,
     amount: 0,
@@ -53,7 +53,10 @@ export function TransactionDetail() {
         });
       }
     };
-    void fetchCategories();
+
+    if (isAuth) {
+      void fetchCategories();
+    }
   }, []);
 
   const handleAmountChange = (amount: number) => {

@@ -3,7 +3,7 @@ import type {
   TransactionRequestData,
   CategoriesResponse,
 } from "@/types/transaction.ts";
-import { signOutUser } from "@/lib/auth.ts";
+import { signOutUser, checkTokenValidity } from "@/lib/auth.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
@@ -41,19 +41,25 @@ export async function fetchApi<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
+  // トークンの有効性を確認
+  const isTokenValid = await checkTokenValidity();
+  if (!isTokenValid) {
+    throw new Error("トークンが期限切れです");
+  }
+
   // セッションを取得（トークンが期限切れの場合新しいトークンを自動取得）
   const session = await fetchAuthSession();
-  const idToken = session.tokens?.idToken?.toString();
+  const accessToken = session.tokens?.accessToken?.toString();
 
   const defaultHeaders: Record<string, string> = {
     "Content-Type": "application/json",
   };
 
-  if (idToken) {
-    defaultHeaders.Authorization = `Bearer ${idToken}`;
+  if (accessToken) {
+    defaultHeaders.Authorization = `Bearer ${accessToken}`;
   } else {
-    console.error("IDトークンが取得できませんでした");
     await signOutUser();
+    throw new Error("IDトークンが取得できませんでした");
   }
 
   // ヘッダー情報が上書きされないよう事前にマージする
@@ -71,6 +77,11 @@ export async function fetchApi<T>(
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      await signOutUser();
+      throw new Error("認証に失敗しました。再度ログインしてください。");
+    }
+
     const errorData = await response.json().catch(() => null);
     console.error("API Error:", {
       status: response.status,
