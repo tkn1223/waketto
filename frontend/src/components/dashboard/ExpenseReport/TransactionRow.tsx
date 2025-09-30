@@ -1,18 +1,12 @@
 import { formatDate } from "@/types/displayFormat.ts";
 
-export function TransactionRow({
-  key,
-  category,
-}: {
-  key: string;
-  category: any;
-}) {
+export function TransactionRow({ category }: { category: any }) {
   return (
-    <div key={key} className="space-y-2">
+    <div className="space-y-1.5">
       {category.payments.map((payment: any, paymentIndex: number) => (
         <div
-          key={`${key}-payment-${paymentIndex}`}
-          className="grid grid-cols-12 items-center p-2 bg-gray-50 rounded hover:bg-gray-100 cursor-pointer"
+          key={`payment-${paymentIndex}`}
+          className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 cursor-pointer"
         >
           <span className="col-span-3 text-sm">
             {formatDate(payment.payment_date)}
