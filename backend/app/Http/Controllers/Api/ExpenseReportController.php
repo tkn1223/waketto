@@ -6,12 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Payment;
+use App\Models\CategoryGroup;
 
 class ExpenseReportController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
         $userId = $request->attributes->get('auth_user')->id;
+
+        $allCategoryGroups = CategoryGroup::select('code', 'name')
+                             ->get();
+
         $paymentData = Payment::where('recorded_by_user_id', $userId)
                        ->with('category', 'category.categoryGroup')
                        ->orderBy('payment_date', 'asc')
@@ -19,16 +24,16 @@ class ExpenseReportController extends Controller
         
         $sortedByCategoryData = [];
 
+        foreach ($allCategoryGroups as $categoryGroup) {
+            $sortedByCategoryData[$categoryGroup->code] = [
+                'group_name' => $categoryGroup->name,
+                'categories' => []
+            ];
+        }
+
         foreach ($paymentData as $payment) {
             $groupCode = $payment->category->group_code;
             $categoryCode = $payment->category->code;
-
-            if (!isset($sortedByCategoryData[$groupCode])) {
-                $sortedByCategoryData[$groupCode] = [
-                    'group_name' => $payment->category->categoryGroup->name,
-                    'categories' => []
-                ];
-            }
 
             if (!isset($sortedByCategoryData[$groupCode]['categories'][$categoryCode])) {
                 $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [

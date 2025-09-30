@@ -25,6 +25,7 @@ export default function DashboardPage() {
     const fetchExpenseReport = async () => {
       try {
         const response = await getExpenseReport();
+        console.log(response);
         setExpenseReport(response);
       } catch (error) {
         console.error("支出管理表の取得に失敗しました:", error);
@@ -109,7 +110,10 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-12 gap-1">
               {Array.from({ length: 12 }, (_, i) => (
-                <Label className="p-2 text-xs bg-gray-200 flex items-center justify-center">
+                <Label
+                  key={`month-lavel-${i}`}
+                  className="p-2 text-xs bg-gray-200 flex items-center justify-center"
+                >
                   {i + 1} 月
                 </Label>
               ))}
@@ -165,7 +169,10 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-12 gap-1">
               {Array.from({ length: 12 }, (_, i) => (
-                <Label className="p-2 text-xs bg-gray-200 flex items-center justify-center">
+                <Label
+                  key={`month-lavel-${i}`}
+                  className="p-2 text-xs bg-gray-200 flex items-center justify-center"
+                >
                   {i + 1} 月
                 </Label>
               ))}
@@ -173,7 +180,10 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-12 gap-1">
               {Array.from({ length: 12 }, (_, i) => (
-                <Label className="p-2 text-xs flex items-center justify-center">
+                <Label
+                  key={`month-lavel-${i}`}
+                  className="p-2 text-xs flex items-center justify-center"
+                >
                   月の支出
                 </Label>
               ))}
