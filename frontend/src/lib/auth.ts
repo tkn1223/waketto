@@ -216,8 +216,10 @@ export async function signInWithCognito(
 export async function isAuthenticated(): Promise<boolean> {
   try {
     const user = await getCurrentUser();
-
-    return !!user;
+    if (!user) {
+      return false;
+    }
+    return true;
   } catch {
     return false;
   }
@@ -229,14 +231,6 @@ export async function isAuthenticated(): Promise<boolean> {
 export async function signOutUser() {
   try {
     await signOut();
-
-    localStorage.clear();
-    sessionStorage.clear();
-
-    // 必要に応じてページをリロードまたはリダイレクト
-    if (typeof window !== "undefined") {
-      window.location.href = "/signin";
-    }
   } catch (error) {
     console.error("Sign out error:", error);
   }
@@ -250,19 +244,24 @@ export async function createAuthenticatedRequest(
   options: RequestInit = {}
 ): Promise<Response> {
   try {
-    // congnitoのidトークンを取得
+    // トークンの有効性を確認
+    const isTokenValid = await checkTokenValidity();
+    if (!isTokenValid) {
+      throw new Error("トークンが期限切れです");
+    }
+
+    // congnitoのアクセストークンを取得
     const session = await fetchAuthSession();
-    const idToken = session.tokens?.idToken?.toString();
+    const accessToken = session.tokens?.accessToken?.toString();
 
     const defaultHeaders: Record<string, string> = {
       "Content-Type": "application/json",
     };
 
-    if (idToken) {
-      defaultHeaders.Authorization = `Bearer ${idToken}`;
+    if (accessToken) {
+      defaultHeaders.Authorization = `Bearer ${accessToken}`;
     } else {
-      throw new Error("IDトークンが取得できませんでした");
-      // 取得できなかった時のエラーハンドリングが必要
+      throw new Error("アクセストークンが取得できませんでした");
     }
 
     // ヘッダー情報が上書きされないよう事前にマージする
@@ -278,12 +277,6 @@ export async function createAuthenticatedRequest(
       ...options,
       headers: mergedHeaders,
     });
-
-    // 401エラー時に自動ログアウト
-    if (response.status === 401) {
-      await signOutUser();
-      throw new Error("Unauthorized");
-    }
 
     return response;
   } catch (error) {
@@ -319,5 +312,61 @@ export async function getCurrentUserInfo(): Promise<{
     console.error("Failed to get current user:", error);
 
     return null;
+  }
+}
+
+/**
+ * トークンを手動更新
+ */
+export async function refreshToken(): Promise<boolean> {
+  try {
+    const session = await fetchAuthSession({ forceRefresh: true });
+
+    if (session.tokens?.accessToken && session.tokens?.idToken) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.error("トークン更新エラー:", error);
+    return false;
+  }
+}
+
+/**
+ * トークンの有効性を確認
+ */
+export async function checkTokenValidity(): Promise<boolean> {
+  try {
+    const session = await fetchAuthSession();
+    const accessToken = session.tokens?.accessToken?.toString();
+
+    if (!accessToken) {
+      return false;
+    }
+
+    // トークンの有効期限を確認
+    const payload = JSON.parse(atob(accessToken.split(".")[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    // 有効期限が5分以内の場合に更新を行う
+    const timeUntilExpiry = payload.exp - currentTime;
+    if (timeUntilExpiry < 300) {
+      const refreshSuccess = await refreshToken();
+
+      if (!refreshSuccess) {
+        // リフレッシュ失敗時は強制的にサインアウト
+        await signOutUser();
+        return false;
+      }
+
+      return true;
+    }
+
+    return true;
+  } catch (error) {
+    console.error("トークン有効性確認エラー:", error);
+    await signOutUser();
+    return false;
   }
 }

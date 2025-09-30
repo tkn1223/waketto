@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated } from "@/lib/auth.ts";
+import { isAuthenticated, checkTokenValidity } from "@/lib/auth.ts";
 
 export default function Home() {
   const router = useRouter();
@@ -12,11 +12,15 @@ export default function Home() {
     const checkAuthAndRedirect = async () => {
       const authenticated = await isAuthenticated();
 
+      // 認証済み→ダッシュボード、未認証→サインインページ
       if (authenticated) {
-        // 認証済みの場合はダッシュボードにリダイレクト
-        router.push("/dashboard");
+        const isTokenValid = await checkTokenValidity();
+        if (isTokenValid) {
+          router.push("/dashboard");
+        } else {
+          router.push("/signin");
+        }
       } else {
-        // 未認証の場合はサインインページにリダイレクト
         router.push("/signin");
       }
     };
