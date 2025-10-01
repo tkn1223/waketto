@@ -1,12 +1,26 @@
+import { useState } from "react";
 import { formatDate } from "@/types/displayFormat.ts";
+import { Payment } from "@/types/transaction.ts";
+import { TransactionDetailDialog } from "./TransactionDetailDialog.tsx";
 
 export function TransactionRow({ category }: { category: any }) {
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleOpneDialog = (payment: Payment) => {
+    setSelectedPayment(payment);
+    setIsDialogOpen(true);
+  };
+
   return (
     <div className="space-y-1.5">
-      {category.payments.map((payment: any, paymentIndex: number) => (
+      {category.payments.map((payment: Payment, paymentIndex: number) => (
         <div
           key={`payment-${paymentIndex}`}
-          className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 cursor-pointer"
+          onClick={() => {
+            handleOpneDialog(payment);
+          }}
+          className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none cursor-pointer"
         >
           <span className="col-span-3 text-sm">
             {formatDate(payment.payment_date)}
@@ -19,6 +33,14 @@ export function TransactionRow({ category }: { category: any }) {
           </span>
         </div>
       ))}
+
+      {selectedPayment && (
+        <TransactionDetailDialog
+          payment={selectedPayment}
+          isOpen={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+        />
+      )}
     </div>
   );
 }
