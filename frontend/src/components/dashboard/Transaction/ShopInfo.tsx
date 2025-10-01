@@ -1,6 +1,6 @@
+import { useState } from "react";
 import { Store } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
-import { useState } from "react";
 
 interface ShopInfoProps {
   shop_name: string;
@@ -13,6 +13,7 @@ export function ShopInfo({ shop_name, onShopNameChange }: ShopInfoProps) {
   const handleShopNameChange = (value: string) => {
     if (value.length > 255) {
       setError("文字数の上限を超えています");
+
       return;
     }
     setError(null);

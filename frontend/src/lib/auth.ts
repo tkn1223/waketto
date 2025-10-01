@@ -6,10 +6,10 @@ import {
   signOut,
   signUp,
 } from "aws-amplify/auth";
-import {
-  SignUpCredentials,
+import type {
   AuthResult,
   InfomationForLogin,
+  SignUpCredentials,
   User,
 } from "@/types/auth.ts";
 
@@ -157,6 +157,7 @@ export async function signInWithCognito(
 ): Promise<AuthResult> {
   // ログインの有無を確認
   const isAlreadySignedIn = await isAuthenticated();
+
   if (isAlreadySignedIn) {
     return {
       success: true,
@@ -216,9 +217,11 @@ export async function signInWithCognito(
 export async function isAuthenticated(): Promise<boolean> {
   try {
     const user = await getCurrentUser();
+
     if (!user) {
       return false;
     }
+
     return true;
   } catch {
     return false;
@@ -246,6 +249,7 @@ export async function createAuthenticatedRequest(
   try {
     // トークンの有効性を確認
     const isTokenValid = await checkTokenValidity();
+
     if (!isTokenValid) {
       throw new Error("トークンが期限切れです");
     }
@@ -329,6 +333,7 @@ export async function refreshToken(): Promise<boolean> {
     }
   } catch (error) {
     console.error("トークン更新エラー:", error);
+
     return false;
   }
 }
@@ -351,12 +356,14 @@ export async function checkTokenValidity(): Promise<boolean> {
 
     // 有効期限が5分以内の場合に更新を行う
     const timeUntilExpiry = payload.exp - currentTime;
+
     if (timeUntilExpiry < 300) {
       const refreshSuccess = await refreshToken();
 
       if (!refreshSuccess) {
         // リフレッシュ失敗時は強制的にサインアウト
         await signOutUser();
+
         return false;
       }
 
@@ -367,6 +374,7 @@ export async function checkTokenValidity(): Promise<boolean> {
   } catch (error) {
     console.error("トークン有効性確認エラー:", error);
     await signOutUser();
+
     return false;
   }
 }

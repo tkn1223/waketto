@@ -60,3 +60,8 @@ export interface CategoriesResponse {
   status: boolean;
   data: CategoryData;
 }
+
+export interface CategoryContextType {
+  categories: CategoryData;
+  isCategoriesLoading: boolean;
+}

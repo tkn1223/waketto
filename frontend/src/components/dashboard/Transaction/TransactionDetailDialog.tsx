@@ -4,10 +4,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import { updateTransactionData } from "@/types/transaction.ts";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useTransactionForm } from "@/hooks/useTransactionForm.tsx";
-import { TransactionForm } from "./TransactionForm";
+import type { updateTransactionData } from "@/types/transaction.ts";
+import { TransactionForm } from "./TransactionForm.tsx";
 
 interface TransactionDetailDialogProps {
   payment: updateTransactionData;

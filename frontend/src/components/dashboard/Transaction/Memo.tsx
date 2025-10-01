@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { NotebookPen } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
-import { useState } from "react";
 
 interface MemoProps {
   memo: string;
@@ -15,6 +15,7 @@ export function Memo({ memo, onMemoChange }: MemoProps) {
   const handleMemoChange = (value: string) => {
     if (value.length > 255) {
       setError("文字数の上限を超えています");
+
       return;
     }
     setError(null);

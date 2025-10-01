@@ -1,15 +1,15 @@
-import { useState, useEffect } from "react";
+import {useState } from "react";
 import { format } from "date-fns";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useCategory } from "@/contexts/CategoryContext.tsx";
-import {
-  TransactionData,
-  CategoryData,
+import { postTransaction } from "@/lib/api.ts";
+import type {
   CategorySelection,
-  updateTransactionData,
-} from "@/types/transaction.tsx";
-import { getCategories, postTransaction } from "@/lib/api.ts";
-import { toast } from "sonner";
+  TransactionData,
+  updateTransactionData} from "@/types/transaction.tsx";
+
+
 
 interface UseTransactionFormProps {
   transactionPatch: Partial<updateTransactionData>;

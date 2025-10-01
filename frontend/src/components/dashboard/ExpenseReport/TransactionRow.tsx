@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { formatDate } from "@/types/displayFormat.ts";
-import { updateTransactionData } from "@/types/transaction.ts";
+import type { updateTransactionData } from "@/types/transaction.ts";
 import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
 
 export function TransactionRow({ category }: { category: any }) {
