@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { formatDate } from "@/types/displayFormat.ts";
 import { updateTransactionData } from "@/types/transaction.ts";
-import { TransactionDetailDialog } from "./TransactionDetailDialog.tsx";
+import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
 
 export function TransactionRow({ category }: { category: any }) {
   const [selectedPayment, setSelectedPayment] =

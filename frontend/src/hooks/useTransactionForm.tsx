@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useCategory } from "@/contexts/CategoryContext.tsx";
 import {
   TransactionData,
   CategoryData,
@@ -19,8 +20,8 @@ export const useTransactionForm = ({
   transactionPatch,
   onSaveSuccess,
 }: UseTransactionFormProps) => {
-  const { userInfo, isAuth } = useAuth();
-  const [categories, setCategories] = useState<CategoryData>({});
+  const { userInfo } = useAuth();
+  const { categories, isCategoriesLoading } = useCategory();
   const [transactionData, setTransactionData] = useState<TransactionData>(
     transactionPatch
       ? {
@@ -50,26 +51,6 @@ export const useTransactionForm = ({
           memo: "",
         }
   );
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await getCategories();
-
-        if (response.status) {
-          setCategories(response.data);
-        }
-      } catch (err) {
-        toast.error("カテゴリーの取得に失敗しました", {
-          className: "!bg-red-600 !text-white !border-red-800",
-        });
-      }
-    };
-
-    if (isAuth) {
-      void fetchCategories();
-    }
-  }, []);
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
@@ -141,6 +122,7 @@ export const useTransactionForm = ({
 
   return {
     categories,
+    isCategoriesLoading,
     transactionData,
     isSaveDisabled,
     handleAmountChange,

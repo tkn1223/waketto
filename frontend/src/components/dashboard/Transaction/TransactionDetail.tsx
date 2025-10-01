@@ -13,7 +13,6 @@ import {
 export function TransactionDetail() {
   const { userInfo } = useAuth();
   const {
-    categories,
     transactionData,
     isSaveDisabled,
     handleAmountChange,
@@ -37,7 +36,6 @@ export function TransactionDetail() {
         <CardContent className="space-y-7">
           <TransactionForm
             userInfo={userInfo}
-            categories={categories}
             transactionData={transactionData}
             isSaveDisabled={isSaveDisabled}
             onAmountChange={handleAmountChange}

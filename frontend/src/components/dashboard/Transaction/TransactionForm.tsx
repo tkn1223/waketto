@@ -17,7 +17,6 @@ import { Amount } from "./Amount.tsx";
 interface TransactionFormProps {
   // data
   userInfo: { user_id: string; name: string };
-  categories: CategoryData;
   transactionData: TransactionData;
   isSaveDisabled: boolean;
   saveButtonText: string; // ボタンのテキスト
@@ -33,7 +32,6 @@ interface TransactionFormProps {
 
 export function TransactionForm({
   userInfo,
-  categories,
   transactionData,
   isSaveDisabled,
   onAmountChange,
@@ -67,7 +65,6 @@ export function TransactionForm({
           {/* カテゴリー */}
           <div className="w-1/2">
             <CategoryList
-              categories={categories}
               selected={transactionData.category}
               onSelectionChange={onCategoryChange}
             />

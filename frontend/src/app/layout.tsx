@@ -4,6 +4,7 @@ import { useEffect, useState, ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner.tsx";
 import AmplifyProvider from "@/components/auth/AmplifyProvider.tsx";
 import { AuthProvider } from "@/contexts/AuthContext.tsx";
+import { CategoryProvider } from "@/contexts/CategoryContext.tsx";
 import { Footer } from "@/components/layout/Footer.tsx";
 import { Header } from "@/components/layout/Header.tsx";
 
@@ -44,18 +45,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <AmplifyProvider>
           <AuthProvider>
-            <Header
-              // isLoading={isLoading}
-              // isAuth={isAuth}
-              // setIsAuth={setIsAuth}
-              // user={user}
-              // setUser={setUser}
-              finance={finance}
-              setFinance={setFinance}
-            />
-            {children}
-            <Toaster position="top-center" richColors />
-            <Footer />
+            <CategoryProvider>
+              <Header finance={finance} setFinance={setFinance} />
+              {children}
+              <Toaster position="top-center" richColors />
+              <Footer />
+            </CategoryProvider>
           </AuthProvider>
         </AmplifyProvider>
       </body>

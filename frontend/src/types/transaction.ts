@@ -52,7 +52,6 @@ export interface CategorySelection {
 }
 
 export interface CategoryListProps {
-  categories: CategoryData;
   selected: CategorySelection | null;
   onSelectionChange: (selected: CategorySelection | null) => void;
 }

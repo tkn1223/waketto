@@ -7,7 +7,7 @@ import {
 import { updateTransactionData } from "@/types/transaction.ts";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useTransactionForm } from "@/hooks/useTransactionForm.tsx";
-import { TransactionForm } from "../Transaction/TransactionForm";
+import { TransactionForm } from "./TransactionForm";
 
 interface TransactionDetailDialogProps {
   payment: updateTransactionData;
@@ -22,7 +22,6 @@ export function TransactionDetailDialog({
 }: TransactionDetailDialogProps) {
   const { userInfo } = useAuth();
   const {
-    categories,
     transactionData,
     isSaveDisabled,
     handleAmountChange,
@@ -46,7 +45,6 @@ export function TransactionDetailDialog({
         <div className="space-y-7">
           <TransactionForm
             userInfo={userInfo}
-            categories={categories}
             transactionData={transactionData}
             isSaveDisabled={isSaveDisabled}
             onAmountChange={handleAmountChange}
