@@ -10,7 +10,7 @@ export interface TransactionData {
 }
 
 // 編集用の取引明細の型定義
-export interface Payment {
+export interface updateTransactionData {
   id: number;
   amount: number;
   category_id: number;
