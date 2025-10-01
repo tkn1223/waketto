@@ -1,9 +1,9 @@
 import { fetchAuthSession } from "aws-amplify/auth";
+import { checkTokenValidity,signOutUser } from "@/lib/auth.ts";
 import type {
-  TransactionRequestData,
   CategoriesResponse,
+  TransactionRequestData,
 } from "@/types/transaction.ts";
-import { signOutUser, checkTokenValidity } from "@/lib/auth.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
@@ -43,6 +43,7 @@ export async function fetchApi<T>(
 ): Promise<T> {
   // トークンの有効性を確認
   const isTokenValid = await checkTokenValidity();
+
   if (!isTokenValid) {
     throw new Error("トークンが期限切れです");
   }

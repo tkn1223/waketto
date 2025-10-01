@@ -1,20 +1,20 @@
 "use client";
 
+import type {
+  ReactNode} from "react";
 import {
-  useState,
-  useEffect,
   createContext,
   useContext,
-  ReactNode,
-} from "react";
+  useEffect,
+  useState} from "react";
+import { useRouter } from "next/navigation";
 import {
-  isAuthenticated,
   getCurrentUserInfo,
+  isAuthenticated,
   signInWithCognito,
   signOutUser,
 } from "@/lib/auth.ts";
-import { InfomationForLogin } from "@/types/auth.ts";
-import { useRouter } from "next/navigation";
+import type { InfomationForLogin } from "@/types/auth.ts";
 
 interface AuthContextType {
   userInfo: { user_id: string; name: string };
@@ -46,11 +46,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
 
       const result = await signInWithCognito(infomation);
+
       if (result.success) {
         // ログイン後にユーザー情報を取得するため待機
         await new Promise((resolve) => setTimeout(resolve, 100));
 
         const userInfo = await getCurrentUserInfo();
+
         if (userInfo) {
           setUserInfo(userInfo);
           setIsAuth(true);
@@ -100,6 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (authenticated) {
           const userId = await getCurrentUserInfo();
+
           if (userId) {
             setUserInfo(userId);
           } else {
@@ -122,6 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     void checkAuth();
   }, []);
+
   return (
     <AuthContext.Provider
       value={{ userInfo, isAuth, isLoading, error, signIn, signOut }}
@@ -133,8 +137,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+
   return context;
 }

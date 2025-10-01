@@ -17,13 +17,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs.tsx";
+import { useCategory } from "@/contexts/CategoryContext.tsx";
 import type {
   Category,
   CategoryData,
   CategoryListProps,
   CategorySelection,
 } from "@/types/transaction.ts";
-import { useCategory } from "@/contexts/CategoryContext.tsx";
 
 export function CategoryList({
   selected,

@@ -1,5 +1,5 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { TransactionRow } from "./TransactionRow";
+import { ScrollArea } from "@/components/ui/scroll-area.tsx";
+import { TransactionRow } from "./TransactionRow.tsx";
 
 export function ExpenseTable({ expenseReport }: { expenseReport: any }) {
   return (

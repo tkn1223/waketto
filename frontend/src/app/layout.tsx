@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, ReactNode } from "react";
-import { Toaster } from "@/components/ui/sonner.tsx";
+import type { ReactNode } from "react";
+import { useEffect, useState } from "react";
 import AmplifyProvider from "@/components/auth/AmplifyProvider.tsx";
-import { AuthProvider } from "@/contexts/AuthContext.tsx";
-import { CategoryProvider } from "@/contexts/CategoryContext.tsx";
 import { Footer } from "@/components/layout/Footer.tsx";
 import { Header } from "@/components/layout/Header.tsx";
+import { Toaster } from "@/components/ui/sonner.tsx";
+import { AuthProvider } from "@/contexts/AuthContext.tsx";
+import { CategoryProvider } from "@/contexts/CategoryContext.tsx";
 
 import "./globals.css";
 

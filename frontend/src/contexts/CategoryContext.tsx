@@ -1,19 +1,14 @@
+import type {
+  ReactNode} from "react";
 import {
-  useState,
-  useEffect,
-  useContext,
   createContext,
-  ReactNode,
-} from "react";
+  useContext,
+  useEffect,
+  useState} from "react";
+import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { getCategories } from "@/lib/api.ts";
-import { CategoryData } from "@/types/transaction.ts";
-import { toast } from "sonner";
-
-interface CategoryContextType {
-  categories: CategoryData;
-  isCategoriesLoading: boolean;
-}
+import type { CategoryContextType,CategoryData } from "@/types/transaction.ts";
 
 const CategoryContext = createContext<CategoryContextType | undefined>(
   undefined
@@ -55,8 +50,10 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 
 export function useCategory() {
   const context = useContext(CategoryContext);
+
   if (context === undefined) {
     throw new Error("useCategory must be used within a CategoryProvider");
   }
+
   return context;
 }

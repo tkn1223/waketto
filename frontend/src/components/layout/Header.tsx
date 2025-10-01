@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 import { FinanceModeToggle } from "./FinanceModeToggle.tsx";
 import { NaviMenu } from "./NaviMenu.tsx";
 import { UserModeToggle } from "./UserModeToggle.tsx";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 
 interface HeaderProps {
   finance: string;
@@ -12,6 +12,7 @@ interface HeaderProps {
 
 export function Header({ finance, setFinance }: HeaderProps) {
   const { isLoading, isAuth, user } = useAuth();
+
   return (
     <header className="max-w-screen-x1 bg-emerald-100">
       <div className="flex items-center justify-between h-14 px-5">

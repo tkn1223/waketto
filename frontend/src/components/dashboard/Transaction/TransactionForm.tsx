@@ -8,9 +8,8 @@ import { ShopInfo } from "@/components/dashboard/Transaction/ShopInfo.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { CardContent } from "@/components/ui/card.tsx";
 import type {
-  TransactionData,
-  CategoryData,
   CategorySelection,
+  TransactionData,
 } from "@/types/transaction.ts";
 import { Amount } from "./Amount.tsx";
 
