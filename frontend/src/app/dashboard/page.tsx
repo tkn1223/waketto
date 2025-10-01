@@ -25,7 +25,6 @@ export default function DashboardPage() {
     const fetchExpenseReport = async () => {
       try {
         const response = await getExpenseReport();
-        console.log(response);
         setExpenseReport(response);
       } catch (error) {
         console.error("支出管理表の取得に失敗しました:", error);

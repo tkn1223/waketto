@@ -43,8 +43,12 @@ class ExpenseReportController extends Controller
             }
 
             $sortedByCategoryData[$groupCode]['categories'][$categoryCode]['payments'][] = [
-                'payment_date' => $payment->payment_date,
+                'id' => $payment->id,
                 'amount' => $payment->amount,
+                'category_id' => $payment->category_id,
+                'payment_date' => $payment->payment_date,
+                'paid_by_user_id' => $payment->paid_by_user_id,
+                'couple_id' => $payment->couple_id,
                 'store_name' => $payment->store_name,
                 'note' => $payment->note,
             ];
