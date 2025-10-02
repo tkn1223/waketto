@@ -293,6 +293,7 @@ export async function createAuthenticatedRequest(
  * ユーザー情報を取得
  */
 export async function getCurrentUserInfo(): Promise<{
+  id: string;
   user_id: string;
   name: string;
 } | null> {
@@ -307,6 +308,7 @@ export async function getCurrentUserInfo(): Promise<{
 
     const user = (await response.json()) as User;
     const userInfo = {
+      id: user.id,
       user_id: user.user_id,
       name: user.name,
     };
