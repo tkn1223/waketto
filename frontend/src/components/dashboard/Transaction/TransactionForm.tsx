@@ -15,7 +15,7 @@ import { Amount } from "./Amount.tsx";
 
 interface TransactionFormProps {
   // data
-  userInfo: { user_id: string; name: string };
+  userInfo: { id: string; user_id: string; name: string };
   transactionData: TransactionData;
   isSaveDisabled: boolean;
   saveButtonText: string; // ボタンのテキスト
@@ -44,63 +44,61 @@ export function TransactionForm({
 }: TransactionFormProps) {
   return (
     <>
-      <CardContent className="space-y-7">
-        {/* 金額 */}
-        <div className="flex justify-between items-end gap-2">
-          <Amount
-            amount={transactionData.amount}
-            onAmountChange={onAmountChange}
+      {/* 金額 */}
+      <div className="flex justify-between items-end gap-2">
+        <Amount
+          amount={transactionData.amount}
+          onAmountChange={onAmountChange}
+        />
+      </div>
+
+      <div className="flex items-center gap-4">
+        {/* 登録日 */}
+        <div className="w-1/2">
+          <RegisteredDate
+            date={transactionData.date}
+            onDateChange={onDateChange}
           />
         </div>
-
-        <div className="flex items-center gap-4">
-          {/* 登録日 */}
-          <div className="w-1/2">
-            <RegisteredDate
-              date={transactionData.date}
-              onDateChange={onDateChange}
-            />
-          </div>
-          {/* カテゴリー */}
-          <div className="w-1/2">
-            <CategoryList
-              selected={transactionData.category}
-              onSelectionChange={onCategoryChange}
-            />
-          </div>
-        </div>
-
-        {/* 支払者 */}
-        <div className="flex justify-between items-center">
-          <PayerSelect
-            userInfo={userInfo}
-            payer={transactionData.payer}
-            onPayerChange={onPayerChange}
+        {/* カテゴリー */}
+        <div className="w-1/2">
+          <CategoryList
+            selected={transactionData.category}
+            onSelectionChange={onCategoryChange}
           />
         </div>
-        <div className="bg-gray-100 p-2 text-center">支出の詳細</div>
+      </div>
 
-        {/* お店の名前 */}
-        <div>
-          <ShopInfo
-            shop_name={transactionData.shop_name}
-            onShopNameChange={onShopNameChange}
-          />
-        </div>
+      {/* 支払者 */}
+      <div className="flex justify-between items-center">
+        <PayerSelect
+          userInfo={userInfo}
+          payer={transactionData.payer}
+          onPayerChange={onPayerChange}
+        />
+      </div>
+      <div className="bg-gray-100 p-2 text-center">支出の詳細</div>
 
-        {/* メモ */}
-        <div>
-          <Memo memo={transactionData.memo} onMemoChange={onMemoChange} />
-        </div>
+      {/* お店の名前 */}
+      <div>
+        <ShopInfo
+          shop_name={transactionData.shop_name}
+          onShopNameChange={onShopNameChange}
+        />
+      </div>
 
-        <Button
-          className="w-full text-xl h-12"
-          onClick={onSave}
-          disabled={isSaveDisabled}
-        >
-          {saveButtonText}
-        </Button>
-      </CardContent>
+      {/* メモ */}
+      <div>
+        <Memo memo={transactionData.memo} onMemoChange={onMemoChange} />
+      </div>
+
+      <Button
+        className="w-full text-xl h-12"
+        onClick={onSave}
+        disabled={isSaveDisabled}
+      >
+        {saveButtonText}
+      </Button>
     </>
   );
 }

@@ -1,10 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
-
-interface PayerSelectProps {
-  userInfo: { user_id: string; name: string };
-  payer: string;
-  onPayerChange: (payer: string) => void;
-}
+import { PayerSelectProps } from "@/types/transaction.ts";
 
 export function PayerSelect({
   userInfo,
@@ -13,6 +8,26 @@ export function PayerSelect({
 }: PayerSelectProps) {
   const partner = "partner";
 
+  const getSelectedPayer = () => {
+    // ユーザー確認（id:更新時）
+    if (payer === userInfo.id) {
+      return userInfo.user_id;
+    }
+
+    // ユーザー確認（user_id:新規登録時）
+    if (payer === userInfo.user_id) {
+      return userInfo.user_id;
+    }
+
+    // パートナー
+    if (payer !== userInfo.id && payer !== userInfo.user_id) {
+      return "partner";
+    }
+
+    // デフォルト
+    return userInfo.user_id;
+  };
+
   return (
     <>
       <p>支払った人</p>
@@ -20,14 +35,14 @@ export function PayerSelect({
       <ToggleGroup
         className="flex overflow-hidden rounded-xl border shadow-sm"
         type="single"
-        value={payer}
+        value={getSelectedPayer()}
         onValueChange={(value) => onPayerChange(value || userInfo.user_id)}
       >
         <ToggleGroupItem
           variant={undefined}
           className={[
             "px-6 py-2 text-sm outline-none transition",
-            payer === userInfo.user_id
+            getSelectedPayer() === userInfo.user_id
               ? "!bg-sky-600 !text-white"
               : "bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}
@@ -38,7 +53,7 @@ export function PayerSelect({
         <ToggleGroupItem
           className={[
             "px-6 py-2 text-sm outline-none transition",
-            payer === partner
+            getSelectedPayer() === partner
               ? "!bg-sky-600 !text-white"
               : "bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}

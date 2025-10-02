@@ -1,9 +1,8 @@
 // ユーザー情報の型定義
 export interface User {
-  id: number;
+  id: string;
   name: string;
   user_id: string;
-  email: string;
   cognito_sub: string;
   created_at: string;
 }

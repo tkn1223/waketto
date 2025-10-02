@@ -1,4 +1,4 @@
-import {useState } from "react";
+import { useState } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
@@ -7,9 +7,8 @@ import { postTransaction } from "@/lib/api.ts";
 import type {
   CategorySelection,
   TransactionData,
-  updateTransactionData} from "@/types/transaction.tsx";
-
-
+  updateTransactionData,
+} from "@/types/transaction.tsx";
 
 interface UseTransactionFormProps {
   transactionPatch: Partial<updateTransactionData>;
@@ -36,8 +35,7 @@ export const useTransactionForm = ({
                 value: transactionPatch.category_id.toString(),
               }
             : null,
-          payer:
-            transactionPatch.paid_by_user_id?.toString() || userInfo.user_id,
+          payer: transactionPatch.paid_by_user_id || userInfo.user_id,
           shop_name: transactionPatch.store_name || "",
           memo: transactionPatch.note || "",
         }
@@ -51,6 +49,8 @@ export const useTransactionForm = ({
           memo: "",
         }
   );
+
+  console.log("transactionData", transactionData);
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
@@ -81,7 +81,7 @@ export const useTransactionForm = ({
       const requestData = {
         ...transactionData,
         date: format(transactionData.date, "yyyy-MM-dd"),
-        category: parseInt(transactionData.category?.value || ""),
+        category: transactionData.category?.value || "",
       };
 
       const response = await postTransaction(requestData);

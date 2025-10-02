@@ -1,12 +1,7 @@
 "use client";
 
-import type {
-  ReactNode} from "react";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState} from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   getCurrentUserInfo,
@@ -17,7 +12,7 @@ import {
 import type { InfomationForLogin } from "@/types/auth.ts";
 
 interface AuthContextType {
-  userInfo: { user_id: string; name: string };
+  userInfo: { id: string; user_id: string; name: string };
   isAuth: boolean;
   isLoading: boolean;
   error: string | null;
@@ -31,9 +26,10 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [userInfo, setUserInfo] = useState<{
+    id: string;
     user_id: string;
     name: string;
-  }>({ user_id: "", name: "" });
+  }>({ id: "", user_id: "", name: "" });
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error instanceof Error ? error.message : "ログインに失敗しました"
       );
       setIsAuth(false);
-      setUserInfo({ user_id: "", name: "" });
+      setUserInfo({ id: "", user_id: "", name: "" });
       throw error;
     } finally {
       setIsLoading(false);
@@ -82,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signOutUser();
       setIsAuth(false);
-      setUserInfo({ user_id: "", name: "" });
+      setUserInfo({ id: "", user_id: "", name: "" });
       localStorage.clear();
       sessionStorage.clear();
     } catch (error) {
@@ -108,16 +104,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           } else {
             console.warn("ユーザー情報が取得できませんでした");
             setIsAuth(false);
-            setUserInfo({ user_id: "", name: "" });
+            setUserInfo({ id: "", user_id: "", name: "" });
           }
         } else {
           setIsAuth(false);
-          setUserInfo({ user_id: "", name: "" });
         }
       } catch (err) {
         console.error("Authentication check failed:", err);
         setIsAuth(false);
-        setUserInfo({ user_id: "", name: "" });
+        setUserInfo({ id: "", user_id: "", name: "" });
       } finally {
         setIsLoading(false);
       }
