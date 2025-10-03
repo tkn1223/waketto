@@ -1,4 +1,4 @@
-// 取引明細の型定義
+// 取引明細
 export interface TransactionData {
   user: string;
   amount: number;
@@ -9,19 +9,19 @@ export interface TransactionData {
   memo: string;
 }
 
-// 編集用の取引明細の型定義
+// 編集用の取引明細（APIからの戻り値に確実性がないためオプショナルを設定）
 export interface updateTransactionData {
   id: string;
-  amount: number;
-  category_id: string;
-  payment_date: string;
-  paid_by_user_id: string;
-  couple_id: string | null;
-  store_name: string | null;
-  note: string | null;
+  amount?: number;
+  category_id?: string;
+  payment_date?: string;
+  paid_by_user_id?: string;
+  couple_id?: string | null;
+  store_name?: string | null;
+  note?: string | null;
 }
 
-// API送信用の型（日付は文字列）
+// API送信用日付は文字列）
 export interface TransactionRequestData {
   user: string;
   amount: number;
@@ -32,7 +32,7 @@ export interface TransactionRequestData {
   memo: string | null;
 }
 
-// カテゴリー関連の型定義
+// カテゴリー関連
 export interface Category {
   id: number;
   code: string;
@@ -66,7 +66,7 @@ export interface CategoryContextType {
   isCategoriesLoading: boolean;
 }
 
-// 支払者選択用の型定義
+// 支払者選択用
 export interface PayerSelectProps {
   userInfo: { id: string; user_id: string; name: string };
   payer: string;
