@@ -6,28 +6,8 @@ import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect.tsx"
 import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate.tsx";
 import { ShopInfo } from "@/components/dashboard/Transaction/ShopInfo.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import { CardContent } from "@/components/ui/card.tsx";
-import type {
-  CategorySelection,
-  TransactionData,
-} from "@/types/transaction.ts";
+import type { TransactionFormProps } from "@/types/transaction.ts";
 import { Amount } from "./Amount.tsx";
-
-interface TransactionFormProps {
-  // data
-  userInfo: { id: string; user_id: string; name: string };
-  transactionData: TransactionData;
-  isSaveDisabled: boolean;
-  saveButtonText: string; // ボタンのテキスト
-  // handler
-  onAmountChange: (amount: number) => void;
-  onDateChange: (date: Date) => void;
-  onCategoryChange: (category: CategorySelection | null) => void;
-  onPayerChange: (payer: string) => void;
-  onShopNameChange: (shop_name: string) => void;
-  onMemoChange: (memo: string) => void;
-  onSave: () => void;
-}
 
 export function TransactionForm({
   userInfo,
@@ -40,7 +20,9 @@ export function TransactionForm({
   onShopNameChange,
   onMemoChange,
   onSave,
+  onDelete,
   saveButtonText,
+  deleteButtonText,
 }: TransactionFormProps) {
   return (
     <>
@@ -92,13 +74,32 @@ export function TransactionForm({
         <Memo memo={transactionData.memo} onMemoChange={onMemoChange} />
       </div>
 
-      <Button
-        className="w-full text-xl h-12"
-        onClick={onSave}
-        disabled={isSaveDisabled}
-      >
-        {saveButtonText}
-      </Button>
+      {deleteButtonText ? (
+        <div className="flex gap-4">
+          <Button
+            className="flex-[2] text-xl py-6"
+            onClick={onSave}
+            disabled={isSaveDisabled}
+          >
+            {saveButtonText}
+          </Button>
+          <Button
+            className="flex-[1] text-md py-6 rounded-full"
+            variant="destructive"
+            onClick={onDelete}
+          >
+            {deleteButtonText}
+          </Button>
+        </div>
+      ) : (
+        <Button
+          className="w-full text-xl py-6"
+          onClick={onSave}
+          disabled={isSaveDisabled}
+        >
+          {saveButtonText}
+        </Button>
+      )}
     </>
   );
 }

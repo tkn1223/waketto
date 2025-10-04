@@ -1,14 +1,9 @@
-import type {
-  ReactNode} from "react";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState} from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { getCategories } from "@/lib/api.ts";
-import type { CategoryContextType,CategoryData } from "@/types/transaction.ts";
+import type { CategoryContextType, CategoryData } from "@/types/transaction.ts";
 
 const CategoryContext = createContext<CategoryContextType | undefined>(
   undefined
@@ -27,6 +22,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.status) {
         setCategories(response.data);
+        console.log("categories", response.data);
       }
     } catch (err) {
       toast.error("カテゴリーの取得に失敗しました", {

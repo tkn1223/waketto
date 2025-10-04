@@ -1,4 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
@@ -22,17 +24,17 @@ export const useTransactionForm = ({
   const { userInfo } = useAuth();
   const { categories, isCategoriesLoading } = useCategory();
 
-  // transactionPatchからTransactionDataを作成する共通関数
-  const createTransactionData = useMemo(() => {
-    return (patch: updateTransactionData | null): TransactionData => {
+  // 無限レンダリング対策: createTransactionData関数をメモ化してuseEffectの不要な実行を防ぐ
+  const createTransactionData = useCallback(
+    (patch: updateTransactionData | null): TransactionData => {
       if (patch) {
         return {
           user: userInfo.user_id,
           amount: patch.amount || 0,
           date: patch.payment_date ? new Date(patch.payment_date) : new Date(),
           category: {
-            type: "category",
-            value: patch.category_id || "",
+            type: patch.category_group_code || "category",
+            value: patch.category_id ? String(patch.category_id) : "",
           },
           payer: patch.paid_by_user_id || userInfo.id,
           shop_name: patch.store_name || "",
@@ -49,14 +51,14 @@ export const useTransactionForm = ({
           memo: "",
         };
       }
-    };
-  }, [userInfo.user_id, userInfo.id]);
+    },
+    [userInfo.user_id, userInfo.id]
+  );
 
   const [transactionData, setTransactionData] = useState<TransactionData>(
     createTransactionData(transactionPatch)
   );
 
-  // transactionPatchの変更を監視してtransactionDataを更新
   useEffect(() => {
     setTransactionData(createTransactionData(transactionPatch));
   }, [
@@ -64,13 +66,13 @@ export const useTransactionForm = ({
     transactionPatch?.amount,
     transactionPatch?.payment_date,
     transactionPatch?.category_id,
+    transactionPatch?.category_group_code,
     transactionPatch?.paid_by_user_id,
     transactionPatch?.store_name,
     transactionPatch?.note,
-    createTransactionData,
   ]);
 
-  // console.log("transactionData", transactionData);
+  console.log("transactionData", transactionData);
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
@@ -125,6 +127,18 @@ export const useTransactionForm = ({
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      console.log("handleDelete");
+    } catch (error) {
+      toast.error("取引明細の削除に失敗しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
+    } finally {
+      resetForm();
+    }
+  };
+
   const resetForm = () => {
     setTransactionData({
       user: userInfo.user_id,
@@ -152,6 +166,7 @@ export const useTransactionForm = ({
     handleShopNameChange,
     handleMemoChange,
     handleSave,
+    handleDelete,
     resetForm,
   };
 };
