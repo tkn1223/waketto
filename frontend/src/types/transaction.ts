@@ -14,6 +14,7 @@ export interface updateTransactionData {
   id: string;
   amount?: number;
   category_id?: string;
+  category_group_code?: string;
   payment_date?: string;
   paid_by_user_id?: string;
   couple_id?: string | null;
@@ -71,4 +72,23 @@ export interface PayerSelectProps {
   userInfo: { id: string; user_id: string; name: string };
   payer: string;
   onPayerChange: (payer: string) => void;
+}
+
+// 取引明細フォーム用
+export interface TransactionFormProps {
+  // data
+  userInfo: { id: string; user_id: string; name: string };
+  transactionData: TransactionData;
+  isSaveDisabled: boolean;
+  saveButtonText: string; // ボタンのテキスト
+  deleteButtonText: string; // ボタンのテキスト
+  // handler
+  onAmountChange: (amount: number) => void;
+  onDateChange: (date: Date) => void;
+  onCategoryChange: (category: CategorySelection | null) => void;
+  onPayerChange: (payer: string) => void;
+  onShopNameChange: (shop_name: string) => void;
+  onMemoChange: (memo: string) => void;
+  onSave: () => void;
+  onDelete: () => void;
 }

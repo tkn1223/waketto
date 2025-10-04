@@ -46,6 +46,7 @@ class ExpenseReportController extends Controller
                 'id' => $payment->id,
                 'amount' => $payment->amount,
                 'category_id' => $payment->category_id,
+                'category_group_code' => $groupCode,
                 'payment_date' => $payment->payment_date,
                 'paid_by_user_id' => $payment->paid_by_user_id,
                 'couple_id' => $payment->couple_id,

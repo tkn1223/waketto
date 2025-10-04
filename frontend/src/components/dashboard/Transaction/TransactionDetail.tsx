@@ -22,8 +22,9 @@ export function TransactionDetail() {
     handleShopNameChange,
     handleMemoChange,
     handleSave,
+    handleDelete,
   } = useTransactionForm({
-    transactionPatch: {},
+    transactionPatch: null,
     onSaveSuccess: () => {},
   });
 
@@ -45,7 +46,9 @@ export function TransactionDetail() {
             onShopNameChange={handleShopNameChange}
             onMemoChange={handleMemoChange}
             onSave={handleSave}
+            onDelete={handleDelete}
             saveButtonText="保存する"
+            deleteButtonText=""
           />
         </CardContent>
       </Card>

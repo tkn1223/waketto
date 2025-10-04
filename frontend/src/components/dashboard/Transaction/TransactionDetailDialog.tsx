@@ -31,6 +31,7 @@ export function TransactionDetailDialog({
     handleShopNameChange,
     handleMemoChange,
     handleSave,
+    handleDelete,
   } = useTransactionForm({
     transactionPatch: { ...payment },
     onSaveSuccess: onClose,
@@ -54,7 +55,9 @@ export function TransactionDetailDialog({
             onShopNameChange={handleShopNameChange}
             onMemoChange={handleMemoChange}
             onSave={handleSave}
+            onDelete={handleDelete}
             saveButtonText="更新する"
+            deleteButtonText="削除する"
           />
         </div>
       </DialogContent>

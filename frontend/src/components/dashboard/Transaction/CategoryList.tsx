@@ -44,7 +44,12 @@ export function CategoryList({
   }));
 
   // デフォルトタブを設定（最初のタブ）
-  const defaultTab = tabItems.length > 0 ? tabItems[0].key : "";
+  const getdefaultTab = () => {
+    if (selected?.type) {
+      return selected.type;
+    }
+    tabItems.length > 0 ? tabItems[0].key : "";
+  };
 
   return (
     <Popover open={categoryOpen} onOpenChange={setCategoryOpen}>
@@ -68,7 +73,7 @@ export function CategoryList({
 
           {/* カテゴリー選択ポップオーバー */}
           <PopoverContent align="end" className="w-[300px] p-0">
-            <Tabs defaultValue={defaultTab} className="w-full">
+            <Tabs defaultValue={getdefaultTab()} className="w-full">
               {/* タブ上部：タブリスト */}
               <div className="sticky top-0 z-10 bg-gray-200 rounded-t-md">
                 <TabsList className="grid w-full grid-cols-3 grid-rows-2 gap-1 p-1 bg-transparent h-auto">
