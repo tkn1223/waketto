@@ -20,6 +20,7 @@ export function TransactionForm({
   onShopNameChange,
   onMemoChange,
   onSave,
+  onUpdate,
   onDelete,
   saveButtonText,
   deleteButtonText,
@@ -78,7 +79,7 @@ export function TransactionForm({
         <div className="flex gap-4">
           <Button
             className="flex-[2] text-xl py-6"
-            onClick={onSave}
+            onClick={onUpdate}
             disabled={isSaveDisabled}
           >
             {saveButtonText}
