@@ -13,12 +13,14 @@ interface TransactionDetailDialogProps {
   payment: SavedTransactionData;
   isOpen: boolean;
   onClose: () => void;
+  onUpdate: () => void;
 }
 
 export function TransactionDetailDialog({
   payment,
   isOpen,
   onClose,
+  onUpdate,
 }: TransactionDetailDialogProps) {
   const { userInfo } = useAuth();
   const {
@@ -34,7 +36,10 @@ export function TransactionDetailDialog({
     handleDelete,
   } = useTransactionForm({
     transactionPatch: { ...payment },
-    onSuccess: onClose,
+    onSuccess: () => {
+      onClose();
+      onUpdate();
+    },
   });
 
   return (

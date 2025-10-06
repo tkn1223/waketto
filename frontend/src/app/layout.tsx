@@ -8,6 +8,8 @@ import { Header } from "@/components/layout/Header.tsx";
 import { Toaster } from "@/components/ui/sonner.tsx";
 import { AuthProvider } from "@/contexts/AuthContext.tsx";
 import { CategoryProvider } from "@/contexts/CategoryContext.tsx";
+import { SWRConfig } from "swr";
+import { swrConfig } from "@/lib/swr.ts";
 
 import "./globals.css";
 
@@ -45,14 +47,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ja">
       <body className="antialiased">
         <AmplifyProvider>
-          <AuthProvider>
-            <CategoryProvider>
-              <Header finance={finance} setFinance={setFinance} />
-              {children}
-              <Toaster position="top-center" richColors />
-              <Footer />
-            </CategoryProvider>
-          </AuthProvider>
+          <SWRConfig value={swrConfig}>
+            <AuthProvider>
+              <CategoryProvider>
+                <Header finance={finance} setFinance={setFinance} />
+                {children}
+                <Toaster position="top-center" richColors />
+                <Footer />
+              </CategoryProvider>
+            </AuthProvider>
+          </SWRConfig>
         </AmplifyProvider>
       </body>
     </html>

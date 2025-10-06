@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.tsx";
@@ -12,34 +12,19 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { getExpenseReport } from "@/lib/api.ts";
+import { useExpenseReport } from "@/lib/swr.ts";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import type { ExpenseReportResponse } from "@/types/transaction.ts";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [expenseReport, setExpenseReport] = useState<
-    ExpenseReportResponse | undefined
-  >();
-  const [error, setError] = useState<string | null>(null);
   const { userInfo, isAuth, isLoading } = useAuth();
 
-  useEffect(() => {
-    const fetchExpenseReport = async () => {
-      try {
-        const response = await getExpenseReport();
-        setExpenseReport(response);
-      } catch (error) {
-        console.error("支出管理表の取得に失敗しました:", error);
-        setError("支出管理表の取得に失敗しました");
-      }
-    };
-
-    // 認証済みかつ認証ローディング完了後にデータ取得を実行
-    if (isAuth && !isLoading) {
-      void fetchExpenseReport();
-    }
-  }, [isAuth, isLoading]);
+  const {
+    data: expenseReport,
+    error: expenseReportError,
+    isLoading: isExpenseReportLoading,
+    mutate,
+  } = useExpenseReport(isAuth);
 
   // 認証失敗時のリダイレクト
   useEffect(() => {
@@ -48,25 +33,17 @@ export default function DashboardPage() {
     }
   }, [isAuth, isLoading, router]);
 
+  // 支出管理表のデータを更新
+  const refreshExpenseReport = () => {
+    mutate();
+  };
+
   if (isLoading || !userInfo) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-gray-600">読み込み中...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <Button onClick={() => router.push("/signin")}>
-            ログインページに戻る
-          </Button>
         </div>
       </div>
     );
@@ -83,11 +60,25 @@ export default function DashboardPage() {
                 <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
               </CardHeader>
               <CardContent>
-                {expenseReport ? (
-                  <ExpenseTable expenseReport={expenseReport} />
+                {isExpenseReportLoading ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">データを読み込み中...</p>
+                  </div>
+                ) : expenseReportError ? (
+                  <div className="text-center py-8">
+                    <p className="text-red-600">データの取得に失敗しました</p>
+                    <Button onClick={() => mutate()} className="mt-2">
+                      再試行
+                    </Button>
+                  </div>
+                ) : expenseReport ? (
+                  <ExpenseTable
+                    expenseReport={expenseReport}
+                    onTransactionUpdate={refreshExpenseReport}
+                  />
                 ) : (
-                  <div>
-                    データを読み込めませんでした。再度ログインしてください。
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">データがありません</p>
                   </div>
                 )}
               </CardContent>
@@ -96,7 +87,7 @@ export default function DashboardPage() {
         </div>
         {/* 取引明細カード */}
         <div className="lg:col-span-1">
-          <TransactionDetail />
+          <TransactionDetail onUpdate={refreshExpenseReport} />
         </div>
         {/* 予算消化率 */}
         <div className="col-span-3 space-y-3">

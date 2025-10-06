@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useTransactionForm } from "@/hooks/useTransactionForm.tsx";
 import { TransactionForm } from "./TransactionForm.tsx";
 
-export function TransactionDetail() {
+export function TransactionDetail({ onUpdate }: { onUpdate: () => void }) {
   const { userInfo } = useAuth();
   const {
     transactionData,
@@ -24,7 +24,9 @@ export function TransactionDetail() {
     handleSave,
   } = useTransactionForm({
     transactionPatch: null,
-    onSuccess: () => {},
+    onSuccess: () => {
+      onUpdate();
+    },
   });
 
   return (

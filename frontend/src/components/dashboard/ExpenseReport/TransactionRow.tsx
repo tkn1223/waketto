@@ -6,7 +6,10 @@ import type {
 } from "@/types/transaction.ts";
 import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
 
-export function TransactionRow({ category }: TransactionRowProps) {
+export function TransactionRow({
+  category,
+  onTransactionUpdate,
+}: TransactionRowProps) {
   const [selectedPayment, setSelectedPayment] =
     useState<SavedTransactionData | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -43,6 +46,7 @@ export function TransactionRow({ category }: TransactionRowProps) {
           payment={selectedPayment}
           isOpen={isDialogOpen}
           onClose={() => setIsDialogOpen(false)}
+          onUpdate={onTransactionUpdate} // 更新成功時にコールバック実行
         />
       )}
     </div>
