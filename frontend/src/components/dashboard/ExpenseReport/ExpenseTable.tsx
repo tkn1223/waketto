@@ -7,8 +7,10 @@ import type {
 
 export function ExpenseTable({
   expenseReport,
+  onTransactionUpdate,
 }: {
   expenseReport: ExpenseReportResponse;
+  onTransactionUpdate: () => void;
 }) {
   return (
     <>
@@ -26,7 +28,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.monthly_fixed_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>
@@ -48,7 +54,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.monthly_variable_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>
@@ -70,7 +80,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.occasional_fixed_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>
@@ -92,7 +106,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.occasional_variable_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>
@@ -114,7 +132,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.luxury_consumption_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>
@@ -136,7 +158,11 @@ export function ExpenseTable({
                 Object.entries(
                   expenseReport.data?.savings_investment_cost?.categories || {}
                 ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow key={key} category={category} />
+                  <TransactionRow
+                    key={key}
+                    category={category}
+                    onTransactionUpdate={onTransactionUpdate}
+                  />
                 ))
               ) : (
                 <div className="text-sm text-gray-500">明細が未登録です</div>

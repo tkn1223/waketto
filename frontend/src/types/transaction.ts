@@ -63,6 +63,7 @@ export interface CategoryWithPayments {
 // 支出管理表の型定義（取引明細）
 export interface TransactionRowProps {
   category: CategoryWithPayments;
+  onTransactionUpdate: () => void;
 }
 
 // カテゴリー関連

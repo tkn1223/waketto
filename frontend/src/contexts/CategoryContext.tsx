@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import { getCategories } from "@/lib/api.ts";
-import type { CategoryContextType, CategoryData } from "@/types/transaction.ts";
+import { useCategories } from "@/lib/swr.ts";
+import type { CategoryContextType } from "@/types/transaction.ts";
 
 const CategoryContext = createContext<CategoryContextType | undefined>(
   undefined
@@ -11,33 +11,28 @@ const CategoryContext = createContext<CategoryContextType | undefined>(
 
 export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   const { isAuth } = useAuth();
-  const [categories, setCategories] = useState<CategoryData>({});
-  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
-  const fetchCategories = async () => {
-    if (!isAuth) return;
 
-    setIsCategoriesLoading(true);
-    try {
-      const response = await getCategories();
+  // SWRでカテゴリーデータを取得（認証済みの場合のみ）
+  const {
+    data: categories,
+    error,
+    isLoading: isCategoriesLoading,
+  } = useCategories(isAuth);
 
-      if (response.status) {
-        setCategories(response.data);
-      }
-    } catch (err) {
-      toast.error("カテゴリーの取得に失敗しました", {
-        className: "!bg-red-600 !text-white !border-red-800",
-      });
-    } finally {
-      setIsCategoriesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void fetchCategories();
-  }, [isAuth]);
+  // エラーハンドリング
+  if (error) {
+    toast.error("カテゴリーの取得に失敗しました", {
+      className: "!bg-red-600 !text-white !border-red-800",
+    });
+  }
 
   return (
-    <CategoryContext.Provider value={{ categories, isCategoriesLoading }}>
+    <CategoryContext.Provider
+      value={{
+        categories: categories?.data || {},
+        isCategoriesLoading: isCategoriesLoading,
+      }}
+    >
       {children}
     </CategoryContext.Provider>
   );
