@@ -1,5 +1,5 @@
 import { fetchAuthSession } from "aws-amplify/auth";
-import { checkTokenValidity,signOutUser } from "@/lib/auth.ts";
+import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
 import type {
   CategoriesResponse,
   TransactionRequestData,
@@ -31,6 +31,24 @@ export async function postTransaction(
   return await fetchApi<Response>("/transaction", {
     method: "POST",
     body: JSON.stringify(requestData),
+  });
+}
+
+// 取引明細を更新
+export async function putTransaction(
+  requestData: any,
+  id: string
+): Promise<Response> {
+  return await fetchApi<Response>(`/transaction/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(requestData),
+  });
+}
+
+// 取引明細を削除
+export async function deleteTransaction(id: string): Promise<Response> {
+  return await fetchApi(`/transaction/${id}`, {
+    method: "DELETE",
   });
 }
 

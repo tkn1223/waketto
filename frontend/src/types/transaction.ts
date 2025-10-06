@@ -22,7 +22,7 @@ export interface updateTransactionData {
   note?: string | null;
 }
 
-// API送信用日付は文字列）
+// 取引明細保存用（日付は文字列）
 export interface TransactionRequestData {
   user: string;
   amount: number;
@@ -89,6 +89,7 @@ export interface TransactionFormProps {
   onPayerChange: (payer: string) => void;
   onShopNameChange: (shop_name: string) => void;
   onMemoChange: (memo: string) => void;
-  onSave: () => void;
-  onDelete: () => void;
+  onSave?: () => void;
+  onUpdate?: () => void;
+  onDelete?: () => void;
 }

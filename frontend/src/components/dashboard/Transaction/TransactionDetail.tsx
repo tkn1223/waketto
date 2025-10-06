@@ -22,10 +22,9 @@ export function TransactionDetail() {
     handleShopNameChange,
     handleMemoChange,
     handleSave,
-    handleDelete,
   } = useTransactionForm({
     transactionPatch: null,
-    onSaveSuccess: () => {},
+    onSuccess: () => {},
   });
 
   return (
@@ -46,7 +45,6 @@ export function TransactionDetail() {
             onShopNameChange={handleShopNameChange}
             onMemoChange={handleMemoChange}
             onSave={handleSave}
-            onDelete={handleDelete}
             saveButtonText="保存する"
             deleteButtonText=""
           />

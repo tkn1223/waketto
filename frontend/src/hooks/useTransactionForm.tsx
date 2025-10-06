@@ -5,7 +5,11 @@ import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useCategory } from "@/contexts/CategoryContext.tsx";
-import { postTransaction } from "@/lib/api.ts";
+import {
+  postTransaction,
+  putTransaction,
+  deleteTransaction,
+} from "@/lib/api.ts";
 import type {
   CategorySelection,
   TransactionData,
@@ -14,12 +18,12 @@ import type {
 
 interface UseTransactionFormProps {
   transactionPatch: updateTransactionData | null;
-  onSaveSuccess: () => void;
+  onSuccess: () => void;
 }
 
 export const useTransactionForm = ({
   transactionPatch,
-  onSaveSuccess,
+  onSuccess,
 }: UseTransactionFormProps) => {
   const { userInfo } = useAuth();
   const { categories, isCategoriesLoading } = useCategory();
@@ -34,7 +38,7 @@ export const useTransactionForm = ({
           date: patch.payment_date ? new Date(patch.payment_date) : new Date(),
           category: {
             type: patch.category_group_code || "category",
-            value: patch.category_id ? String(patch.category_id) : "",
+            value: patch.category_id ? patch.category_id : "",
           },
           payer: patch.paid_by_user_id || userInfo.id,
           shop_name: patch.store_name || "",
@@ -71,8 +75,6 @@ export const useTransactionForm = ({
     transactionPatch?.store_name,
     transactionPatch?.note,
   ]);
-
-  console.log("transactionData", transactionData);
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
@@ -112,30 +114,80 @@ export const useTransactionForm = ({
         toast.success("取引明細を保存しました", {
           className: "!bg-yellow-600 !text-white !border-yellow-800",
         });
-        onSaveSuccess();
+        resetForm();
       } else {
         toast.error("取引明細の保存に失敗しました", {
           className: "!bg-red-600 !text-white !border-red-800",
         });
       }
     } catch (error) {
-      toast.error("取引明細の保存に失敗しました", {
+      toast.error("取引明細の保存中に サーバーエラーが発生しました", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
-    } finally {
-      resetForm();
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!transactionPatch?.id) {
+      toast.error("更新対象の取引が指定されていません", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
+      return;
+    }
+
+    try {
+      const requestData = {
+        ...transactionData,
+        date: format(transactionData.date, "yyyy-MM-dd"),
+        category: transactionData.category?.value || "",
+      };
+
+      const response = await putTransaction(requestData, transactionPatch?.id);
+
+      if (response.status) {
+        toast.success("取引明細を更新しました", {
+          className: "!bg-yellow-600 !text-white !border-yellow-800",
+        });
+        resetForm();
+        onSuccess();
+      } else {
+        toast.error("取引明細の更新に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
+      }
+    } catch (error) {
+      toast.error("取引明細の更新中に サーバーエラーが発生しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
     }
   };
 
   const handleDelete = async () => {
-    try {
-      console.log("handleDelete");
-    } catch (error) {
-      toast.error("取引明細の削除に失敗しました", {
+    if (!transactionPatch?.id) {
+      toast.error("削除対象の取引が指定されていません", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
-    } finally {
-      resetForm();
+      return;
+    }
+
+    try {
+      const response = await deleteTransaction(transactionPatch?.id);
+
+      if (response.status) {
+        toast.success("取引明細を削除しました", {
+          className: "!bg-yellow-600 !text-white !border-yellow-800",
+        });
+        resetForm();
+        onSuccess();
+      } else {
+        toast.error("取引明細の削除に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
+      }
+    } catch (error) {
+      toast.error("取引明細の削除中に サーバーエラーが発生しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
     }
   };
 
@@ -166,7 +218,7 @@ export const useTransactionForm = ({
     handleShopNameChange,
     handleMemoChange,
     handleSave,
+    handleUpdate,
     handleDelete,
-    resetForm,
   };
 };
