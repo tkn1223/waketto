@@ -13,11 +13,11 @@ import {
 import type {
   CategorySelection,
   TransactionData,
-  updateTransactionData,
+  SavedTransactionData,
 } from "@/types/transaction.tsx";
 
 interface UseTransactionFormProps {
-  transactionPatch: updateTransactionData | null;
+  transactionPatch: SavedTransactionData | null;
   onSuccess: () => void;
 }
 
@@ -30,19 +30,19 @@ export const useTransactionForm = ({
 
   // 無限レンダリング対策: createTransactionData関数をメモ化してuseEffectの不要な実行を防ぐ
   const createTransactionData = useCallback(
-    (patch: updateTransactionData | null): TransactionData => {
+    (patch: SavedTransactionData | null): TransactionData => {
       if (patch) {
         return {
           user: userInfo.user_id,
           amount: patch.amount || 0,
-          date: patch.payment_date ? new Date(patch.payment_date) : new Date(),
+          date: patch.date ? new Date(patch.date) : new Date(),
           category: {
             type: patch.category_group_code || "category",
-            value: patch.category_id ? patch.category_id : "",
+            value: patch.category ? patch.category.toString() : "",
           },
-          payer: patch.paid_by_user_id || userInfo.id,
-          shop_name: patch.store_name || "",
-          memo: patch.note || "",
+          payer: patch.user || userInfo.id,
+          shop_name: patch.shop_name || "",
+          memo: patch.memo || "",
         };
       } else {
         return {
@@ -68,12 +68,12 @@ export const useTransactionForm = ({
   }, [
     transactionPatch?.id,
     transactionPatch?.amount,
-    transactionPatch?.payment_date,
-    transactionPatch?.category_id,
+    transactionPatch?.date,
+    transactionPatch?.category,
     transactionPatch?.category_group_code,
-    transactionPatch?.paid_by_user_id,
-    transactionPatch?.store_name,
-    transactionPatch?.note,
+    transactionPatch?.user,
+    transactionPatch?.shop_name,
+    transactionPatch?.memo,
   ]);
 
   const handleAmountChange = (amount: number) => {
@@ -203,6 +203,7 @@ export const useTransactionForm = ({
     });
   };
 
+  // 保存/更新ボタンの無効化
   const isSaveDisabled =
     transactionData.amount <= 0 || transactionData.category === null;
 

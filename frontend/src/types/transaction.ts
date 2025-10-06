@@ -1,4 +1,4 @@
-// 取引明細
+// フロントエンドで扱う際の取引明細の型
 export interface TransactionData {
   user: string;
   amount: number;
@@ -9,28 +9,60 @@ export interface TransactionData {
   memo: string;
 }
 
-// 編集用の取引明細（APIからの戻り値に確実性がないためオプショナルを設定）
-export interface updateTransactionData {
-  id: string;
-  amount?: number;
-  category_id?: string;
-  category_group_code?: string;
-  payment_date?: string;
-  paid_by_user_id?: string;
-  couple_id?: string | null;
-  store_name?: string | null;
-  note?: string | null;
-}
-
-// 取引明細保存用（日付は文字列）
+// バックエンドに渡すときの取引明細の型
 export interface TransactionRequestData {
   user: string;
   amount: number;
-  date: string;
+  date: string; // 事前に文字列に変換する
   category: string;
   payer: string;
   shop_name: string | null;
   memo: string | null;
+}
+
+// バックエンドから取得した取引明細の型（APIからの戻り値に確実性がないためオプショナルを設定）
+export interface SavedTransactionData {
+  id: string;
+  user?: string;
+  amount?: number;
+  date?: string;
+  category?: string;
+  shop_name?: string | null;
+  memo?: string | null;
+  category_group_code?: string;
+}
+
+// 支出管理表のAPIレスポンス型定義
+export interface ExpenseReportResponse {
+  status: boolean;
+  data: ExpenseReportData;
+}
+
+// 支出管理表の型定義（カテゴリーグループ）
+export interface ExpenseReportData {
+  monthly_fixed_cost?: CategoryGroupData;
+  monthly_variable_cost?: CategoryGroupData;
+  occasional_fixed_cost?: CategoryGroupData;
+  occasional_variable_cost?: CategoryGroupData;
+  luxury_consumption_cost?: CategoryGroupData;
+  savings_investment_cost?: CategoryGroupData;
+}
+
+// 支出管理表の型定義（カテゴリーグループとカテゴリ詳細）
+export interface CategoryGroupData {
+  group_name: string;
+  categories: Record<string, CategoryWithPayments>;
+}
+
+// 支出管理表の型定義（カテゴリと取引明細詳細）
+export interface CategoryWithPayments {
+  category_name: string;
+  payments: SavedTransactionData[];
+}
+
+// 支出管理表の型定義（取引明細）
+export interface TransactionRowProps {
+  category: CategoryWithPayments;
 }
 
 // カテゴリー関連
@@ -43,6 +75,12 @@ export interface Category {
 export interface CategoryGroup {
   group_name: string;
   categories: Category[];
+}
+
+// 金額（取引明細）
+export interface AmountProps {
+  amount: number;
+  onAmountChange: (amount: number) => void;
 }
 
 export type CategoryData = Record<string, CategoryGroup>;
