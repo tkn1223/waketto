@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useTransactionForm } from "@/hooks/useTransactionForm.tsx";
-import type { updateTransactionData } from "@/types/transaction.ts";
+import type { SavedTransactionData } from "@/types/transaction.ts";
 import { TransactionForm } from "./TransactionForm.tsx";
 
 interface TransactionDetailDialogProps {
-  payment: updateTransactionData;
+  payment: SavedTransactionData;
   isOpen: boolean;
   onClose: () => void;
 }

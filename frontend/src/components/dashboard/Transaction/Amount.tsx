@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-
-interface AmountProps {
-  amount: number;
-  onAmountChange: (amount: number) => void;
-}
+import type { AmountProps } from "@/types/transaction.ts";
 
 // [表示用] 数値をカンマ区切りの文字列に変換
 const formatNumber = (num: number): string => {

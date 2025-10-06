@@ -3,6 +3,7 @@ import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
 import type {
   CategoriesResponse,
   TransactionRequestData,
+  ExpenseReportResponse,
 } from "@/types/transaction.ts";
 
 // 環境変数の型定義
@@ -20,8 +21,8 @@ export async function getCategories(): Promise<CategoriesResponse> {
 }
 
 // 支出管理表の一覧を取得
-export async function getExpenseReport(): Promise<any> {
-  return await fetchApi<any>("/expense-report");
+export async function getExpenseReport(): Promise<ExpenseReportResponse> {
+  return await fetchApi<ExpenseReportResponse>("/expense-report");
 }
 
 // 取引明細を保存
@@ -36,7 +37,7 @@ export async function postTransaction(
 
 // 取引明細を更新
 export async function putTransaction(
-  requestData: any,
+  requestData: TransactionRequestData,
   id: string
 ): Promise<Response> {
   return await fetchApi<Response>(`/transaction/${id}`, {

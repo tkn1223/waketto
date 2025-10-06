@@ -13,6 +13,8 @@ export function TransactionForm({
   userInfo,
   transactionData,
   isSaveDisabled,
+  saveButtonText,
+  deleteButtonText,
   onAmountChange,
   onDateChange,
   onCategoryChange,
@@ -22,8 +24,6 @@ export function TransactionForm({
   onSave,
   onUpdate,
   onDelete,
-  saveButtonText,
-  deleteButtonText,
 }: TransactionFormProps) {
   return (
     <>

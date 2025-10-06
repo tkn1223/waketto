@@ -22,7 +22,6 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
 
       if (response.status) {
         setCategories(response.data);
-        console.log("categories", response.data);
       }
     } catch (err) {
       toast.error("カテゴリーの取得に失敗しました", {

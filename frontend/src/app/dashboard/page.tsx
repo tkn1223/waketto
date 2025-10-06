@@ -14,10 +14,13 @@ import {
 import { Label } from "@/components/ui/label.tsx";
 import { getExpenseReport } from "@/lib/api.ts";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import type { ExpenseReportResponse } from "@/types/transaction.ts";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [expenseReport, setExpenseReport] = useState<any>();
+  const [expenseReport, setExpenseReport] = useState<
+    ExpenseReportResponse | undefined
+  >();
   const [error, setError] = useState<string | null>(null);
   const { userInfo, isAuth, isLoading } = useAuth();
 
@@ -80,7 +83,13 @@ export default function DashboardPage() {
                 <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
               </CardHeader>
               <CardContent>
-                <ExpenseTable expenseReport={expenseReport} />
+                {expenseReport ? (
+                  <ExpenseTable expenseReport={expenseReport} />
+                ) : (
+                  <div>
+                    データを読み込めませんでした。再度ログインしてください。
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
