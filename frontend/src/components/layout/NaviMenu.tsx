@@ -30,20 +30,19 @@ export function NaviMenu() {
             <ul className="grid w-[200px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="#" className="flex-row items-center gap-2">
+                  <Link href="/setting" className="flex-row items-center gap-2">
                     <SettingsIcon />
                     設定
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
-                  <Link
-                    href="#"
+                  <button
                     onClick={handleSignOut}
-                    className="flex-row items-center gap-2"
+                    className="w-full flex-row items-center gap-2"
                   >
                     <LogOutIcon />
                     ログアウト
-                  </Link>
+                  </button>
                 </NavigationMenuLink>
               </li>
             </ul>
