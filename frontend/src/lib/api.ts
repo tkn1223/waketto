@@ -11,6 +11,12 @@ const COGNITO_CONFIG = {
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
 };
 
+export type Response = {
+  status: boolean;
+  message?: string;
+  errors?: Record<string, string>;
+};
+
 /*
  * 各APIリクエストの定義
  */
@@ -53,6 +59,13 @@ export async function deleteTransaction(id: string): Promise<Response> {
   });
 }
 
+// パートナー設定の保存
+export async function postPartnerSetting(partnerId: string): Promise<Response> {
+  return await fetchApi<Response>(`/partner-setting/${partnerId}`, {
+    method: "POST",
+  });
+}
+
 /*
  * APIリクエスト
  */
@@ -64,7 +77,9 @@ export async function fetchApi<T>(
   const isTokenValid = await checkTokenValidity();
 
   if (!isTokenValid) {
-    throw new Error("トークンが期限切れです");
+    // トークン期限切れ時は自動的にサインアウトしてログイン画面にリダイレクト
+    await signOutUser();
+    window.location.href = "/signin";
   }
 
   // セッションを取得（トークンが期限切れの場合新しいトークンを自動取得）

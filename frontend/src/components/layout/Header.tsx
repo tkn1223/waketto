@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ finance, setFinance }: HeaderProps) {
-  const { isLoading, isAuth, user } = useAuth();
+  const { isLoading, isAuth } = useAuth();
 
   return (
     <header className="max-w-screen-x1 bg-emerald-100">
