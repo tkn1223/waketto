@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable
 {
@@ -55,5 +57,38 @@ class User extends Authenticatable
         } while (User::where('user_id', $userId)->exists());
 
         return $userId;
+    }
+
+    /**
+     * パートナー設定
+     */
+    public static function setPartner(User $user, User $partner): bool
+    {
+        DB::beginTransaction();
+
+        try {
+            $user->update([
+                'couple_id' => $partner->id,
+                'pair_index' => 1,
+            ]);
+    
+            $partner->update([
+                'couple_id' => $user->id,
+                'pair_index' => 2,
+            ]);
+    
+            DB::commit();
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('パートナー設定エラー', [
+                'error' => $e->getMessage(),
+                'user_id' => $user->id,
+                'partner_id' => $partner->id,
+            ]);
+
+            return false;
+        }
     }
 }

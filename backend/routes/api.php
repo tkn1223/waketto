@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ExpenseReportController;
 use App\Http\Controllers\Api\TransactionController;
+use App\Http\Controllers\Api\SettingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,9 @@ Route::middleware('cognito')->group(function () {
 
     // 支出管理表関連のルート
     Route::get('/expense-report', [ExpenseReportController::class, 'index']);
+
+    // 設定関連のルート
+    Route::post('/partner-setting/{partnerId}', [SettingController::class, 'entry']);
 });
 
 // パブリックルート（認証不要）
