@@ -2,11 +2,7 @@
 
 import { User, Users } from "lucide-react";
 import { Toggle } from "@/components/ui/toggle.tsx";
-
-interface UserModeToggleProps {
-  user: string;
-  setUser: (user: string) => void;
-}
+import type { UserModeToggleProps } from "@/types/viewmode";
 
 export function UserModeToggle({ user, setUser }: UserModeToggleProps) {
   return (
