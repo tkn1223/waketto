@@ -1,10 +1,19 @@
-// ユーザー情報の型定義
+// ユーザー情報の型定義（バックエンドから返される完全な情報）
 export interface User {
   id: string;
   name: string;
   user_id: string;
   cognito_sub: string;
+  couple_id: string | null;
   created_at: string;
+}
+
+// ユーザー情報の型定義（フロントエンドで使用する最小限の情報）
+export interface UserInfo {
+  id: string;
+  user_id: string;
+  name: string;
+  couple_id: string | null;
 }
 
 // ログイン情報の型定義

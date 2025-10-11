@@ -6,26 +6,13 @@ export function PayerSelect({
   payer,
   onPayerChange,
 }: PayerSelectProps) {
-  const partner = "partner";
-
   const getSelectedPayer = () => {
-    // ユーザー確認（id:更新時）
-    if (payer === userInfo.id) {
+    // ユーザー確認
+    if (payer === userInfo.id || payer === userInfo.user_id) {
       return userInfo.user_id;
     }
-
-    // ユーザー確認（user_id:新規登録時）
-    if (payer === userInfo.user_id) {
-      return userInfo.user_id;
-    }
-
-    // パートナー
-    if (payer !== userInfo.id && payer !== userInfo.user_id) {
-      return "partner";
-    }
-
-    // デフォルト
-    return userInfo.user_id;
+    // パートナー確認
+    return userInfo.couple_id || "";
   };
 
   return (
@@ -53,11 +40,11 @@ export function PayerSelect({
         <ToggleGroupItem
           className={[
             "px-6 py-2 text-sm outline-none transition",
-            getSelectedPayer() === partner
+            getSelectedPayer() === userInfo.couple_id
               ? "!bg-sky-600 !text-white"
               : "bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}
-          value={partner}
+          value={userInfo.couple_id || ""}
         >
           パートナー
         </ToggleGroupItem>

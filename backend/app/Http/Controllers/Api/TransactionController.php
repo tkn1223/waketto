@@ -22,12 +22,25 @@ class TransactionController extends Controller
         } else {
             $couple_id = null;
         }
-        
+
+        // payerが存在するか確認
+        $payerExists = User::where('user_id', $request->payer)
+                        ->orWhere('couple_id', $request->payer)
+                        ->exists();
+
+        if (!$payerExists) {
+            return response()->json([
+                'status' => false,
+                'message' => '支払者が存在しません',
+            ], 422);
+        };
+
+        // バリデーションチェック
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
             'category' => 'required|integer|exists:categories,id',
             'date' => 'required|date',
-            'payer' => 'required|string|exists:users,user_id',
+            'payer' => 'required|string',
             'shop_name'=> 'nullable|string|max:255',
             'memo' => 'nullable|string|max:255',
         ], [

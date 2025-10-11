@@ -27,13 +27,21 @@ class Payment extends Model
   public static function newPaymentRecord($data, $user_id, $couple_id)
   {
     try {
-      $payer = User::where('user_id', $data['payer'])
-               ->first()
-               ->id;
+      // 最初は自分に設定しておいて、パートナーの場合はパートナーに設定
+      $paid_by_user_id = $user_id;
+
+      if ($couple_id) {
+        if ($data['payer'] === (string)$couple_id) {
+          $paid_by_user_id= User::where('couple_id', $data['payer'])
+                            ->where('id', '!=', $user_id)
+                            ->first()
+                            ->id;
+        };
+      };
 
       self::create([
         'category_id' => $data['category'],
-        'paid_by_user_id' => $payer,
+        'paid_by_user_id' => $paid_by_user_id,
         'recorded_by_user_id' => $user_id,
         'couple_id' => $couple_id,
         'payment_date' => $data['date'],
