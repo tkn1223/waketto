@@ -12,10 +12,16 @@ use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
         $user_id = $user->id;
+
+        if ($userMode === 'common') {
+            $couple_id = $user->couple_id;
+        } else {
+            $couple_id = null;
+        }
         
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
@@ -49,7 +55,7 @@ class TransactionController extends Controller
             ], 422);
         };
 
-        $payment = Payment::newPaymentRecord($validator->validated(), $user_id);
+        $payment = Payment::newPaymentRecord($validator->validated(), $user_id, $couple_id);
         
         if (!$payment) {
             return response()->json([

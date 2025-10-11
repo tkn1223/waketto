@@ -10,17 +10,33 @@ use App\Models\CategoryGroup;
 
 class ExpenseReportController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, $userMode): JsonResponse
     {
-        $userId = $request->attributes->get('auth_user')->id;
+        $user = $request->attributes->get('auth_user');
+        $userId = $user->id;
 
-        $allCategoryGroups = CategoryGroup::select('code', 'name')
-                             ->get();
+        if ($userMode === 'common') {
+            $couple_id = $user->couple_id;
+        } else {
+            $couple_id = null;
+        }
 
-        $paymentData = Payment::where('recorded_by_user_id', $userId)
-                       ->with('category', 'category.categoryGroup')
-                       ->orderBy('payment_date', 'asc')
-                       ->get();
+        $allCategoryGroups = CategoryGroup::select('code', 'name')->get();
+
+
+        if (isset($couple_id) && $couple_id !== null) {
+            // commonモード
+            $paymentData = Payment::where('couple_id', $couple_id);
+        } else {
+            // aloneモード（自分が記録したデータのみ + couple_idがnull)
+            $paymentData = Payment::where('recorded_by_user_id', $userId)
+                                  ->whereNull('couple_id');
+        }
+
+        $paymentData = $paymentData->with('category', 'category.categoryGroup')
+            ->orderBy('payment_date', 'asc')
+            ->get();
+
         
         $sortedByCategoryData = [];
 

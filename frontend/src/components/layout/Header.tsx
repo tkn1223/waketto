@@ -1,17 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { FinanceModeToggle } from "./FinanceModeToggle.tsx";
 import { NaviMenu } from "./NaviMenu.tsx";
 import { UserModeToggle } from "./UserModeToggle.tsx";
 
-interface HeaderProps {
-  finance: string;
-  setFinance: (finance: string) => void;
-}
-
-export function Header({ finance, setFinance }: HeaderProps) {
+export function Header() {
   const { isLoading, isAuth } = useAuth();
+  const { finance, setFinance, user, setUser } = useViewMode();
 
   return (
     <header className="max-w-screen-x1 bg-emerald-100">
@@ -30,8 +29,7 @@ export function Header({ finance, setFinance }: HeaderProps) {
         {!isLoading &&
           (isAuth ? (
             <div className="flex items-center justify-between space-x-3">
-              {/* 改善：userはappsettingscontextで管理する */}
-              <UserModeToggle user="alone" setUser={() => {}} />
+              <UserModeToggle user={user} setUser={setUser} />
               <FinanceModeToggle finance={finance} setFinance={setFinance} />
               <NaviMenu />
             </div>

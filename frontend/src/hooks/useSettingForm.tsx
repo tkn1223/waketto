@@ -20,7 +20,6 @@ export const useSettingForm = () => {
           className: "!bg-yellow-600 !text-white !border-yellow-800",
         });
       } else {
-        console.log(response);
         toast.error(response.message, {
           className: "!bg-red-600 !text-white !border-red-800",
         });

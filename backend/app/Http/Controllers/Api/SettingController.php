@@ -23,7 +23,7 @@ class SettingController extends Controller
 
         $partner = User::where('user_id', $partnerId)->first();
 
-        if (!$partner) {
+        if (!$partner || $user->id === $partner->id) {
             return response()->json([
                 'status' => false,
                 'message' => '入力されたIDのユーザーが見つかりません',

@@ -1,6 +1,8 @@
+"use client";
+
 import useSWR from "swr";
 import { getExpenseReport, getCategories } from "./api.ts";
-
+import { UserMode } from "@/types/viewmode.ts";
 // デフォルトfetcher
 const defaultFetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -22,11 +24,15 @@ export const swrConfig = {
 };
 
 // カスタムフック（認証済みの場合のみ取得）
-export const useExpenseReport = (isAuth?: boolean) => {
-  return useSWR(isAuth ? "/expense-report" : null, getExpenseReport, {
-    ...swrConfig,
-    refreshInterval: 30000, // 30秒ごとに更新
-  });
+export const useExpenseReport = (isAuth?: boolean, userMode?: UserMode) => {
+  return useSWR(
+    isAuth ? `/expense-report/${userMode}` : null,
+    () => getExpenseReport(userMode),
+    {
+      ...swrConfig,
+      refreshInterval: 30000, // 30秒ごとに更新
+    }
+  );
 };
 
 export const useCategories = (isAuth?: boolean) => {

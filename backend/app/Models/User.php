@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\Couple;
 
 class User extends Authenticatable
 {
@@ -67,13 +68,17 @@ class User extends Authenticatable
         DB::beginTransaction();
 
         try {
+            $couple = Couple::create([
+                'name' => $user->user_id . ' & ' . $partner->user_id,
+            ]);
+
             $user->update([
-                'couple_id' => $partner->id,
+                'couple_id' => $couple->id,
                 'pair_index' => 1,
             ]);
     
             $partner->update([
-                'couple_id' => $user->id,
+                'couple_id' => $couple->id,
                 'pair_index' => 2,
             ]);
     

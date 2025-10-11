@@ -1,11 +1,7 @@
 "use client";
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs.tsx";
-
-interface FinanceModeToggleProps {
-  finance: string;
-  setFinance: (finance: string) => void;
-}
+import type { FinanceModeToggleProps } from "@/types/viewmode";
 
 export function FinanceModeToggle({
   finance,

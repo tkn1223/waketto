@@ -15,6 +15,7 @@ import type {
   TransactionData,
   SavedTransactionData,
 } from "@/types/transaction.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 
 interface UseTransactionFormProps {
   transactionPatch: SavedTransactionData | null;
@@ -27,6 +28,7 @@ export const useTransactionForm = ({
 }: UseTransactionFormProps) => {
   const { userInfo } = useAuth();
   const { categories, isCategoriesLoading } = useCategory();
+  const { user } = useViewMode();
 
   // 無限レンダリング対策: createTransactionData関数をメモ化してuseEffectの不要な実行を防ぐ
   const createTransactionData = useCallback(
@@ -108,13 +110,14 @@ export const useTransactionForm = ({
         category: transactionData.category?.value || "",
       };
 
-      const response = await postTransaction(requestData);
+      const response = await postTransaction(requestData, user);
 
       if (response.status) {
         toast.success("取引明細を保存しました", {
           className: "!bg-yellow-600 !text-white !border-yellow-800",
         });
         resetForm();
+        onSuccess();
       } else {
         toast.error("取引明細の保存に失敗しました", {
           className: "!bg-red-600 !text-white !border-red-800",
