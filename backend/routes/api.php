@@ -35,13 +35,13 @@ Route::middleware('cognito')->group(function () {
 
     // 取引明細関連のルート
     Route::prefix('transaction')->group(function () {
-        Route::post('/', [TransactionController::class, 'store']);
+        Route::post('/{userMode}', [TransactionController::class, 'store']);
         Route::put('/{id}', [TransactionController::class, 'update']);
         Route::delete('/{id}', [TransactionController::class, 'delete']);
     });
 
     // 支出管理表関連のルート
-    Route::get('/expense-report', [ExpenseReportController::class, 'index']);
+    Route::get('/expense-report/{userMode}', [ExpenseReportController::class, 'index']);
 
     // 設定関連のルート
     Route::post('/partner-setting/{partnerId}', [SettingController::class, 'entry']);

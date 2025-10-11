@@ -14,17 +14,19 @@ import {
 import { Label } from "@/components/ui/label.tsx";
 import { useExpenseReport } from "@/lib/swr.ts";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { userInfo, isAuth, isLoading } = useAuth();
+  const { user } = useViewMode();
 
   const {
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
     mutate,
-  } = useExpenseReport(isAuth);
+  } = useExpenseReport(isAuth, user);
 
   // 認証失敗時のリダイレクト
   useEffect(() => {
@@ -32,11 +34,6 @@ export default function DashboardPage() {
       router.push("/signin");
     }
   }, [isAuth, isLoading, router]);
-
-  // 支出管理表のデータを更新
-  const refreshExpenseReport = () => {
-    mutate();
-  };
 
   if (isLoading || !userInfo) {
     return (
@@ -74,7 +71,7 @@ export default function DashboardPage() {
                 ) : expenseReport ? (
                   <ExpenseTable
                     expenseReport={expenseReport}
-                    onTransactionUpdate={refreshExpenseReport}
+                    onTransactionUpdate={mutate}
                   />
                 ) : (
                   <div className="text-center py-8">
@@ -85,9 +82,9 @@ export default function DashboardPage() {
             </Card>
           </div>
         </div>
-        {/* 取引明細カード */}
+        {/* 取引明細カード(mutateでデータ更新) */}
         <div className="lg:col-span-1">
-          <TransactionDetail onUpdate={refreshExpenseReport} />
+          <TransactionDetail onUpdate={mutate} />
         </div>
         {/* 予算消化率 */}
         <div className="col-span-3 space-y-3">

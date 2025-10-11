@@ -5,6 +5,7 @@ import type {
   TransactionRequestData,
   ExpenseReportResponse,
 } from "@/types/transaction.ts";
+import { UserMode } from "@/types/viewmode.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
@@ -27,15 +28,18 @@ export async function getCategories(): Promise<CategoriesResponse> {
 }
 
 // 支出管理表の一覧を取得
-export async function getExpenseReport(): Promise<ExpenseReportResponse> {
-  return await fetchApi<ExpenseReportResponse>("/expense-report");
+export async function getExpenseReport(
+  userMode?: UserMode
+): Promise<ExpenseReportResponse> {
+  return await fetchApi<ExpenseReportResponse>(`/expense-report/${userMode}`);
 }
 
 // 取引明細を保存
 export async function postTransaction(
-  requestData: TransactionRequestData
+  requestData: TransactionRequestData,
+  userMode?: UserMode
 ): Promise<Response> {
-  return await fetchApi<Response>("/transaction", {
+  return await fetchApi<Response>(`/transaction/${userMode}`, {
     method: "POST",
     body: JSON.stringify(requestData),
   });

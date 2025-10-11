@@ -24,7 +24,7 @@ class Payment extends Model
     return $this->belongsTo(Category::class, 'category_id', 'id');
   }
 
-  public static function newPaymentRecord($data, $user_id)
+  public static function newPaymentRecord($data, $user_id, $couple_id)
   {
     try {
       $payer = User::where('user_id', $data['payer'])
@@ -35,6 +35,7 @@ class Payment extends Model
         'category_id' => $data['category'],
         'paid_by_user_id' => $payer,
         'recorded_by_user_id' => $user_id,
+        'couple_id' => $couple_id,
         'payment_date' => $data['date'],
         'amount' => $data['amount'],
         'store_name' => $data['shop_name'],

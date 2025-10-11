@@ -1,5 +1,6 @@
 "use client";
 
+import { useSWRConfig } from "swr";
 import {
   createContext,
   ReactNode,
@@ -19,6 +20,8 @@ export const ViewModeContext = createContext<ViewModeContextType | undefined>(
 );
 
 export function ViewModeProvider({ children }: { children: ReactNode }) {
+  const { mutate } = useSWRConfig();
+
   const [finance, setFinance] = useState<FinanceMode>(() => {
     if (typeof window !== "undefined") {
       const currentFinance = localStorage.getItem("financeMode");
@@ -41,6 +44,18 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
 
   const currentView = `${finance}-${user}`;
 
+  const handleFinanceChange = (mode: FinanceMode) => {
+    setFinance(mode);
+  };
+
+  const handleUserChange = (mode: UserMode) => {
+    setUser(mode);
+    // モード切替時にデータを再取得
+    mutate(
+      (key) => typeof key === "string" && key.startsWith("/expense-report")
+    );
+  };
+
   // localStorageに保存（ファイナンスモード）
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -57,7 +72,13 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
 
   return (
     <ViewModeContext.Provider
-      value={{ finance, user, setFinance, setUser, currentView }}
+      value={{
+        finance,
+        user,
+        setFinance: handleFinanceChange,
+        setUser: handleUserChange,
+        currentView,
+      }}
     >
       {children}
     </ViewModeContext.Provider>
