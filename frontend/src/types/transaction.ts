@@ -1,3 +1,5 @@
+import type { UserInfo } from "@/types/auth.ts";
+
 // フロントエンドで扱う際の取引明細の型
 export interface TransactionData {
   user: string;
@@ -108,7 +110,7 @@ export interface CategoryContextType {
 
 // 支払者選択用
 export interface PayerSelectProps {
-  userInfo: { id: string; user_id: string; name: string };
+  userInfo: UserInfo;
   payer: string;
   onPayerChange: (payer: string) => void;
 }
@@ -116,7 +118,7 @@ export interface PayerSelectProps {
 // 取引明細フォーム用
 export interface TransactionFormProps {
   // data
-  userInfo: { id: string; user_id: string; name: string };
+  userInfo: UserInfo;
   transactionData: TransactionData;
   isSaveDisabled: boolean;
   saveButtonText: string; // ボタンのテキスト

@@ -42,7 +42,7 @@ export const useTransactionForm = ({
             type: patch.category_group_code || "category",
             value: patch.category ? patch.category.toString() : "",
           },
-          payer: patch.user || userInfo.id,
+          payer: String(patch.user || userInfo.id),
           shop_name: patch.shop_name || "",
           memo: patch.memo || "",
         };
@@ -52,7 +52,7 @@ export const useTransactionForm = ({
           amount: 0,
           date: new Date(),
           category: null,
-          payer: userInfo.user_id,
+          payer: userInfo.id,
           shop_name: "",
           memo: "",
         };
@@ -106,9 +106,12 @@ export const useTransactionForm = ({
     try {
       const requestData = {
         ...transactionData,
+        payer: String(transactionData.payer),
         date: format(transactionData.date, "yyyy-MM-dd"),
         category: transactionData.category?.value || "",
       };
+
+      console.log("requestData", requestData);
 
       const response = await postTransaction(requestData, user);
 
@@ -141,6 +144,7 @@ export const useTransactionForm = ({
     try {
       const requestData = {
         ...transactionData,
+        payer: String(transactionData.payer),
         date: format(transactionData.date, "yyyy-MM-dd"),
         category: transactionData.category?.value || "",
       };
@@ -200,7 +204,7 @@ export const useTransactionForm = ({
       amount: 0,
       date: new Date(),
       category: null,
-      payer: userInfo.user_id,
+      payer: userInfo.id,
       shop_name: "",
       memo: "",
     });
