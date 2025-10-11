@@ -24,7 +24,7 @@ class TransactionController extends Controller
         }
 
         // payerが存在するか確認
-        $payerExists = User::where('user_id', $request->payer)
+        $payerExists = User::where('id', $request->payer)
                         ->orWhere('couple_id', $request->payer)
                         ->exists();
 
@@ -85,11 +85,26 @@ class TransactionController extends Controller
 
     public function update(Request $request, $id): JsonResponse
     {
+        $user = $request->attributes->get('auth_user');
+        $user_id = $user->id;
+
+        // payerが存在するか確認
+        $payerExists = User::where('id', $request->payer)
+        ->orWhere('couple_id', $request->payer)
+        ->exists();
+
+        if (!$payerExists) {
+            return response()->json([
+                'status' => false,
+                'message' => '支払者が存在しません',
+            ], 422);
+        };
+
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
             'category' => 'required|integer|exists:categories,id',
             'date' => 'required|date',
-            'payer' => 'required|integer|exists:users,id',
+            'payer' => 'required|string',
             'shop_name'=> 'nullable|string|max:255',
             'memo' => 'nullable|string|max:255',
         ], [
@@ -100,7 +115,7 @@ class TransactionController extends Controller
             'date.required' => '日付は必須です',
             'date.date' => '日付は日付形式で入力してください',
             'payer.required' => '支払者は必須です',
-            'payer.exists' => '支払者は存在しません',
+            'payer.string' => '支払者は文字列で入力してください',
             'shop_name.string' => 'お店の名前は文字列で入力してください',
             'shop_name.max' => 'お店の名前は255文字以内で入力してください',
             'memo.string' => 'メモは文字列で入力してください',
@@ -118,7 +133,7 @@ class TransactionController extends Controller
             ], 422);
         };
 
-        $updatePayment = Payment::updatePaymentRecord($validator, $id);
+        $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id);
         if (!$updatePayment) {
             return response()->json([
                 'status' => false,

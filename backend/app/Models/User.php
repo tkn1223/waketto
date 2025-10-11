@@ -96,4 +96,27 @@ class User extends Authenticatable
             return false;
         }
     }
+
+    /**
+     * partnerのidを取得
+     */
+    public static function getPartnerId($user_id)
+    {
+        try {
+            $couple_id = User::where('id', $user_id)->first()->couple_id;
+
+            $partner_id= User::where('couple_id', $couple_id)
+                             ->where('id', '!=', $user_id)
+                             ->first()
+                             ->id;
+    
+            return $partner_id;
+        } catch (\Exception $e) {
+            Log::error('Partner ID取得エラー', [
+                'error' => $e->getMessage(),
+                'user_id' => $user_id,
+            ]);
+            return $user_id;
+        }
+    }
 }

@@ -52,7 +52,7 @@ export const useTransactionForm = ({
           amount: 0,
           date: new Date(),
           category: null,
-          payer: userInfo.user_id,
+          payer: userInfo.id,
           shop_name: "",
           memo: "",
         };
@@ -204,7 +204,7 @@ export const useTransactionForm = ({
       amount: 0,
       date: new Date(),
       category: null,
-      payer: userInfo.user_id,
+      payer: userInfo.id,
       shop_name: "",
       memo: "",
     });

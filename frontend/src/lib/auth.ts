@@ -306,10 +306,10 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
     const user = (await response.json()) as User;
 
     const userInfo = {
-      id: user.id,
+      id: String(user.id),
       user_id: user.user_id,
       name: user.name,
-      couple_id: user.couple_id,
+      couple_id: String(user.couple_id),
     };
 
     return userInfo;

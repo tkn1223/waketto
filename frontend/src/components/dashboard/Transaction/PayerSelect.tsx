@@ -6,12 +6,12 @@ export function PayerSelect({
   payer,
   onPayerChange,
 }: PayerSelectProps) {
+  // 選択された支払者を取得
   const getSelectedPayer = () => {
-    // ユーザー確認
-    if (payer === userInfo.id || payer === userInfo.user_id) {
-      return userInfo.user_id;
+    if (payer === userInfo.id) {
+      return userInfo.id;
     }
-    // パートナー確認
+    // partnerのidは取得していないので、couple_idで代用
     return userInfo.couple_id || "";
   };
 
@@ -23,17 +23,17 @@ export function PayerSelect({
         className="flex overflow-hidden rounded-xl border shadow-sm"
         type="single"
         value={getSelectedPayer()}
-        onValueChange={(value) => onPayerChange(value || userInfo.user_id)}
+        onValueChange={(value) => onPayerChange(value || userInfo.id)}
       >
         <ToggleGroupItem
           variant={undefined}
           className={[
             "px-6 py-2 text-sm outline-none transition",
-            getSelectedPayer() === userInfo.user_id
+            getSelectedPayer() === userInfo.id
               ? "!bg-sky-600 !text-white"
               : "bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}
-          value={userInfo.user_id}
+          value={userInfo.id}
         >
           {userInfo.name}
         </ToggleGroupItem>

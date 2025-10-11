@@ -32,10 +32,7 @@ class Payment extends Model
 
       if ($couple_id) {
         if ($data['payer'] === (string)$couple_id) {
-          $paid_by_user_id= User::where('couple_id', $data['payer'])
-                            ->where('id', '!=', $user_id)
-                            ->first()
-                            ->id;
+          $paid_by_user_id= User::getPartnerId($user_id);
         };
       };
 
@@ -62,7 +59,7 @@ class Payment extends Model
     }
   }
 
-  public static function updatePaymentRecord($validator, $id)
+  public static function updatePaymentRecord($validator, $id, $user_id)
   {
     try {
       $paymentData = Payment::find($id);
@@ -73,9 +70,23 @@ class Payment extends Model
           ], 500);
       }
 
+      $current_payer = (string)$paymentData->paid_by_user_id;
+      $update_payer = $validator->validated()['payer'];
+
+      if ($current_payer === $update_payer) {
+        // 支払者が変更なし
+        $paid_by_user_id = $current_payer;
+      } else if ($update_payer === (string)$user_id) {
+        // 支払者が自分に変更
+        $paid_by_user_id = $user_id;
+      } else {
+        // 支払者がパートナーに変更
+        $paid_by_user_id = User::getPartnerId($user_id);
+      }
+
       $paymentData->update([
         'category_id' => $validator->validated()['category'],
-        'paid_by_user_id' => $validator->validated()['payer'],
+        'paid_by_user_id' => $paid_by_user_id,
         'payment_date' => $validator->validated()['date'],
         'amount' => $validator->validated()['amount'],
         'store_name' => $validator->validated()['shop_name'],
