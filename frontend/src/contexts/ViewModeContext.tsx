@@ -42,8 +42,6 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
     return "alone";
   });
 
-  const currentView = `${finance}-${user}`;
-
   const handleFinanceChange = (mode: FinanceMode) => {
     setFinance(mode);
   };
@@ -77,7 +75,6 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
         user,
         setFinance: handleFinanceChange,
         setUser: handleUserChange,
-        currentView,
       }}
     >
       {children}
