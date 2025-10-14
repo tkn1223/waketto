@@ -45,7 +45,7 @@ export function MonthlyBarChart() {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Bar Chart - Stacked + Legend</CardTitle>
+          <CardTitle>Monthly Bar Chart</CardTitle>
           <CardDescription>January - June 2024</CardDescription>
         </CardHeader>
         <CardContent>
