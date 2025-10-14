@@ -10,7 +10,7 @@ import {
 import { Label } from "@/components/ui/label.tsx";
 import { useExpenseReport } from "@/lib/swr";
 import { UserMode } from "@/types/viewmode";
-import { userInfo } from "os";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -19,6 +19,7 @@ export function AnnualExpenseSummary({
   isAuth: boolean;
   user: UserMode;
 }) {
+  const { userInfo } = useAuth();
   const {
     data: expenseReport,
     error: expenseReportError,

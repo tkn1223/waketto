@@ -6,7 +6,6 @@ export interface ViewModeContextType {
   user: UserMode;
   setFinance: (mode: FinanceMode) => void;
   setUser: (mode: UserMode) => void;
-  currentView: string;
 }
 
 export interface FinanceModeToggleProps {
