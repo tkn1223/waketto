@@ -8,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import { useExpenseReport } from "@/lib/swr";
+import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
 import { UserMode } from "@/types/viewmode";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { mutate } from "swr";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -25,8 +25,18 @@ export function AnnualExpenseSummary({
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
-    mutate,
+    mutate: expenseMutate,
   } = useExpenseReport(user, isAuth);
+
+  const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
+    user,
+    isAuth
+  );
+
+  const handleUpdte = () => {
+    expenseMutate();
+    budgetUsageMutate();
+  };
 
   return (
     <>
@@ -45,14 +55,14 @@ export function AnnualExpenseSummary({
               ) : expenseReportError ? (
                 <div className="text-center py-8">
                   <p className="text-red-600">データの取得に失敗しました</p>
-                  <Button onClick={() => mutate()} className="mt-2">
+                  <Button onClick={() => expenseMutate()} className="mt-2">
                     再試行
                   </Button>
                 </div>
               ) : expenseReport ? (
                 <ExpenseTable
                   expenseReport={expenseReport}
-                  onTransactionUpdate={mutate}
+                  onTransactionUpdate={handleUpdte}
                 />
               ) : (
                 <div className="text-center py-8">
@@ -65,7 +75,7 @@ export function AnnualExpenseSummary({
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
       <div className="lg:col-span-1">
-        <TransactionDetail onUpdate={mutate} />
+        <TransactionDetail onUpdate={handleUpdte} />
       </div>
       {/* 予算消化率 */}
       <div className="col-span-3 space-y-3">

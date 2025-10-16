@@ -27,6 +27,13 @@ class BudgetUsageController extends Controller
             $budget = $this->getBudgetData($couple_id, $userId);
             // 実績の取得
             $paymentRecords = $this->getPaymentRecords($couple_id, $userId, $budget);
+            // 予算と実績を結合
+            $connectedData = $this->connectBudgetAndPaymentRecords($budget, $paymentRecords);
+
+            return response()->json([
+                'status' => true,
+                'data' => $connectedData,
+            ]);
         } catch (\Exception $e) {
             Log::error('予算の取得に失敗しました', [
                 'error' => $e->getMessage(),
@@ -36,12 +43,6 @@ class BudgetUsageController extends Controller
                 'message' => '予算の取得に失敗しました',
             ], 500);
         }
-
-        return response()->json([
-            'status' => true,
-            'data' => $budget,
-            'payment_records' => $paymentRecords,
-        ]);
     }
 
     private function getBudgetData($couple_id, $userId)
@@ -72,5 +73,38 @@ class BudgetUsageController extends Controller
         : $query->where('recorded_by_user_id', $userId)
             ->whereNull('couple_id')
             ->get();
+    }
+
+    private function connectBudgetAndPaymentRecords($budget, $paymentRecords)
+    {
+        return $budget->map(function ($budgetItem) use ($paymentRecords) {
+            $categoryPaymentRecord = $paymentRecords->where('category_id', $budgetItem->category_id); // 次にsumを使用したいのでtoArrayは最後に実施
+
+            // 12か月分のデータを作成
+            $monthlyData = [];
+            for ($month = 1; $month <= 12; $month++) {
+                $monthRecord = $categoryPaymentRecord->where('month', $month)->first();
+                $monthlyData[] = [
+                    'month' => $month,
+                    'category_id' => $budgetItem->category_id,
+                    'amount' => $monthRecord ? (int)$monthRecord->amount : 0,
+                    'payment_ids' => $monthRecord ? $monthRecord->payment_ids : '',
+                ];
+            }
+
+            Log::info($monthlyData);
+            Log::info(gettype($monthlyData[8]['amount']));
+
+            // 残りの予算
+            $residueBudget = $budgetItem->amount - $categoryPaymentRecord->sum('amount');
+
+            return [
+                'id' => $budgetItem->id,
+                'category' => $budgetItem->category,
+                'budget_amount' => $budgetItem->amount,
+                'monthly_data' => $monthlyData,
+                'residue_budget' => $residueBudget,
+            ];
+        });
     }
 }

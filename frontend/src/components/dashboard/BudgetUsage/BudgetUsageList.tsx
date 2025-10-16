@@ -12,8 +12,6 @@ export function BudgetUsageList() {
   const { user } = useViewMode();
   const { data: budget } = useBudgetUsage(user, isAuth);
 
-  console.log(budget);
-
   if (budget?.status !== true) {
     return (
       <div className="text-center py-8 border border-gray-300 rounded-md">
@@ -34,11 +32,8 @@ export function BudgetUsageList() {
   return (
     <>
       {budget?.data.map((item, i) => (
-        <div
-          key={`budget-usage-${i}`}
-          className="p-3 border border-gray-300 space-y-2"
-        >
-          <div className="grid grid-cols-3 gap-2">
+        <div key={`budget-usage-${i}`} className="p-3 border border-gray-300">
+          <div className="grid grid-cols-3 gap-2 mb-3">
             <div className="flex items-end justify-center">
               <span className="text-gray-500">項目：</span>
               <span className="text-lg font-medium">{item.category.name}</span>
@@ -46,57 +41,37 @@ export function BudgetUsageList() {
             <div className="flex items-end justify-center">
               <span className="text-gray-500">予算：</span>
               <span className="text-lg font-medium">
-                {formatToMan(item.amount)}
+                {formatToMan(item.budget_amount)}
               </span>
             </div>
             <div className="flex items-end justify-center">
               <span className="text-gray-500">残り：</span>
-              <span className="text-lg font-medium">12万</span>
+              <span className="text-lg font-medium">
+                {formatToMan(item.residue_budget)}
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-12 gap-1">
             {Array.from({ length: 12 }, (_, i) => (
-              <Label
+              <span
                 key={`month-lavel-${i}`}
-                className="p-2 text-xs bg-gray-200 flex items-center justify-center"
+                className="p-2 text-x flex items-center justify-center bg-gray-200 border border-gray-200"
               >
                 {i + 1} 月
-              </Label>
+              </span>
             ))}
           </div>
 
           <div className="grid grid-cols-12 gap-1">
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥50,000
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥70,000
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
-            <span className="p-2 text-base flex items-center justify-center">
-              ¥0
-            </span>
+            {item.monthly_data.map((monthData, i) => (
+              <span
+                key={`month-data-${i}`}
+                className="p-2 font-medium flex items-center justify-center border-b border-r border-l border-gray-200"
+              >
+                {monthData.amount.toLocaleString()} 円
+              </span>
+            ))}
           </div>
         </div>
       ))}
