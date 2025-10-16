@@ -14,9 +14,9 @@ export function BudgetUsageList() {
 
   console.log(budget);
 
-  if (budget?.status === false) {
+  if (budget?.status !== true) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-8 border border-gray-300 rounded-md">
         <p className="text-gray-500">データの取得に失敗しました</p>
       </div>
     );
