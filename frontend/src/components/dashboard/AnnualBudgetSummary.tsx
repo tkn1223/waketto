@@ -20,7 +20,7 @@ export function AnnualBudgetSummary({
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
     mutate,
-  } = useExpenseReport(isAuth, user);
+  } = useExpenseReport(user, isAuth);
 
   return (
     <>
