@@ -1,6 +1,12 @@
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.tsx";
+import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import { BudgetUsageList } from "@/components/dashboard/BudgetUsage/BudgetUsageList.tsx";
+import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
+import { useDateSelector } from "@/hooks/useDateSelector.tsx";
+import { UserMode } from "@/types/viewmode";
+import { useAuth } from "@/contexts/AuthContext.tsx";
+
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -8,9 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
-import { UserMode } from "@/types/viewmode";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -26,11 +29,17 @@ export function AnnualExpenseSummary({
     isLoading: isExpenseReportLoading,
     mutate: expenseMutate,
   } = useExpenseReport(user, isAuth);
+  const {
+    data: budgetUsage,
+    error: budgetUsageError,
+    isLoading: isBudgetUsageLoading,
+    mutate: budgetUsageMutate,
+  } = useBudgetUsage(user, isAuth);
 
-  const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
-    user,
-    isAuth
-  );
+  // 支出管理表の年月セレクタ
+  const expenseDateSelector = useDateSelector();
+  // 予算消化率の年月セレクタ
+  const budgetUsageDateSelector = useDateSelector();
 
   const handleUpdte = () => {
     expenseMutate();
@@ -43,8 +52,9 @@ export function AnnualExpenseSummary({
       <div className="lg:col-span-2">
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <Card>
-            <CardHeader>
+            <CardHeader className="flex justify-between">
               <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
+              <YearMonthSelector {...expenseDateSelector} />
             </CardHeader>
             <CardContent>
               {isExpenseReportLoading ? (
@@ -78,7 +88,10 @@ export function AnnualExpenseSummary({
       </div>
       {/* 予算消化率 */}
       <div className="col-span-3 space-y-3">
-        <div className="font-medium text-lg">予算の消化状況</div>
+        <div className="flex justify-between">
+          <span className="font-medium text-lg">予算の消化状況</span>
+          <YearMonthSelector {...budgetUsageDateSelector} />
+        </div>
         <BudgetUsageList />
       </div>
     </>
