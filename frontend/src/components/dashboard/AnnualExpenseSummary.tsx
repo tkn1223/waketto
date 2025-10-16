@@ -11,7 +11,6 @@ import {
 import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
 import { UserMode } from "@/types/viewmode";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import { mutate } from "swr";
 
 export function AnnualExpenseSummary({
   isAuth,
