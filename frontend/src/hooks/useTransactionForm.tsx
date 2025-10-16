@@ -111,8 +111,6 @@ export const useTransactionForm = ({
         category: transactionData.category?.value || "",
       };
 
-      console.log("requestData", requestData);
-
       const response = await postTransaction(requestData, user);
 
       if (response.status) {

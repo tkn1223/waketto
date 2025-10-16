@@ -1,5 +1,6 @@
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.tsx";
+import { BudgetUsageList } from "@/components/dashboard/BudgetUsage/BudgetUsageList.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -7,10 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { Label } from "@/components/ui/label.tsx";
-import { useExpenseReport } from "@/lib/swr";
+import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
 import { UserMode } from "@/types/viewmode";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { mutate } from "swr";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -24,8 +25,18 @@ export function AnnualExpenseSummary({
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
-    mutate,
-  } = useExpenseReport(isAuth, user);
+    mutate: expenseMutate,
+  } = useExpenseReport(user, isAuth);
+
+  const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
+    user,
+    isAuth
+  );
+
+  const handleUpdte = () => {
+    expenseMutate();
+    budgetUsageMutate();
+  };
 
   return (
     <>
@@ -44,14 +55,14 @@ export function AnnualExpenseSummary({
               ) : expenseReportError ? (
                 <div className="text-center py-8">
                   <p className="text-red-600">データの取得に失敗しました</p>
-                  <Button onClick={() => mutate()} className="mt-2">
+                  <Button onClick={() => expenseMutate()} className="mt-2">
                     再試行
                   </Button>
                 </div>
               ) : expenseReport ? (
                 <ExpenseTable
                   expenseReport={expenseReport}
-                  onTransactionUpdate={mutate}
+                  onTransactionUpdate={handleUpdte}
                 />
               ) : (
                 <div className="text-center py-8">
@@ -64,107 +75,12 @@ export function AnnualExpenseSummary({
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
       <div className="lg:col-span-1">
-        <TransactionDetail onUpdate={mutate} />
+        <TransactionDetail onUpdate={handleUpdte} />
       </div>
       {/* 予算消化率 */}
       <div className="col-span-3 space-y-3">
         <div className="font-medium text-lg">予算の消化状況</div>
-
-        {/* 予算１つ目：旅行費 */}
-        <div className="p-2 border border-gray-300 space-y-1">
-          <div className="grid grid-cols-3 gap-2">
-            <Label className="text-md p-2 flex items-center justify-center">
-              項目：旅行費
-            </Label>
-            <Label className="text-md p-2 flex items-center justify-center">
-              予算：24万
-            </Label>
-            <Label className="text-md p-2 flex items-center justify-center">
-              残り：12万
-            </Label>
-          </div>
-
-          <div className="grid grid-cols-12 gap-1">
-            {Array.from({ length: 12 }, (_, i) => (
-              <Label
-                key={`month-lavel-${i}`}
-                className="p-2 text-xs bg-gray-200 flex items-center justify-center"
-              >
-                {i + 1} 月
-              </Label>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-12 gap-1">
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥50,000
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥70,000
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-            <Label className="p-2 text-xs flex items-center justify-center">
-              ¥0
-            </Label>
-          </div>
-        </div>
-
-        {/* 予算２つ目：家具家電 */}
-        <div className="p-2 border border-gray-300 space-y-1">
-          <div className="grid grid-cols-3 gap-2">
-            <Label className="text-md p-2 flex items-center justify-center">
-              項目：旅行費
-            </Label>
-            <Label className="text-md p-2 flex items-center justify-center">
-              予算：24万
-            </Label>
-            <Label className="text-md p-2 flex items-center justify-center">
-              残り：12万
-            </Label>
-          </div>
-
-          <div className="grid grid-cols-12 gap-1">
-            {Array.from({ length: 12 }, (_, i) => (
-              <Label
-                key={`month-lavel-${i}`}
-                className="p-2 text-xs bg-gray-200 flex items-center justify-center"
-              >
-                {i + 1} 月
-              </Label>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-12 gap-1">
-            {Array.from({ length: 12 }, (_, i) => (
-              <Label
-                key={`month-lavel-${i}`}
-                className="p-2 text-xs flex items-center justify-center"
-              >
-                月の支出
-              </Label>
-            ))}
-          </div>
-        </div>
+        <BudgetUsageList />
       </div>
     </>
   );

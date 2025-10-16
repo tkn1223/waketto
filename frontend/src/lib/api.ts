@@ -5,6 +5,7 @@ import type {
   TransactionRequestData,
   ExpenseReportResponse,
 } from "@/types/transaction.ts";
+import { BudgetUsageResponse } from "@/types/summary.ts";
 import { UserMode } from "@/types/viewmode.ts";
 
 // 環境変数の型定義
@@ -61,6 +62,13 @@ export async function deleteTransaction(id: string): Promise<Response> {
   return await fetchApi(`/transaction/${id}`, {
     method: "DELETE",
   });
+}
+
+// 予算消化状況の一覧を取得
+export async function getBudgetUsage(
+  userMode: UserMode
+): Promise<BudgetUsageResponse> {
+  return await fetchApi<BudgetUsageResponse>(`/budget-usage/${userMode}`);
 }
 
 // パートナー設定の保存

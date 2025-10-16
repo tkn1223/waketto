@@ -9,3 +9,12 @@ export const formatDate = (dateString: string): string => {
 
   return `${year}/${month}/${day}`;
 };
+
+// 金額を万単位に変換
+export const formatToMan = (amount: number): string => {
+  const man = amount / 10000;
+  if (man % 1 === 0) {
+    return `${man}万`;
+  }
+  return `${man.toFixed(1)}万`;
+};
