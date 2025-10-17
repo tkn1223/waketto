@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { YearMonthSelectorProps } from "@/types/expense.ts";
 import {
   Select,
   SelectContent,
@@ -8,13 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-
-interface YearMonthSelectorProps {
-  year: string;
-  month: string;
-  onYearChange: (year: string) => void;
-  onMonthChange: (month: string) => void;
-}
 
 export function YearMonthSelector({
   year,

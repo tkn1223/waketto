@@ -5,15 +5,6 @@ import { BudgetUsageList } from "@/components/dashboard/BudgetUsage/BudgetUsageL
 import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
 import { useDateSelector } from "@/hooks/useDateSelector.tsx";
 import { UserMode } from "@/types/viewmode";
-import { useAuth } from "@/contexts/AuthContext.tsx";
-
-import { Button } from "@/components/ui/button.tsx";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -22,19 +13,16 @@ export function AnnualExpenseSummary({
   isAuth: boolean;
   user: UserMode;
 }) {
-  const { userInfo } = useAuth();
   const {
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
     mutate: expenseMutate,
   } = useExpenseReport(user, isAuth);
-  const {
-    data: budgetUsage,
-    error: budgetUsageError,
-    isLoading: isBudgetUsageLoading,
-    mutate: budgetUsageMutate,
-  } = useBudgetUsage(user, isAuth);
+  const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
+    user,
+    isAuth
+  );
 
   // 支出管理表の年月セレクタ
   const expenseDateSelector = useDateSelector();
@@ -50,37 +38,14 @@ export function AnnualExpenseSummary({
     <>
       {/* 支出管理表カード */}
       <div className="lg:col-span-2">
-        <div className="bg-white overflow-hidden shadow rounded-lg">
-          <Card>
-            <CardHeader className="flex justify-between">
-              <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
-              <YearMonthSelector {...expenseDateSelector} />
-            </CardHeader>
-            <CardContent>
-              {isExpenseReportLoading ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">データを読み込み中...</p>
-                </div>
-              ) : expenseReportError ? (
-                <div className="text-center py-8">
-                  <p className="text-red-600">データの取得に失敗しました</p>
-                  <Button onClick={() => expenseMutate()} className="mt-2">
-                    再試行
-                  </Button>
-                </div>
-              ) : expenseReport ? (
-                <ExpenseTable
-                  expenseReport={expenseReport}
-                  onTransactionUpdate={handleUpdte}
-                />
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">データがありません</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <ExpenseTable
+          expenseReport={expenseReport}
+          expenseReportError={expenseReportError}
+          isExpenseReportLoading={isExpenseReportLoading}
+          expenseMutate={expenseMutate}
+          handleUpdte={handleUpdte}
+          expenseDateSelector={expenseDateSelector}
+        />
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
       <div className="lg:col-span-1">
@@ -92,7 +57,7 @@ export function AnnualExpenseSummary({
           <span className="font-medium text-lg">予算の消化状況</span>
           <YearMonthSelector {...budgetUsageDateSelector} />
         </div>
-        <BudgetUsageList />
+        <BudgetUsageList budgetUsage={budgetUsage} />
       </div>
     </>
   );

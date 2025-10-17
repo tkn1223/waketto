@@ -1,18 +1,17 @@
 import { useRouter } from "next/navigation";
-import { Label } from "@/components/ui/label.tsx";
-import { Button } from "@/components/ui/button.tsx";
-import { useBudgetUsage } from "@/lib/swr";
-import { useViewMode } from "@/contexts/ViewModeContext.tsx";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 import { formatToMan } from "@/types/displayFormat.ts";
+import { BudgetUsageResponse } from "@/types/summary.ts";
 
-export function BudgetUsageList() {
+import { Button } from "@/components/ui/button.tsx";
+
+export function BudgetUsageList({
+  budgetUsage,
+}: {
+  budgetUsage: BudgetUsageResponse | undefined;
+}) {
   const router = useRouter();
-  const { isAuth } = useAuth();
-  const { user } = useViewMode();
-  const { data: budget } = useBudgetUsage(user, isAuth);
 
-  if (budget?.status !== true) {
+  if (budgetUsage?.status !== true) {
     return (
       <div className="text-center py-8 border border-gray-300 rounded-md">
         <p className="text-gray-500">データの取得に失敗しました</p>
@@ -20,7 +19,7 @@ export function BudgetUsageList() {
     );
   }
 
-  if (budget?.data.length === 0) {
+  if (budgetUsage?.data.length === 0) {
     return (
       <div className="text-center py-8 space-y-4 border border-gray-300 rounded-md">
         <p className="text-lg text-gray-500">予算が登録されていません</p>
@@ -31,7 +30,7 @@ export function BudgetUsageList() {
 
   return (
     <>
-      {budget?.data.map((item, i) => (
+      {budgetUsage.data.map((item, i) => (
         <div key={`budget-usage-${i}`} className="p-3 border border-gray-300">
           <div className="grid grid-cols-3 gap-2 mb-3">
             <div className="flex items-end justify-center">
