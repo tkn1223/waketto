@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { YearMonthSelectorProps } from "@/types/expense.ts";
+import { DateSelector } from "@/types/expense.ts";
 import {
   Select,
   SelectContent,
@@ -15,7 +15,7 @@ export function YearMonthSelector({
   month,
   onYearChange,
   onMonthChange,
-}: YearMonthSelectorProps) {
+}: DateSelector) {
   const now = new Date();
 
   const months: string[] = [];
@@ -27,10 +27,6 @@ export function YearMonthSelector({
   for (let i = now.getFullYear() - 4; i <= now.getFullYear() + 1; i++) {
     years.push(i.toString());
   }
-
-  useEffect(() => {
-    console.log(year, month);
-  }, [year, month]);
 
   return (
     <div className="flex items-center gap-2">

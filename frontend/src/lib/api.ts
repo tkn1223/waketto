@@ -6,6 +6,7 @@ import type {
   ExpenseReportResponse,
 } from "@/types/transaction.ts";
 import { BudgetUsageResponse } from "@/types/summary.ts";
+import { DateSelector } from "@/types/expense.ts";
 import { UserMode } from "@/types/viewmode.ts";
 
 // 環境変数の型定義
@@ -30,9 +31,18 @@ export async function getCategories(): Promise<CategoriesResponse> {
 
 // 支出管理表の一覧を取得
 export async function getExpenseReport(
-  userMode?: UserMode
+  userMode: UserMode,
+  dateSelector: DateSelector
 ): Promise<ExpenseReportResponse> {
-  return await fetchApi<ExpenseReportResponse>(`/expense-report/${userMode}`);
+  // クエリパラメータを作成
+  const params = new URLSearchParams();
+  if (dateSelector.year) params.append("year", dateSelector.year);
+  if (dateSelector.month) params.append("month", dateSelector.month);
+
+  const queryString = params.toString();
+  return await fetchApi<ExpenseReportResponse>(
+    `/expense-report/${userMode}${queryString ? `?${queryString}` : ""}`
+  );
 }
 
 // 取引明細を保存
@@ -66,9 +76,17 @@ export async function deleteTransaction(id: string): Promise<Response> {
 
 // 予算消化状況の一覧を取得
 export async function getBudgetUsage(
-  userMode: UserMode
+  userMode: UserMode,
+  dateSelector: DateSelector
 ): Promise<BudgetUsageResponse> {
-  return await fetchApi<BudgetUsageResponse>(`/budget-usage/${userMode}`);
+  // クエリパラメータを作成
+  const params = new URLSearchParams();
+  if (dateSelector.year) params.append("year", dateSelector.year);
+
+  const queryString = params.toString();
+  return await fetchApi<BudgetUsageResponse>(
+    `/budget-usage/${userMode}${queryString ? `?${queryString}` : ""}`
+  );
 }
 
 // パートナー設定の保存

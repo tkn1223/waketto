@@ -3,31 +3,25 @@ import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.
 import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import { BudgetUsageList } from "@/components/dashboard/BudgetUsage/BudgetUsageList.tsx";
 import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
-import { useDateSelector } from "@/hooks/useDateSelector.tsx";
-import { UserMode } from "@/types/viewmode";
+import { AnnualExpenseSummaryProps } from "@/types/summary.ts";
 
 export function AnnualExpenseSummary({
   isAuth,
   user,
-}: {
-  isAuth: boolean;
-  user: UserMode;
-}) {
+  expenseDateSelector,
+  budgetUsageDateSelector,
+}: AnnualExpenseSummaryProps) {
   const {
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
     mutate: expenseMutate,
-  } = useExpenseReport(user, isAuth);
+  } = useExpenseReport(user, expenseDateSelector, isAuth);
   const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
     user,
+    budgetUsageDateSelector,
     isAuth
   );
-
-  // 支出管理表の年月セレクタ
-  const expenseDateSelector = useDateSelector();
-  // 予算消化率の年月セレクタ
-  const budgetUsageDateSelector = useDateSelector();
 
   const handleUpdte = () => {
     expenseMutate();

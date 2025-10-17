@@ -16,6 +16,13 @@ class BudgetUsageController extends Controller
         $user = $request->attributes->get('auth_user');
         $userId = $user->id;
 
+        // クエリパラメータから年を取得
+        $year = $request->query('year', date('Y'));
+        
+        // 年度の開始日と終了日の取得
+        $startDate = "{$year}-01-01";
+        $endDate = "{$year}-12-31";
+
         if ($userMode === 'common') {
             $couple_id = $user->couple_id;
         } else {
@@ -26,7 +33,7 @@ class BudgetUsageController extends Controller
             // 予算の取得
             $budget = $this->getBudgetData($couple_id, $userId);
             // 実績の取得
-            $paymentRecords = $this->getPaymentRecords($couple_id, $userId, $budget);
+            $paymentRecords = $this->getPaymentRecords($couple_id, $userId, $budget, $startDate, $endDate);
             // 予算と実績を結合
             $connectedData = $this->connectBudgetAndPaymentRecords($budget, $paymentRecords);
 
@@ -57,7 +64,7 @@ class BudgetUsageController extends Controller
             ->get();
     }
 
-    private function getPaymentRecords($couple_id, $userId, $budget)
+    private function getPaymentRecords($couple_id, $userId, $budget, $startDate, $endDate)
     {
         $query = Payment::selectRaw('
                 MONTH(payment_date) as month,
@@ -66,12 +73,15 @@ class BudgetUsageController extends Controller
                 GROUP_CONCAT(id) as payment_ids
             ')
             ->whereIn('category_id', $budget->pluck('category_id'))
+            ->whereBetween('payment_date', [$startDate, $endDate])
             ->groupBy('month', 'category_id');
+
 
         return $couple_id
         ? $query->where('couple_id', $couple_id)->get()
         : $query->where('recorded_by_user_id', $userId)
             ->whereNull('couple_id')
+            ->whereBetween('payment_date', [$startDate, $endDate])
             ->get();
     }
 
