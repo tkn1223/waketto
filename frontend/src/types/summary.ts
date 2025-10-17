@@ -1,4 +1,13 @@
 import type { Category } from "@/types/transaction.ts";
+import { UserMode } from "@/types/viewmode";
+import { DateSelector } from "@/types/expense.ts";
+
+export interface AnnualExpenseSummaryProps {
+  isAuth: boolean;
+  user: UserMode;
+  expenseDateSelector: DateSelector;
+  budgetUsageDateSelector: DateSelector;
+}
 
 export interface BudgetUsageResponse {
   status: boolean;

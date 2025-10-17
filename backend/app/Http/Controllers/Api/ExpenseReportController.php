@@ -15,6 +15,14 @@ class ExpenseReportController extends Controller
         $user = $request->attributes->get('auth_user');
         $userId = $user->id;
 
+        // クエリパラメータから年月を取得
+        $year = $request->query('year', date('Y'));
+        $month = $request->query('month', date('n'));
+        
+        // 開始日と終了日の取得
+        $startDate = "{$year}-{$month}-01";
+        $endDate = date('Y-m-t', strtotime($startDate));
+
         if ($userMode === 'common') {
             $couple_id = $user->couple_id;
         } else {
@@ -23,14 +31,15 @@ class ExpenseReportController extends Controller
 
         $allCategoryGroups = CategoryGroup::select('code', 'name')->get();
 
-
         if (isset($couple_id) && $couple_id !== null) {
             // commonモード
-            $paymentData = Payment::where('couple_id', $couple_id);
+            $paymentData = Payment::where('couple_id', $couple_id)
+                ->whereBetween('payment_date', [$startDate, $endDate]);
         } else {
             // aloneモード（自分が記録したデータのみ + couple_idがnull)
             $paymentData = Payment::where('recorded_by_user_id', $userId)
-                                  ->whereNull('couple_id');
+                                  ->whereNull('couple_id')
+                                  ->whereBetween('payment_date', [$startDate, $endDate]);
         }
 
         $paymentData = $paymentData->with('category', 'category.categoryGroup')

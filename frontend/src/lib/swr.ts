@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { getExpenseReport, getCategories, getBudgetUsage } from "./api.ts";
 import { UserMode } from "@/types/viewmode.ts";
+import { DateSelector } from "@/types/expense.ts";
 // デフォルトfetcher
 const defaultFetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -23,30 +24,39 @@ export const swrConfig = {
   errorRetryInterval: 5000, // 5秒間隔で再試行
 };
 
-// カスタムフック（認証済みの場合のみ取得）
-export const useExpenseReport = (userMode: UserMode, isAuth?: boolean) => {
-  return useSWR(
-    isAuth ? `/expense-report/${userMode}` : null,
-    () => getExpenseReport(userMode), // パラメータを渡す際の記述方法
-    {
-      ...swrConfig,
-      refreshInterval: 30000, // 30秒ごとに更新
-    }
-  );
+// 支出管理表データ取得用のカスタムフック
+export const useExpenseReport = (
+  userMode: UserMode,
+  dateSelector: DateSelector,
+  isAuth?: boolean
+) => {
+  const key = isAuth
+    ? `/expense-report/${userMode}?year=${dateSelector.year}&month=${dateSelector.month}`
+    : null;
+  return useSWR(key, () => getExpenseReport(userMode, dateSelector), {
+    ...swrConfig,
+    refreshInterval: 30000, // 30秒ごとに更新
+  });
 };
 
+// カテゴリデータ取得用のカスタムフック
 export const useCategories = (isAuth?: boolean) => {
   return useSWR(isAuth ? "/categories" : null, getCategories, {
     ...swrConfig,
   });
 };
 
-export const useBudgetUsage = (userMode: UserMode, isAuth?: boolean) => {
-  return useSWR(
-    isAuth ? `/budget-usage/${userMode}` : null,
-    () => getBudgetUsage(userMode),
-    {
-      ...swrConfig,
-    }
-  );
+// 予実管理表データ取得用のカスタムフック
+export const useBudgetUsage = (
+  userMode: UserMode,
+  dateSelector: DateSelector,
+  isAuth?: boolean
+) => {
+  const key = isAuth
+    ? `/budget-usage/${userMode}?year=${dateSelector.year}`
+    : null;
+  return useSWR(key, () => getBudgetUsage(userMode, dateSelector), {
+    ...swrConfig,
+    refreshInterval: 30000, // 30秒ごとに更新
+  });
 };

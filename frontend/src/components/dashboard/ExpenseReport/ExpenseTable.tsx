@@ -1,182 +1,57 @@
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { TransactionRow } from "./TransactionRow.tsx";
-import type {
-  ExpenseReportResponse,
-  CategoryWithPayments,
-} from "@/types/transaction.ts";
+import { ExpenseSection } from "@/components/dashboard/ExpenseReport/ExpenseSection";
+import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
+import { ExpenseTableProps } from "@/types/expense.ts";
+import { useAuth } from "@/contexts/AuthContext.tsx";
+
+import { Button } from "@/components/ui/button.tsx";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card.tsx";
 
 export function ExpenseTable({
   expenseReport,
-  onTransactionUpdate,
-}: {
-  expenseReport: ExpenseReportResponse;
-  onTransactionUpdate: () => void;
-}) {
+  isExpenseReportLoading,
+  expenseReportError,
+  expenseMutate,
+  handleUpdte,
+  expenseDateSelector,
+}: ExpenseTableProps) {
+  const { userInfo } = useAuth();
+
   return (
-    <>
-      <div className="grid grid-cols-2 gap-4">
-        {/* 毎月固定費 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.monthly_fixed_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[180px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.monthly_fixed_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.monthly_fixed_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
+    <div className="bg-white overflow-hidden shadow rounded-lg">
+      <Card>
+        <CardHeader className="flex justify-between">
+          <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
+          <YearMonthSelector {...expenseDateSelector} showMonth={true} />
+        </CardHeader>
+        <CardContent>
+          {isExpenseReportLoading ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">データを読み込み中...</p>
             </div>
-          </ScrollArea>
-        </div>
-
-        {/* 毎月変動費 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.monthly_variable_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[180px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.monthly_variable_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.monthly_variable_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
+          ) : expenseReportError ? (
+            <div className="text-center py-8">
+              <p className="text-red-600">データの取得に失敗しました</p>
+              <Button onClick={() => expenseMutate()} className="mt-2">
+                再試行
+              </Button>
             </div>
-          </ScrollArea>
-        </div>
-
-        {/* 不定期固定費 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.occasional_fixed_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[180px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.occasional_fixed_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.occasional_fixed_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
+          ) : expenseReport ? (
+            <ExpenseSection
+              expenseReport={expenseReport}
+              onTransactionUpdate={handleUpdte}
+            />
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">データがありません</p>
             </div>
-          </ScrollArea>
-        </div>
-
-        {/* 不定期変動費 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.occasional_variable_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[180px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.occasional_variable_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.occasional_variable_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
-            </div>
-          </ScrollArea>
-        </div>
-
-        {/* 豊かな浪費 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.luxury_consumption_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[130px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.luxury_consumption_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.luxury_consumption_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
-            </div>
-          </ScrollArea>
-        </div>
-
-        {/* 貯蓄・投資 */}
-        <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
-            {expenseReport.data?.savings_investment_cost?.group_name}
-          </h4>
-          <ScrollArea className="h-[130px] w-full">
-            <div className="space-y-2 pr-3">
-              {checkCategory(
-                expenseReport.data?.savings_investment_cost?.categories
-              ) ? (
-                Object.entries(
-                  expenseReport.data?.savings_investment_cost?.categories || {}
-                ).map(([key, category]: [string, CategoryWithPayments]) => (
-                  <TransactionRow
-                    key={key}
-                    category={category}
-                    onTransactionUpdate={onTransactionUpdate}
-                  />
-                ))
-              ) : (
-                <div className="text-sm text-gray-500">明細が未登録です</div>
-              )}
-            </div>
-          </ScrollArea>
-        </div>
-      </div>
-    </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
-
-const checkCategory = (
-  categories: Record<string, CategoryWithPayments> | undefined
-) => {
-  return categories && Object.entries(categories).length > 0;
-};
