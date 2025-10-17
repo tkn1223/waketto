@@ -1,7 +1,4 @@
-"use client";
-
-import { useEffect } from "react";
-import { DateSelector } from "@/types/expense.ts";
+import { YearMonthSelectorProps } from "@/types/expense.ts";
 import {
   Select,
   SelectContent,
@@ -15,7 +12,8 @@ export function YearMonthSelector({
   month,
   onYearChange,
   onMonthChange,
-}: DateSelector) {
+  showMonth,
+}: YearMonthSelectorProps) {
   const now = new Date();
 
   const months: string[] = [];
@@ -30,18 +28,20 @@ export function YearMonthSelector({
 
   return (
     <div className="flex items-center gap-2">
-      <Select defaultValue={month} onValueChange={onMonthChange}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {months.map((month) => (
-            <SelectItem key={month} value={month}>
-              {month}月
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {showMonth && (
+        <Select defaultValue={month} onValueChange={onMonthChange}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {months.map((month) => (
+              <SelectItem key={month} value={month}>
+                {month}月
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       <Select defaultValue={year} onValueChange={onYearChange}>
         <SelectTrigger>

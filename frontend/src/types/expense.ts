@@ -7,6 +7,14 @@ export interface DateSelector {
   onMonthChange: (month: string) => void;
 }
 
+export interface YearMonthSelectorProps {
+  year: string;
+  month: string;
+  onYearChange: (year: string) => void;
+  onMonthChange: (month: string) => void;
+  showMonth: boolean;
+}
+
 export interface ExpenseTableProps {
   expenseReport: ExpenseReportResponse | undefined;
   isExpenseReportLoading: boolean;

@@ -26,7 +26,7 @@ export function ExpenseTable({
       <Card>
         <CardHeader className="flex justify-between">
           <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
-          <YearMonthSelector {...expenseDateSelector} />
+          <YearMonthSelector {...expenseDateSelector} showMonth={true} />
         </CardHeader>
         <CardContent>
           {isExpenseReportLoading ? (
