@@ -49,7 +49,7 @@ export function AnnualExpenseSummary({
       <div className="col-span-3 space-y-3">
         <div className="flex justify-between">
           <span className="font-medium text-lg">予算の消化状況</span>
-          <YearMonthSelector {...budgetUsageDateSelector} />
+          <YearMonthSelector {...budgetUsageDateSelector} showMonth={false} />
         </div>
         <BudgetUsageList budgetUsage={budgetUsage} />
       </div>
