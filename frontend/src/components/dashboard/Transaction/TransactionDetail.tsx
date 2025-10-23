@@ -46,7 +46,7 @@ export function TransactionDetail({ onUpdate }: { onUpdate: () => void }) {
             onPayerChange={handlePayerChange}
             onShopNameChange={handleShopNameChange}
             onMemoChange={handleMemoChange}
-            onSave={handleSave}
+            onSave={() => void handleSave()}
             saveButtonText="保存する"
             deleteButtonText=""
           />

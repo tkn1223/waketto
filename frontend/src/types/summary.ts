@@ -1,6 +1,6 @@
+import type { DateSelector } from "@/types/expense.ts";
 import type { Category } from "@/types/transaction.ts";
-import { UserMode } from "@/types/viewmode";
-import { DateSelector } from "@/types/expense.ts";
+import type { UserMode } from "@/types/viewmode.ts";
 
 export interface AnnualExpenseSummaryProps {
   isAuth: boolean;
@@ -11,16 +11,16 @@ export interface AnnualExpenseSummaryProps {
 
 export interface BudgetUsageResponse {
   status: boolean;
-  data: Array<{
+  data: {
     id: number;
     category: Category;
     budget_amount: number;
-    monthly_data: Array<{
+    monthly_data: {
       month: number;
       category_id: number;
       amount: number;
       payment_ids: string;
-    }>;
+    }[];
     residue_budget: number;
-  }>;
+  }[];
 }

@@ -2,7 +2,6 @@
 
 import { TrendingUp } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -11,14 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
+import type { ChartConfig } from "@/components/ui/chart.tsx";
 import {
-  ChartConfig,
   ChartContainer,
   ChartLegend,
-  ChartLegendContent,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart";
+} from "@/components/ui/chart.tsx";
 
 export const description = "A stacked bar chart with a legend";
 const chartData = [
@@ -57,7 +55,7 @@ export function YearlyBarChart() {
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                tickFormatter={(value) => value.slice(0, 3)}
+                tickFormatter={(value) => (value as string).slice(0, 3)}
               />
               <ChartTooltip content={<ChartTooltipContent />} />
               <ChartLegend />

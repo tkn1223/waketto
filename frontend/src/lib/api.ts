@@ -1,24 +1,24 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
+import type { DateSelector } from "@/types/expense.ts";
+import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
   CategoriesResponse,
-  TransactionRequestData,
   ExpenseReportResponse,
+  TransactionRequestData,
 } from "@/types/transaction.ts";
-import { BudgetUsageResponse } from "@/types/summary.ts";
-import { DateSelector } from "@/types/expense.ts";
-import { UserMode } from "@/types/viewmode.ts";
+import type { UserMode } from "@/types/viewmode.ts";
 
 // 環境変数の型定義
 const COGNITO_CONFIG = {
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL!,
 };
 
-export type Response = {
+export interface Response {
   status: boolean;
   message?: string;
   errors?: Record<string, string>;
-};
+}
 
 /*
  * 各APIリクエストの定義
@@ -36,10 +36,13 @@ export async function getExpenseReport(
 ): Promise<ExpenseReportResponse> {
   // クエリパラメータを作成
   const params = new URLSearchParams();
+
   if (dateSelector.year) params.append("year", dateSelector.year);
+
   if (dateSelector.month) params.append("month", dateSelector.month);
 
   const queryString = params.toString();
+
   return await fetchApi<ExpenseReportResponse>(
     `/expense-report/${userMode}${queryString ? `?${queryString}` : ""}`
   );
@@ -81,9 +84,11 @@ export async function getBudgetUsage(
 ): Promise<BudgetUsageResponse> {
   // クエリパラメータを作成
   const params = new URLSearchParams();
+
   if (dateSelector.year) params.append("year", dateSelector.year);
 
   const queryString = params.toString();
+
   return await fetchApi<BudgetUsageResponse>(
     `/budget-usage/${userMode}${queryString ? `?${queryString}` : ""}`
   );
@@ -147,11 +152,11 @@ export async function fetchApi<T>(
       throw new Error("認証に失敗しました。再度ログインしてください。");
     }
 
-    const errorData = await response.json().catch(() => null);
+    const errorData = (await response.json().catch(() => null)) as unknown;
     console.error("API Error:", {
       status: response.status,
       statusText: response.statusText,
-      errorData,
+      errorData: errorData as Record<string, unknown>,
     });
     throw new Error(`APIリクエストに失敗しました: ${response.statusText}`);
   }

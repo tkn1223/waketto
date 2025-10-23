@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   getCurrentUserInfo,
@@ -25,6 +20,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
@@ -39,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const _router = useRouter();
 
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
@@ -136,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export function useAuth() {
   const context = useContext(AuthContext);
 

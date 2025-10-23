@@ -1,9 +1,9 @@
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { TransactionRow } from "./TransactionRow.tsx";
 import type {
-  ExpenseReportResponse,
   CategoryWithPayments,
+  ExpenseReportResponse,
 } from "@/types/transaction.ts";
+import { TransactionRow } from "./TransactionRow.tsx";
 
 export function ExpenseSection({
   expenseReport,

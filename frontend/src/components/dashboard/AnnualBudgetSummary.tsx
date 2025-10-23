@@ -1,11 +1,11 @@
-import { SpendingDonutChart } from "@/components/dashboard/SpendingPerMonth/SpendingDonutChart.tsx";
-import { SpendingDetailTable } from "@/components/dashboard/SpendingPerMonth/SpendingDetailTable.tsx";
-import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { MonthlyBarChart } from "@/components/dashboard/ExpenseGraph/MonthlyBarChart.tsx";
 import { YearlyBarChart } from "@/components/dashboard/ExpenseGraph/YearlyBarChart.tsx";
-import { UserMode } from "@/types/viewmode";
-import { useExpenseReport } from "@/lib/swr";
+import { SpendingDetailTable } from "@/components/dashboard/SpendingPerMonth/SpendingDetailTable.tsx";
+import { SpendingDonutChart } from "@/components/dashboard/SpendingPerMonth/SpendingDonutChart.tsx";
+import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useExpenseReport } from "@/lib/swr.ts";
+import type { UserMode } from "@/types/viewmode";
 
 export function AnnualBudgetSummary({
   isAuth,
@@ -14,13 +14,26 @@ export function AnnualBudgetSummary({
   isAuth: boolean;
   user: UserMode;
 }) {
-  const { userInfo } = useAuth();
+  const { userInfo: _userInfo } = useAuth();
   const {
-    data: expenseReport,
-    error: expenseReportError,
-    isLoading: isExpenseReportLoading,
+    data: _expenseReport,
+    error: _expenseReportError,
+    isLoading: _isExpenseReportLoading,
     mutate,
-  } = useExpenseReport(user, isAuth);
+  } = useExpenseReport(
+    user,
+    {
+      year: "2025",
+      month: "1",
+      onYearChange: () => {
+        // Empty function for ESLint
+      },
+      onMonthChange: () => {
+        // Empty function for ESLint
+      },
+    },
+    isAuth
+  );
 
   return (
     <>
@@ -40,7 +53,7 @@ export function AnnualBudgetSummary({
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
       <div className="lg:col-span-1">
-        <TransactionDetail onUpdate={mutate} />
+        <TransactionDetail onUpdate={() => void mutate()} />
       </div>
       <div className="col-span-2">
         <MonthlyBarChart />

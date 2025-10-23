@@ -352,11 +352,14 @@ export async function checkTokenValidity(): Promise<boolean> {
     }
 
     // トークンの有効期限を確認
-    const payload = JSON.parse(atob(accessToken.split(".")[1]));
+    const payload = JSON.parse(atob(accessToken.split(".")[1])) as Record<
+      string,
+      unknown
+    >;
     const currentTime = Math.floor(Date.now() / 1000);
 
     // 有効期限が5分以内の場合に更新を行う
-    const timeUntilExpiry = payload.exp - currentTime;
+    const timeUntilExpiry = (payload.exp as number) - currentTime;
 
     if (timeUntilExpiry < 300) {
       const refreshSuccess = await refreshToken();

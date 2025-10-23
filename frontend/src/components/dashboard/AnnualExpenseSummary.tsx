@@ -1,9 +1,9 @@
-import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
-import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.tsx";
-import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import { BudgetUsageList } from "@/components/dashboard/BudgetUsage/BudgetUsageList.tsx";
-import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
-import { AnnualExpenseSummaryProps } from "@/types/summary.ts";
+import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.tsx";
+import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
+import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
+import { useBudgetUsage, useExpenseReport } from "@/lib/swr.ts";
+import type { AnnualExpenseSummaryProps } from "@/types/summary.ts";
 
 export function AnnualExpenseSummary({
   isAuth,
@@ -24,8 +24,8 @@ export function AnnualExpenseSummary({
   );
 
   const handleUpdte = () => {
-    expenseMutate();
-    budgetUsageMutate();
+    void expenseMutate();
+    void budgetUsageMutate();
   };
 
   return (
@@ -36,8 +36,8 @@ export function AnnualExpenseSummary({
           expenseReport={expenseReport}
           expenseReportError={expenseReportError}
           isExpenseReportLoading={isExpenseReportLoading}
-          expenseMutate={expenseMutate}
-          handleUpdte={handleUpdte}
+          expenseMutate={() => void expenseMutate()}
+          handleUpdte={() => void handleUpdte()}
           expenseDateSelector={expenseDateSelector}
         />
       </div>

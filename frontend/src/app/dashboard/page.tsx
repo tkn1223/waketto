@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext.tsx";
-import { useDateSelector } from "@/hooks/useDateSelector.tsx";
-import { useViewMode } from "@/contexts/ViewModeContext.tsx";
-import { AnnualExpenseSummary } from "@/components/dashboard/AnnualExpenseSummary.tsx";
 import { AnnualBudgetSummary } from "@/components/dashboard/AnnualBudgetSummary.tsx";
+import { AnnualExpenseSummary } from "@/components/dashboard/AnnualExpenseSummary.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
+import { useDateSelector } from "@/hooks/useDateSelector.tsx";
 
 export default function DashboardPage() {
   const router = useRouter();

@@ -20,7 +20,7 @@ services:
     container_name: waketto-backend
     build:
       context: ../backend
-      dockerfile: ../infra/backend/Dockerfile
+      dockerfile: ../infra/backend/Dockerfile.prod
     volumes:
       - ../backend:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -30,7 +30,6 @@ services:
       - DB_DATABASE=${MYSQL_DATABASE}
       - DB_USERNAME=${MYSQL_USER}
       - DB_PASSWORD=${MYSQL_PASSWORD}
-    user: "${UID}:${GID}"
     depends_on:
       - db
     networks:

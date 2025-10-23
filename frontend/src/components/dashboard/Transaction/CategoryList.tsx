@@ -48,7 +48,8 @@ export function CategoryList({
     if (selected?.type) {
       return selected.type;
     }
-    tabItems.length > 0 ? tabItems[0].key : "";
+
+    return tabItems.length > 0 ? tabItems[0].key : "";
   };
 
   return (

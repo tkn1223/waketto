@@ -1,15 +1,15 @@
 "use client";
 
+import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
   CardContent,
-  CardHeader,
   CardFooter,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { Label } from "@/components/ui/label.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import { Label } from "@/components/ui/label.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
 
 export default function SettingPage() {
@@ -38,7 +38,7 @@ export default function SettingPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button onClick={handleSave}>保存</Button>
+            <Button onClick={() => void handleSave()}>保存</Button>
           </CardFooter>
         </Card>
       </div>

@@ -1,16 +1,16 @@
-import { useState } from "react";
-import { formatDate } from "@/types/displayFormat.ts";
-import type {
-  SavedTransactionData,
-  TransactionRowProps,
-} from "@/types/transaction.ts";
-import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
+import { useCallback, useState } from "react";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion.tsx";
+import { formatDate } from "@/types/displayFormat.ts";
+import type {
+  SavedTransactionData,
+  TransactionRowProps,
+} from "@/types/transaction.ts";
+import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
 
 export function TransactionRow({
   category,
@@ -26,10 +26,19 @@ export function TransactionRow({
     0
   );
 
-  const handleOpneDialog = (payment: SavedTransactionData) => {
+  const handleOpneDialog = useCallback((payment: SavedTransactionData) => {
     setSelectedPayment(payment);
     setIsDialogOpen(true);
-  };
+  }, []); // 依存関係なし
+
+  const handleCloseDialog = useCallback(() => {
+    setIsDialogOpen(false);
+    setSelectedPayment(null);
+  }, []); // 依存関係なし
+
+  const handleUpdate = useCallback(() => {
+    onTransactionUpdate();
+  }, [onTransactionUpdate]); // 依存関係を明示
 
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -44,12 +53,13 @@ export function TransactionRow({
         {/* アコーディオンの中身 */}
         <AccordionContent className="space-y-1.5 w-11/12 ml-auto">
           {category.payments.map((payment, paymentIndex: number) => (
-            <div
+            <button
               key={`payment-${paymentIndex}`}
+              type="button"
               onClick={() => {
                 handleOpneDialog(payment);
               }}
-              className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none cursor-pointer"
+              className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none cursor-pointer w-full text-left"
             >
               <span className="col-span-3 text-sm">
                 {formatDate(payment.date ?? Date.now().toString())}
@@ -60,7 +70,7 @@ export function TransactionRow({
               <span className="col-span-3 text-right">
                 {payment.amount?.toLocaleString()} 円
               </span>
-            </div>
+            </button>
           ))}
         </AccordionContent>
 
@@ -68,8 +78,8 @@ export function TransactionRow({
           <TransactionDetailDialog
             payment={selectedPayment}
             isOpen={isDialogOpen}
-            onClose={() => setIsDialogOpen(false)}
-            onUpdate={onTransactionUpdate} // 更新成功時にコールバック実行
+            onClose={handleCloseDialog}
+            onUpdate={handleUpdate}
           />
         )}
       </AccordionItem>

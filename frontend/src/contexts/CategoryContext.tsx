@@ -17,12 +17,12 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   // SWRでカテゴリーデータを取得（認証済みの場合のみ）
   const {
     data: categories,
-    error,
+    error: _error,
     isLoading: isCategoriesLoading,
   } = useCategories(isAuth);
 
   // エラーハンドリング
-  if (error) {
+  if (_error) {
     toast.error("カテゴリーの取得に失敗しました", {
       className: "!bg-red-600 !text-white !border-red-800",
     });
@@ -40,6 +40,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/* eslint-disable react-refresh/only-export-components */
 export function useCategory() {
   const context = useContext(CategoryContext);
 

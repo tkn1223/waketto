@@ -1,4 +1,4 @@
-import { ExpenseReportResponse } from "./transaction.ts";
+import type { ExpenseReportResponse } from "./transaction.ts";
 
 export interface DateSelector {
   year: string;
@@ -18,7 +18,7 @@ export interface YearMonthSelectorProps {
 export interface ExpenseTableProps {
   expenseReport: ExpenseReportResponse | undefined;
   isExpenseReportLoading: boolean;
-  expenseReportError: Error | null;
+  expenseReportError: Error | undefined;
   expenseMutate: () => void;
   handleUpdte: () => void;
   expenseDateSelector: DateSelector;

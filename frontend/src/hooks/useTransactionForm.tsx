@@ -1,21 +1,21 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useCategory } from "@/contexts/CategoryContext.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import {
+  deleteTransaction,
   postTransaction,
   putTransaction,
-  deleteTransaction,
 } from "@/lib/api.ts";
 import type {
   CategorySelection,
-  TransactionData,
   SavedTransactionData,
+  TransactionData,
 } from "@/types/transaction.tsx";
-import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 
 interface UseTransactionFormProps {
   transactionPatch: SavedTransactionData | null;
@@ -66,17 +66,9 @@ export const useTransactionForm = ({
   );
 
   useEffect(() => {
+    console.log("🔄 useTransactionForm useEffect triggered");
     setTransactionData(createTransactionData(transactionPatch));
-  }, [
-    transactionPatch?.id,
-    transactionPatch?.amount,
-    transactionPatch?.date,
-    transactionPatch?.category,
-    transactionPatch?.category_group_code,
-    transactionPatch?.user,
-    transactionPatch?.shop_name,
-    transactionPatch?.memo,
-  ]);
+  }, [transactionPatch]); // createTransactionData を依存関係から除外
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));
@@ -124,7 +116,7 @@ export const useTransactionForm = ({
           className: "!bg-red-600 !text-white !border-red-800",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("取引明細の保存中に サーバーエラーが発生しました", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
@@ -136,6 +128,7 @@ export const useTransactionForm = ({
       toast.error("更新対象の取引が指定されていません", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
+
       return;
     }
 
@@ -160,7 +153,7 @@ export const useTransactionForm = ({
           className: "!bg-red-600 !text-white !border-red-800",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("取引明細の更新中に サーバーエラーが発生しました", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
@@ -172,6 +165,7 @@ export const useTransactionForm = ({
       toast.error("削除対象の取引が指定されていません", {
         className: "!bg-red-600 !text-white !border-red-800",
       });
+
       return;
     }
 
@@ -189,7 +183,7 @@ export const useTransactionForm = ({
           className: "!bg-red-600 !text-white !border-red-800",
         });
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("取引明細の削除中に サーバーエラーが発生しました", {
         className: "!bg-red-600 !text-white !border-red-800",
       });

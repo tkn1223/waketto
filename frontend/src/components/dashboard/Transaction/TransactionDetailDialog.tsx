@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +17,7 @@ interface TransactionDetailDialogProps {
   onUpdate: () => void;
 }
 
-export function TransactionDetailDialog({
+export const TransactionDetailDialog = memo(function TransactionDetailDialog({
   payment,
   isOpen,
   onClose,
@@ -35,7 +36,7 @@ export function TransactionDetailDialog({
     handleUpdate,
     handleDelete,
   } = useTransactionForm({
-    transactionPatch: { ...payment },
+    transactionPatch: payment,
     onSuccess: () => {
       onClose();
       onUpdate();
@@ -59,8 +60,8 @@ export function TransactionDetailDialog({
             onPayerChange={handlePayerChange}
             onShopNameChange={handleShopNameChange}
             onMemoChange={handleMemoChange}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
+            onUpdate={() => void handleUpdate()}
+            onDelete={() => void handleDelete()}
             saveButtonText="更新する"
             deleteButtonText="削除する"
           />
@@ -68,4 +69,4 @@ export function TransactionDetailDialog({
       </DialogContent>
     </Dialog>
   );
-}
+});

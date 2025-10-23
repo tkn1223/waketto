@@ -1,8 +1,4 @@
-import { ExpenseSection } from "@/components/dashboard/ExpenseReport/ExpenseSection";
-import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
-import { ExpenseTableProps } from "@/types/expense.ts";
-import { useAuth } from "@/contexts/AuthContext.tsx";
-
+import { ExpenseSection } from "@/components/dashboard/ExpenseReport/ExpenseSection.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -10,6 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
+import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
+import type { ExpenseTableProps } from "@/types/expense.ts";
 
 export function ExpenseTable({
   expenseReport,

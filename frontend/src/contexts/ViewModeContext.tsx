@@ -1,20 +1,15 @@
 "use client";
 
+import type { ReactNode } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useSWRConfig } from "swr";
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-
 import type {
   FinanceMode,
   UserMode,
   ViewModeContextType,
 } from "@/types/viewmode";
 
+/* eslint-disable react-refresh/only-export-components */
 export const ViewModeContext = createContext<ViewModeContextType | undefined>(
   undefined
 );
@@ -25,20 +20,24 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
   const [finance, setFinance] = useState<FinanceMode>(() => {
     if (typeof window !== "undefined") {
       const currentFinance = localStorage.getItem("financeMode");
+
       if (currentFinance === "expense" || currentFinance === "budget") {
         return currentFinance;
       }
     }
+
     return "expense";
   });
 
   const [user, setUser] = useState<UserMode>(() => {
     if (typeof window !== "undefined") {
       const currentUser = localStorage.getItem("userMode");
+
       if (currentUser === "alone" || currentUser === "common") {
         return currentUser;
       }
     }
+
     return "alone";
   });
 
@@ -49,7 +48,7 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
   const handleUserChange = (mode: UserMode) => {
     setUser(mode);
     // モード切替時にデータを再取得
-    mutate(
+    void mutate(
       (key) => typeof key === "string" && key.startsWith("/expense-report")
     );
   };
@@ -82,10 +81,13 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* eslint-disable react-refresh/only-export-components */
 export function useViewMode() {
   const context = useContext(ViewModeContext);
+
   if (context === undefined) {
     throw new Error("useViewMode must be used within a ViewModeProvider");
   }
+
   return context;
 }

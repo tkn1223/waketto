@@ -1,5 +1,5 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
-import { PayerSelectProps } from "@/types/transaction.ts";
+import type { PayerSelectProps } from "@/types/transaction.ts";
 
 export function PayerSelect({
   userInfo,
@@ -11,6 +11,7 @@ export function PayerSelect({
     if (payer === userInfo.id) {
       return userInfo.id;
     }
+
     // partnerのidは取得していないので、couple_idで代用
     return userInfo.couple_id || "";
   };
