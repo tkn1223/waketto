@@ -10,7 +10,6 @@ yarn-error.log*
 
 # PHP/Composer
 vendor/
-composer.lock
 
 # ===== 環境変数 =====
 .env
