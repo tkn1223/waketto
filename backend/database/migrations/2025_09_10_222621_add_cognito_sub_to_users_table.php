@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             // Cognito認証用カラムを追加
             $table->string('cognito_sub')->unique()->nullable()->after('email');
-            
+
             // Cognito認証では不要なカラムを削除
             $table->dropColumn([
                 'email_verified_at',  // Cognitoが管理
                 'password',           // Cognitoが管理
-                'remember_token'      // セッション認証用のため不要
+                'remember_token',      // セッション認証用のため不要
             ]);
         });
 
@@ -44,7 +44,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable()->after('email');
             $table->string('password')->after('email_verified_at');
             $table->rememberToken();
-            
+
             // Cognito用カラムを削除
             $table->dropColumn('cognito_sub');
         });

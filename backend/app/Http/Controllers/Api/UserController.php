@@ -15,13 +15,13 @@ class UserController extends Controller
     public function profile(Request $request): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
-        
+
         return response()->json([
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'cognito_sub' => $user->cognito_sub,
-            ]
+            ],
         ]);
     }
 
@@ -47,12 +47,12 @@ class UserController extends Controller
                     'email' => $user->email,
                     'cognito_sub' => $user->cognito_sub,
                     'updated_at' => $user->updated_at,
-                ]
+                ],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'バリデーションエラーが発生しました',
-                'errors' => $e->errors()
+                'errors' => $e->errors(),
             ], 422);
         }
     }

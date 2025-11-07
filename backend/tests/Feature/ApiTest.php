@@ -3,8 +3,8 @@
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use App\Models\User;
+use Tests\TestCase;
 
 class ApiTest extends TestCase
 {
@@ -29,6 +29,7 @@ class ApiTest extends TestCase
             $mock->shouldReceive('handle')
                 ->andReturnUsing(function ($request, $next) use ($user) {
                     $request->attributes->set('auth_user', $user);
+
                     return $next($request);
                 });
         });

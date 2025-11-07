@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
@@ -23,14 +22,14 @@ class SettingController extends Controller
 
         $partner = User::where('user_id', $partnerId)->first();
 
-        if (!$partner || $user->id === $partner->id) {
+        if (! $partner || $user->id === $partner->id) {
             return response()->json([
                 'status' => false,
                 'message' => '入力されたIDのユーザーが見つかりません',
             ]);
         }
 
-        if (!User::setPartner($user, $partner)) {
+        if (! User::setPartner($user, $partner)) {
             return response()->json([
                 'status' => false,
                 'message' => 'パートナー設定に失敗しました',

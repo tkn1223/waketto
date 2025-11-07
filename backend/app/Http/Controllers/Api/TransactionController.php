@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Models\Payment;
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
@@ -25,15 +25,15 @@ class TransactionController extends Controller
 
         // payerが存在するか確認
         $payerExists = User::where('id', $request->payer)
-                        ->orWhere('couple_id', $request->payer)
-                        ->exists();
+            ->orWhere('couple_id', $request->payer)
+            ->exists();
 
-        if (!$payerExists) {
+        if (! $payerExists) {
             return response()->json([
                 'status' => false,
                 'message' => '支払者が存在しません',
             ], 422);
-        };
+        }
 
         // バリデーションチェック
         $validator = Validator::make($request->all(), [
@@ -41,7 +41,7 @@ class TransactionController extends Controller
             'category' => 'required|integer|exists:categories,id',
             'date' => 'required|date',
             'payer' => 'required|string',
-            'shop_name'=> 'nullable|string|max:255',
+            'shop_name' => 'nullable|string|max:255',
             'memo' => 'nullable|string|max:255',
         ], [
             'amount.required' => '金額は必須です',
@@ -60,26 +60,27 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             Log::error('Validation failed', [
                 'errors' => $validator->errors(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
+
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
-        };
+        }
 
         $payment = Payment::newPaymentRecord($validator->validated(), $user_id, $couple_id);
-        
-        if (!$payment) {
+
+        if (! $payment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Transaction creation failed'
+                'message' => 'Transaction creation failed',
             ], 500);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Transaction created successfully'
+            'message' => 'Transaction created successfully',
         ]);
     }
 
@@ -90,22 +91,22 @@ class TransactionController extends Controller
 
         // payerが存在するか確認
         $payerExists = User::where('id', $request->payer)
-        ->orWhere('couple_id', $request->payer)
-        ->exists();
+            ->orWhere('couple_id', $request->payer)
+            ->exists();
 
-        if (!$payerExists) {
+        if (! $payerExists) {
             return response()->json([
                 'status' => false,
                 'message' => '支払者が存在しません',
             ], 422);
-        };
+        }
 
         $validator = Validator::make($request->all(), [
             'amount' => 'required|numeric|min:0',
             'category' => 'required|integer|exists:categories,id',
             'date' => 'required|date',
             'payer' => 'required|string',
-            'shop_name'=> 'nullable|string|max:255',
+            'shop_name' => 'nullable|string|max:255',
             'memo' => 'nullable|string|max:255',
         ], [
             'amount.required' => '金額は必須です',
@@ -125,35 +126,36 @@ class TransactionController extends Controller
         if ($validator->fails()) {
             Log::error('Validation failed', [
                 'errors' => $validator->errors(),
-                'request_data' => $request->all()
+                'request_data' => $request->all(),
             ]);
+
             return response()->json([
                 'status' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
-        };
+        }
 
         $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id);
-        if (!$updatePayment) {
+        if (! $updatePayment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Transaction update failed'
+                'message' => 'Transaction update failed',
             ], 500);
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'Transaction updated successfully'
+            'message' => 'Transaction updated successfully',
         ]);
     }
 
     public function delete($id): JsonResponse
     {
         $payment = Payment::find($id);
-        if (!$payment) {
+        if (! $payment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Transaction not found'
+                'message' => 'Transaction not found',
             ], 500);
         }
 
@@ -161,7 +163,7 @@ class TransactionController extends Controller
 
         return response()->json([
             'status' => true,
-            'message' => 'Transaction deleted successfully'
+            'message' => 'Transaction deleted successfully',
         ]);
     }
 }

@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Models\Budget;
 use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class BudgetUsageController extends Controller
@@ -18,7 +18,7 @@ class BudgetUsageController extends Controller
 
         // クエリパラメータから年を取得
         $year = $request->query('year', date('Y'));
-        
+
         // 年度の開始日と終了日の取得
         $startDate = "{$year}-01-01";
         $endDate = "{$year}-12-31";
@@ -45,6 +45,7 @@ class BudgetUsageController extends Controller
             Log::error('予算の取得に失敗しました', [
                 'error' => $e->getMessage(),
             ]);
+
             return response()->json([
                 'status' => false,
                 'message' => '予算の取得に失敗しました',
@@ -76,7 +77,6 @@ class BudgetUsageController extends Controller
             ->whereBetween('payment_date', [$startDate, $endDate])
             ->groupBy('month', 'category_id');
 
-
         return $couple_id
         ? $query->where('couple_id', $couple_id)->get()
         : $query->where('recorded_by_user_id', $userId)
@@ -97,7 +97,7 @@ class BudgetUsageController extends Controller
                 $monthlyData[] = [
                     'month' => $month,
                     'category_id' => $budgetItem->category_id,
-                    'amount' => $monthRecord ? (int)$monthRecord->amount : 0,
+                    'amount' => $monthRecord ? (int) $monthRecord->amount : 0,
                     'payment_ids' => $monthRecord ? $monthRecord->payment_ids : '',
                 ];
             }

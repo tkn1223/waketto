@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-use App\Models\Payment;
 use App\Models\CategoryGroup;
+use App\Models\Payment;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class ExpenseReportController extends Controller
 {
@@ -18,7 +18,7 @@ class ExpenseReportController extends Controller
         // クエリパラメータから年月を取得
         $year = $request->query('year', date('Y'));
         $month = $request->query('month', date('n'));
-        
+
         // 開始日と終了日の取得
         $startDate = "{$year}-{$month}-01";
         $endDate = date('Y-m-t', strtotime($startDate));
@@ -38,21 +38,20 @@ class ExpenseReportController extends Controller
         } else {
             // aloneモード（自分が記録したデータのみ + couple_idがnull)
             $paymentData = Payment::where('recorded_by_user_id', $userId)
-                                  ->whereNull('couple_id')
-                                  ->whereBetween('payment_date', [$startDate, $endDate]);
+                ->whereNull('couple_id')
+                ->whereBetween('payment_date', [$startDate, $endDate]);
         }
 
         $paymentData = $paymentData->with('category', 'category.categoryGroup')
             ->orderBy('payment_date', 'asc')
             ->get();
 
-        
         $sortedByCategoryData = [];
 
         foreach ($allCategoryGroups as $categoryGroup) {
             $sortedByCategoryData[$categoryGroup->code] = [
                 'group_name' => $categoryGroup->name,
-                'categories' => []
+                'categories' => [],
             ];
         }
 
@@ -60,10 +59,10 @@ class ExpenseReportController extends Controller
             $groupCode = $payment->category->group_code;
             $categoryCode = $payment->category->code;
 
-            if (!isset($sortedByCategoryData[$groupCode]['categories'][$categoryCode])) {
+            if (! isset($sortedByCategoryData[$groupCode]['categories'][$categoryCode])) {
                 $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [
                     'category_name' => $payment->category->name,
-                    'payments' => []
+                    'payments' => [],
                 ];
             }
 
@@ -78,7 +77,7 @@ class ExpenseReportController extends Controller
                 'category_group_code' => $groupCode,
             ];
         }
-        
+
         return response()->json([
             'status' => true,
             'data' => $sortedByCategoryData,

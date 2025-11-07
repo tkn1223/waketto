@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Couple;
 
 class User extends Authenticatable
 {
@@ -30,7 +29,7 @@ class User extends Authenticatable
     {
         $user = User::where('cognito_sub', $cognitoSub)->first();
 
-        if (!$user) {
+        if (! $user) {
             $userId = self::generateUserId();
             $user = User::create([
                 'cognito_sub' => $cognitoSub,
@@ -69,24 +68,25 @@ class User extends Authenticatable
 
         try {
             $couple = Couple::create([
-                'name' => $user->user_id . ' & ' . $partner->user_id,
+                'name' => $user->user_id.' & '.$partner->user_id,
             ]);
 
             $user->update([
                 'couple_id' => $couple->id,
                 'pair_index' => 1,
             ]);
-    
+
             $partner->update([
                 'couple_id' => $couple->id,
                 'pair_index' => 2,
             ]);
-    
+
             DB::commit();
+
             return true;
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('パートナー設定エラー', [
                 'error' => $e->getMessage(),
                 'user_id' => $user->id,
@@ -105,17 +105,18 @@ class User extends Authenticatable
         try {
             $couple_id = User::where('id', $user_id)->first()->couple_id;
 
-            $partner_id= User::where('couple_id', $couple_id)
-                             ->where('id', '!=', $user_id)
-                             ->first()
-                             ->id;
-    
+            $partner_id = User::where('couple_id', $couple_id)
+                ->where('id', '!=', $user_id)
+                ->first()
+                ->id;
+
             return $partner_id;
         } catch (\Exception $e) {
             Log::error('Partner ID取得エラー', [
                 'error' => $e->getMessage(),
                 'user_id' => $user_id,
             ]);
+
             return $user_id;
         }
     }
