@@ -14,7 +14,7 @@ env:
   ECS_SERVICE_BACKEND: waketto-backend-service
   ECS_SERVICE_FRONTEND: waketto-task-definition-frontend
   ECR_REPOSITORY_BACKEND: waketto-laravel
-  ECR_REPOSITORY_FRONTEND: waketto-frontend
+  ECR_REPOSITORY_FRONTEND: waketto
   ECR_REPOSITORY_NGINX: waketto-nginx
 
 # ECR push するための権限設定
