@@ -33,7 +33,8 @@ backend/public/storage/
 # Laravel
 backend/storage/*.key
 backend/storage/pail
-backend/bootstrap/cache/
+backend/bootstrap/cache/*
+!backend/bootstrap/cache/.gitkeep
 backend/.phpunit.cache
 backend/.phpunit.result.cache
 
