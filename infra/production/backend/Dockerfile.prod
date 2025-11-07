@@ -1,0 +1,56 @@
+FROM php:8.4-fpm
+
+# 環境変数
+ENV TZ=Asia/Tokyo
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+
+# システム依存関係のインストール
+RUN apt-get update && apt-get install -y \
+    procps \
+    curl \
+    zip \
+    unzip \
+    git \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Composerのインストール
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# 作業ディレクトリ
+WORKDIR /var/www/html
+
+# Composer依存関係のインストール（本番用）
+COPY backend/composer.json backend/composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# アプリケーションコードのコピー
+COPY backend /var/www/html
+
+# 本番用Composerスクリプト実行
+RUN composer install --no-dev --optimize-autoloader
+
+# 必要なディレクトリの作成
+RUN mkdir -p storage/logs \
+    && mkdir -p storage/framework/cache \
+    && mkdir -p storage/framework/sessions \
+    && mkdir -p storage/framework/views \
+    && mkdir -p bootstrap/cache
+
+# ボリューム設定
+VOLUME /var/www/html/storage
+VOLUME /var/www/html/bootstrap/cache
+
+# エントリーポイント
+COPY infra/production/backend/entrypoint.prod.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.prod.sh
+ENTRYPOINT ["entrypoint.prod.sh"]
+
+# ポート公開（PHP-FPMは内部ポート）
+EXPOSE 9000

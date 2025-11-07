@@ -1,0 +1,63 @@
+services:
+  frontend:
+    container_name: waketto-frontend
+    build:
+      context: ../../
+      dockerfile: ./infra/production/frontend/Dockerfile.prod
+    image: 582739605351.dkr.ecr.ap-northeast-1.amazonaws.com/waketto:latest
+    ports:
+      - "80"
+    networks:
+      - app-network
+
+  backend:
+    container_name: waketto-backend
+    build:
+      context: ../../
+      dockerfile: ./infra/production/backend/Dockerfile.prod
+    image: 582739605351.dkr.ecr.ap-northeast-1.amazonaws.com/waketto-laravel:latest
+    volumes:
+      # 本番環境用ボリューム
+      - waketto-storage:/var/www/html/storage
+      - waketto-cache:/var/www/html/bootstrap/cache
+      - ./backend/php.ini.prod:/usr/local/etc/php/php.ini
+    environment:
+      # ローカルテスト用（.env.prod から読み込み）
+      - APP_ENV=production
+      - APP_DEBUG=false
+      # DB設定
+      - DB_CONNECTION=mysql
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      # Cognito設定
+      - COGNITO_USER_POOL_ID=${COGNITO_USER_POOL_ID}
+      - COGNITO_CLIENT_ID=${COGNITO_CLIENT_ID}
+      - COGNITO_REGION=${COGNITO_REGION}
+    networks:
+      - app-network
+
+  nginx:
+    container_name: waketto-nginx
+    build:
+      context: ../../
+      dockerfile: ./infra/production/nginx/Dockerfile.prod
+    image: 582739605351.dkr.ecr.ap-northeast-1.amazonaws.com/waketto-nginx:latest
+    ports:
+      - "80:80"
+      - "443:443" # https対応
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  waketto-storage:
+  waketto-cache:

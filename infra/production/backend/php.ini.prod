@@ -1,0 +1,31 @@
+[PHP]
+
+# 制限
+max_execution_time = 300
+max_input_vars = 1000
+upload_max_filesize = 64M
+post_max_size = 128M
+memory_limit = 512M
+
+# エラー表示
+display_errors = off
+display_startup_errors = off
+error_reporting = E_ERROR
+log_errors = on
+error_log = /dev/stderr
+
+# 設定
+date.timezone = Asia/Tokyo
+mbstring.language = Japanese
+default_charset = UTF-8
+mysqlnd.collect_memory_statistics = on
+zend.assertions = 0
+zend.exception_ignore_args = off
+expose_php = off
+
+# 本番環境用最適化
+opcache.enable = 1
+opcache.memory_consumption = 128
+opcache.max_accelerated_files = 4000
+opcache.revalidate_freq = 0
+opcache.validate_timestamps = 0
