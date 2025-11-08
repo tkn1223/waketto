@@ -3,23 +3,6 @@
 import { useEffect, useState } from "react";
 import { Amplify } from "aws-amplify";
 
-// デバッグ: 環境変数の値を確認
-console.log("=== Cognito Environment Variables ===");
-console.log(
-  "NEXT_PUBLIC_COGNITO_USER_POOL_ID:",
-  process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID
-);
-console.log(
-  "NEXT_PUBLIC_COGNITO_CLIENT_ID:",
-  process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID
-);
-console.log(
-  "NEXT_PUBLIC_COGNITO_REGION:",
-  process.env.NEXT_PUBLIC_COGNITO_REGION
-);
-console.log("NEXT_PUBLIC_API_BASE_URL:", process.env.NEXT_PUBLIC_API_BASE_URL);
-console.log("=====================================");
-
 const amplifyConfig = {
   Auth: {
     Cognito: {

@@ -17,7 +17,7 @@ env:
   ECR_REPOSITORY_FRONTEND: waketto
   ECR_REPOSITORY_NGINX: waketto-nginx
   # Next.js フロントエンドの環境変数
-  NEXT_PUBLIC_API_BASE_URL: https://waketto.com
+  NEXT_PUBLIC_API_BASE_URL: http://waketto-alb-backend-560663801.ap-northeast-1.elb.amazonaws.com
   NEXT_PUBLIC_COGNITO_USER_POOL_ID: ap-northeast-1_TseqnOeTs
   NEXT_PUBLIC_COGNITO_CLIENT_ID: 6hfaj5gg452d01al3k9pbvbeon
   NEXT_PUBLIC_COGNITO_REGION: ap-northeast-1
