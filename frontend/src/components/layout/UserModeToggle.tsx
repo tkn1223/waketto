@@ -36,7 +36,7 @@ export function UserModeToggle({ user, setUser }: UserModeToggleProps) {
         disabled
         className="cursor-not-allowed"
       >
-        <User className="h-4 w-4 mr-1" />
+        <User className="h-4 w-4" />
         個人
       </Toggle>
     );
