@@ -66,7 +66,6 @@ export const useTransactionForm = ({
   );
 
   useEffect(() => {
-    console.log("🔄 useTransactionForm useEffect triggered");
     setTransactionData(createTransactionData(transactionPatch));
   }, [transactionPatch]); // createTransactionData を依存関係から除外
 
