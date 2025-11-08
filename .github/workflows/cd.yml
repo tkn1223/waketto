@@ -16,6 +16,11 @@ env:
   ECR_REPOSITORY_BACKEND: waketto-laravel
   ECR_REPOSITORY_FRONTEND: waketto
   ECR_REPOSITORY_NGINX: waketto-nginx
+  # Next.js フロントエンドの環境変数
+  NEXT_PUBLIC_API_BASE_URL: https://waketto.nomnichi.net
+  NEXT_PUBLIC_COGNITO_USER_POOL_ID: ap-northeast-1_TseqnOeTs
+  NEXT_PUBLIC_COGNITO_CLIENT_ID: 6hfaj5gg452d01al3k9pbvbeon
+  NEXT_PUBLIC_COGNITO_REGION: ap-northeast-1
 
 # ECR push するための権限設定
 permissions:
@@ -156,10 +161,10 @@ jobs:
         run: |
           docker build \
             --no-cache \
-            --build-arg NEXT_PUBLIC_API_BASE_URL="${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" \
-            --build-arg NEXT_PUBLIC_COGNITO_USER_POOL_ID="${{ secrets.NEXT_PUBLIC_COGNITO_USER_POOL_ID }}" \
-            --build-arg NEXT_PUBLIC_COGNITO_CLIENT_ID="${{ secrets.NEXT_PUBLIC_COGNITO_CLIENT_ID }}" \
-            --build-arg NEXT_PUBLIC_COGNITO_REGION="ap-northeast-1" \
+            --build-arg NEXT_PUBLIC_API_BASE_URL="${{ env.NEXT_PUBLIC_API_BASE_URL }}" \
+            --build-arg NEXT_PUBLIC_COGNITO_USER_POOL_ID="${{ env.NEXT_PUBLIC_COGNITO_USER_POOL_ID }}" \
+            --build-arg NEXT_PUBLIC_COGNITO_CLIENT_ID="${{ env.NEXT_PUBLIC_COGNITO_CLIENT_ID }}" \
+            --build-arg NEXT_PUBLIC_COGNITO_REGION="${{ env.NEXT_PUBLIC_COGNITO_REGION }}" \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest \
             -f infra/production/frontend/Dockerfile.prod \
