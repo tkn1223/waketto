@@ -54,6 +54,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
+            --no-cache \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest \
             -f infra/production/backend/Dockerfile.prod \
@@ -67,6 +68,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
+            --no-cache \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:latest \
             -f infra/production/nginx/Dockerfile.prod \
@@ -74,11 +76,54 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_NGINX:latest
 
-      - name: Update ECS backend service (includes nginx)
+      - name: Get current backend task definition
+        id: get-backend-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE_BACKEND }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'services[0].taskDefinition' \
+            --output text)
+          echo "task_def_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      - name: Download current backend task definition
+        id: download-backend-task-def
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ steps.get-backend-task-def.outputs.task_def_arn }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'taskDefinition' > task-def.json
+
+          # 新しいイメージ URI に更新（backend と nginx の両方）
+          jq --arg BACKEND_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" \
+             --arg NGINX_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG" \
+             'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
+              .containerDefinitions |= map(
+                if .name == "backend" then .image = $BACKEND_IMAGE
+                elif .name == "nginx" then .image = $NGINX_IMAGE
+                else . end
+              )' task-def.json > new-task-def.json
+
+      - name: Register new backend task definition
+        id: register-backend-task-def
+        run: |
+          NEW_TASK_DEF=$(aws ecs register-task-definition \
+            --cli-input-json file://new-task-def.json \
+            --region ${{ env.AWS_REGION }} \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "new_task_def_arn=$NEW_TASK_DEF" >> $GITHUB_OUTPUT
+
+      - name: Update ECS backend service with new task definition
         run: |
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER }} \
             --service ${{ env.ECS_SERVICE_BACKEND }} \
+            --task-definition ${{ steps.register-backend-task-def.outputs.new_task_def_arn }} \
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
 
@@ -110,6 +155,7 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
+            --no-cache \
             --build-arg NEXT_PUBLIC_API_BASE_URL="${{ secrets.NEXT_PUBLIC_API_BASE_URL }}" \
             --build-arg NEXT_PUBLIC_COGNITO_USER_POOL_ID="${{ secrets.NEXT_PUBLIC_COGNITO_USER_POOL_ID }}" \
             --build-arg NEXT_PUBLIC_COGNITO_CLIENT_ID="${{ secrets.NEXT_PUBLIC_COGNITO_CLIENT_ID }}" \
@@ -122,10 +168,51 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
           echo "image=$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Update ECS frontend service
+      - name: Get current frontend task definition
+        id: get-frontend-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs describe-services \
+            --cluster ${{ env.ECS_CLUSTER }} \
+            --services ${{ env.ECS_SERVICE_FRONTEND }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'services[0].taskDefinition' \
+            --output text)
+          echo "task_def_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+
+      - name: Download current frontend task definition
+        id: download-frontend-task-def
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ steps.get-frontend-task-def.outputs.task_def_arn }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'taskDefinition' > frontend-task-def.json
+
+          # 新しいイメージ URI に更新
+          jq --arg FRONTEND_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" \
+             'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
+              .containerDefinitions |= map(
+                if .name == "frontend" then .image = $FRONTEND_IMAGE
+                else . end
+              )' frontend-task-def.json > new-frontend-task-def.json
+
+      - name: Register new frontend task definition
+        id: register-frontend-task-def
+        run: |
+          NEW_TASK_DEF=$(aws ecs register-task-definition \
+            --cli-input-json file://new-frontend-task-def.json \
+            --region ${{ env.AWS_REGION }} \
+            --query 'taskDefinition.taskDefinitionArn' \
+            --output text)
+          echo "new_task_def_arn=$NEW_TASK_DEF" >> $GITHUB_OUTPUT
+
+      - name: Update ECS frontend service with new task definition
         run: |
           aws ecs update-service \
             --cluster ${{ env.ECS_CLUSTER }} \
             --service ${{ env.ECS_SERVICE_FRONTEND }} \
+            --task-definition ${{ steps.register-frontend-task-def.outputs.new_task_def_arn }} \
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
