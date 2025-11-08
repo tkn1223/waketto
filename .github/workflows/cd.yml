@@ -194,7 +194,7 @@ jobs:
           jq --arg FRONTEND_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG" \
              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
               .containerDefinitions |= map(
-                if .name == "frontend" then .image = $FRONTEND_IMAGE
+                if .name == "next" then .image = $FRONTEND_IMAGE
                 else . end
               )' frontend-task-def.json > new-frontend-task-def.json
 
