@@ -21,6 +21,8 @@ env:
   NEXT_PUBLIC_COGNITO_USER_POOL_ID: ap-northeast-1_TseqnOeTs
   NEXT_PUBLIC_COGNITO_CLIENT_ID: 6hfaj5gg452d01al3k9pbvbeon
   NEXT_PUBLIC_COGNITO_REGION: ap-northeast-1
+  # S3 バケット名
+  S3_BUCKET_NAME: waketto-s3-bucket
 
 # ECR push するための権限設定
 permissions:
@@ -221,3 +223,45 @@ jobs:
             --task-definition ${{ steps.register-frontend-task-def.outputs.new_task_def_arn }} \
             --force-new-deployment \
             --region ${{ env.AWS_REGION }}
+
+  # 処理④ Next.js（フロントエンド）のS3への自動デプロイ
+  deploy-frontend-s3:
+    needs: [ci] # CI 通過後に実行
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js static export
+        working-directory: ./frontend
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ env.NEXT_PUBLIC_API_BASE_URL }}
+          NEXT_PUBLIC_COGNITO_USER_POOL_ID: ${{ env.NEXT_PUBLIC_COGNITO_USER_POOL_ID }}
+          NEXT_PUBLIC_COGNITO_CLIENT_ID: ${{ env.NEXT_PUBLIC_COGNITO_CLIENT_ID }}
+          NEXT_PUBLIC_COGNITO_REGION: ${{ env.NEXT_PUBLIC_COGNITO_REGION }}
+        run: pnpm build
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync frontend/out/ s3://${{ env.S3_BUCKET_NAME }} --delete
