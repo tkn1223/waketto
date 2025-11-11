@@ -98,3 +98,6 @@ auth.json
 *.key
 *.crt
 *.csr
+
+# ===== ドキュメント =====
+.docs/

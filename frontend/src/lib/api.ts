@@ -114,7 +114,8 @@ export async function fetchApi<T>(
   if (!isTokenValid) {
     // トークン期限切れ時は自動的にサインアウトしてログイン画面にリダイレクト
     await signOutUser();
-    window.location.href = "/signin";
+    // window.location.hrefを使わず、エラーをスローして呼び出し元で処理
+    throw new Error("トークンが期限切れです。再度ログインしてください。");
   }
 
   // セッションを取得（トークンが期限切れの場合新しいトークンを自動取得）
