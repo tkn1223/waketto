@@ -169,6 +169,7 @@ export default defineConfig([
     ignores: [
       "{dist,build,public,node_modules}/**",
       "{.react-router,.next}/**",
+      "out/**",
       "**/lib/utils.{js,ts}",
       "**/components/ui/**/*.{js,jsx,tsx}",
       "**/*.config.*",

@@ -2,13 +2,13 @@
 
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
+  checkTokenValidity,
   getCurrentUserInfo,
   isAuthenticated,
   signInWithCognito,
   signOutUser,
-  checkTokenValidity,
 } from "@/lib/auth.ts";
 import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
 
