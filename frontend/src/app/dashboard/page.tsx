@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { AnnualBudgetSummary } from "@/components/dashboard/AnnualBudgetSummary.tsx";
 import { AnnualExpenseSummary } from "@/components/dashboard/AnnualExpenseSummary.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
@@ -9,18 +7,12 @@ import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { useDateSelector } from "@/hooks/useDateSelector.tsx";
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { userInfo, isAuth, isLoading } = useAuth();
   const { user, finance } = useViewMode();
   const expenseDateSelector = useDateSelector(); // 支出管理表の年月セレクタ
   const budgetUsageDateSelector = useDateSelector(); // 予算消化率の年月セレクタ
 
-  // 認証失敗時のリダイレクト
-  useEffect(() => {
-    if (!isAuth && !isLoading) {
-      router.push("/signin");
-    }
-  }, [isAuth, isLoading, router]);
+  // リダイレクト処理はAuthContextで実施
 
   if (isLoading || !userInfo) {
     return (

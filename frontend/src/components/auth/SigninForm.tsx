@@ -16,7 +16,8 @@ export default function SigninForm() {
     e.preventDefault();
     try {
       await signIn({ email, password });
-      router.push("/dashboard");
+      // signIn後にdashboardにリダイレクト
+      router.replace("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -39,10 +40,10 @@ export default function SigninForm() {
               💡 予算と実績をまとめて管理できる 【 支出管理表 × 家計簿 】
             </li>
             <li className="tracking-[-.01em]">
-              📊 月ごと・年ごとの支出がひと目でわかる。
+              📊 月ごと・年ごとの支出がひと目でわかる
             </li>
             <li className="tracking-[-.01em">
-              👥 ひとりでもふたりでも。個人モード/共有モードで家計管理を分担。
+              👥 ひとりでもふたりでも。個人モード/共有モードで家計管理を分担
             </li>
           </ol>
           <p className="text-base/6 mt-6">

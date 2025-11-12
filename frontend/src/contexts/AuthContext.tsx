@@ -2,12 +2,13 @@
 
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   getCurrentUserInfo,
   isAuthenticated,
   signInWithCognito,
   signOutUser,
+  checkTokenValidity,
 } from "@/lib/auth.ts";
 import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
 
@@ -35,7 +36,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const _router = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
 
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
@@ -83,6 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
       localStorage.clear();
       sessionStorage.clear();
+
+      // ログアウト後は必ずサインインページにリダイレクト
+      if (pathname !== "/signin") {
+        router.replace("/signin");
+      }
     } catch (error) {
       setError(
         error instanceof Error ? error.message : "ログアウトに失敗しました"
@@ -96,15 +103,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const checkAuth = async () => {
       try {
         const authenticated = await isAuthenticated();
-        setIsAuth(authenticated);
 
         if (authenticated) {
-          const userId = await getCurrentUserInfo();
+          // トークンの有効性を事前にチェック
+          const isTokenValid = await checkTokenValidity();
 
-          if (userId) {
-            setUserInfo(userId);
+          if (isTokenValid) {
+            // トークンが有効な場合のみユーザー情報を取得
+            const userId = await getCurrentUserInfo();
+
+            if (userId) {
+              setUserInfo(userId);
+              setIsAuth(true);
+            } else {
+              console.error("ユーザー情報が取得できませんでした");
+              setIsAuth(false);
+              setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+            }
           } else {
-            console.warn("ユーザー情報が取得できませんでした");
+            // トークンが無効な場合は認証状態をリセット
             setIsAuth(false);
             setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
           }
@@ -123,6 +140,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     void checkAuth();
   }, []);
 
+  // 認証状態に応じたリダイレクト処理
+  useEffect(() => {
+    // 認証チェック中は何もしない
+    if (isLoading) {
+      return;
+    }
+
+    // 認証済みの場合
+    if (isAuth) {
+      // 現在のパスが認証不要ページの場合はダッシュボードにリダイレクト
+      if (pathname === "/signin" || pathname === "/signup") {
+        // 同一URLへの遷移を防ぐ
+        router.replace("/dashboard");
+      } else if (pathname === "/") {
+        // ルートページの場合はダッシュボードにリダイレクト
+        router.replace("/dashboard");
+      }
+    } else {
+      // 未認証の場合
+      if (pathname === "/dashboard") {
+        router.replace("/signin");
+      } else if (pathname === "/") {
+        router.replace("/signin");
+      }
+    }
+  }, [isAuth, isLoading, pathname, router]);
+
   return (
     <AuthContext.Provider
       value={{ userInfo, isAuth, isLoading, error, signIn, signOut }}
@@ -132,6 +176,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// ESLintの設定を無視
 /* eslint-disable react-refresh/only-export-components */
 export function useAuth() {
   const context = useContext(AuthContext);
