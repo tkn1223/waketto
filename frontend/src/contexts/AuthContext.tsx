@@ -159,11 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } else {
       // 未認証の場合
-      if (pathname === "/dashboard") {
-        router.replace("/signin");
-      } else if (pathname === "/") {
-        router.replace("/signin");
-      }
+      router.replace("/signin");
     }
   }, [isAuth, isLoading, pathname, router]);
 
