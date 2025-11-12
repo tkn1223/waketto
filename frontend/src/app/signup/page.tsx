@@ -68,7 +68,8 @@ export default function SignupPage() {
 
       if (result.success) {
         window.dispatchEvent(new CustomEvent("signedIn"));
-        router.push("/dashboard");
+        // signedIn後にdashboardにリダイレクト
+        router.replace("/dashboard");
       } else {
         setError(result.error || "確認に失敗しました");
       }
