@@ -101,38 +101,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkAuth = async () => {
+      console.log("[AuthContext] 認証チェック開始");
       try {
         const authenticated = await isAuthenticated();
+        console.log("[AuthContext] isAuthenticated 結果:", authenticated);
 
         if (authenticated) {
           // トークンの有効性を事前にチェック
           const isTokenValid = await checkTokenValidity();
+          console.log("[AuthContext] checkTokenValidity 結果:", isTokenValid);
 
           if (isTokenValid) {
             // トークンが有効な場合のみユーザー情報を取得
             const userId = await getCurrentUserInfo();
+            console.log("[AuthContext] getCurrentUserInfo 結果:", userId);
 
             if (userId) {
               setUserInfo(userId);
               setIsAuth(true);
+              console.log("[AuthContext] 認証成功: ユーザー情報を設定");
             } else {
-              console.error("ユーザー情報が取得できませんでした");
+              console.error("[AuthContext] ユーザー情報が取得できませんでした");
               setIsAuth(false);
               setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
             }
           } else {
             // トークンが無効な場合は認証状態をリセット
+            console.log("[AuthContext] トークンが無効: 認証状態をリセット");
             setIsAuth(false);
             setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
           }
         } else {
+          console.log("[AuthContext] 未認証: isAuth を false に設定");
           setIsAuth(false);
         }
       } catch (err) {
-        console.error("Authentication check failed:", err);
+        console.error("[AuthContext] Authentication check failed:", err);
         setIsAuth(false);
         setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
       } finally {
+        console.log(
+          "[AuthContext] 認証チェック完了: isLoading を false に設定"
+        );
         setIsLoading(false);
       }
     };
@@ -144,22 +154,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // 認証チェック中は何もしない
     if (isLoading) {
+      console.log("[AuthContext] リダイレクト処理: 認証チェック中...", {
+        isLoading,
+        isAuth,
+        pathname,
+      });
       return;
     }
+
+    console.log("[AuthContext] リダイレクト処理: 認証チェック完了", {
+      isLoading,
+      isAuth,
+      pathname,
+    });
 
     // 認証済みの場合
     if (isAuth) {
       // 現在のパスが認証不要ページの場合はダッシュボードにリダイレクト
       if (pathname === "/signin" || pathname === "/signup") {
+        console.log(
+          "[AuthContext] 認証済み: /signin または /signup から /dashboard にリダイレクト"
+        );
         // 同一URLへの遷移を防ぐ
         router.replace("/dashboard");
       } else if (pathname === "/") {
+        console.log("[AuthContext] 認証済み: / から /dashboard にリダイレクト");
         // ルートページの場合はダッシュボードにリダイレクト
         router.replace("/dashboard");
       }
     } else {
       // 未認証の場合
-      router.replace("/signin");
+      console.log("[AuthContext] 未認証: /signin にリダイレクト", { pathname });
+      // 現在のパスが /signin または /signup の場合はリダイレクトしない
+      if (pathname !== "/signin" && pathname !== "/signup") {
+        router.replace("/signin");
+      }
     }
   }, [isAuth, isLoading, pathname, router]);
 
