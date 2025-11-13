@@ -39,6 +39,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  // 有効なパスのリストを定義
+  const validPaths = ["/", "/dashboard", "/setting", "/signin", "/signup"];
+
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
     try {
@@ -87,7 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sessionStorage.clear();
 
       // ログアウト後は必ずサインインページにリダイレクト
-      if (pathname !== "/signin") {
+      const normalizedPathname = pathname.replace(/\/$/, "") || "/";
+      if (normalizedPathname !== "/signin") {
         router.replace("/signin");
       }
     } catch (error) {
@@ -143,24 +147,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 認証チェック中は何もしない
     if (isLoading) return;
 
+    // pathnameを正規化（末尾スラッシュを削除）
+    const normalizedPathname = pathname.replace(/\/$/, "") || "/";
+
+    // 有効なパスかどうかをチェック
+    const isValidPath = validPaths.includes(normalizedPathname);
+
     // 認証済みの場合
     if (isAuth) {
+      // 無効なパスの場合はダッシュボードにリダイレクト
+      if (!isValidPath) {
+        router.replace("/dashboard");
+        return;
+      }
+
       // 現在のパスが認証不要ページの場合はダッシュボードにリダイレクト
-      if (pathname === "/signin" || pathname === "/signup") {
+      if (
+        normalizedPathname === "/signin" ||
+        normalizedPathname === "/signup"
+      ) {
         // 同一URLへの遷移を防ぐ
         router.replace("/dashboard");
-      } else if (pathname === "/") {
+      } else if (normalizedPathname === "/") {
         // ルートページの場合はダッシュボードにリダイレクト
         router.replace("/dashboard");
       }
     } else {
       // 未認証の場合
-      // 現在のパスが /signin または /signup の場合はリダイレクトしない
-      if (pathname !== "/signin" && pathname !== "/signup") {
+      // 無効なパスの場合はサインインページにリダイレクト
+      if (!isValidPath) {
         router.replace("/signin");
+        return;
       }
+
+      if (
+        normalizedPathname === "/signin" ||
+        normalizedPathname === "/signup"
+      ) {
+        return;
+      }
+      router.replace("/signin");
     }
-  }, [isAuth, isLoading, pathname, router]);
+  }, [isAuth, isLoading, pathname, router, validPaths]);
 
   return (
     <AuthContext.Provider
