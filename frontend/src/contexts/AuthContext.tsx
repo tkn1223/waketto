@@ -91,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // ログアウト後は必ずサインインページにリダイレクト
       const normalizedPathname = pathname.replace(/\/$/, "") || "/";
+
       if (normalizedPathname !== "/signin") {
         router.replace("/signin");
       }
@@ -158,6 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 無効なパスの場合はダッシュボードにリダイレクト
       if (!isValidPath) {
         router.replace("/dashboard");
+
         return;
       }
 
@@ -177,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 無効なパスの場合はサインインページにリダイレクト
       if (!isValidPath) {
         router.replace("/signin");
+
         return;
       }
 
