@@ -23,6 +23,8 @@ env:
   NEXT_PUBLIC_COGNITO_REGION: ap-northeast-1
   # S3 バケット名
   S3_BUCKET_NAME: waketto-s3-bucket
+  # CloudFront ディストリビューションID
+  CLOUDFRONT_DISTRIBUTION_ID: E22UL8VHKB6QY3
 
 # ECR push するための権限設定
 permissions:
@@ -265,3 +267,9 @@ jobs:
       - name: Deploy to S3
         run: |
           aws s3 sync frontend/out/ s3://${{ env.S3_BUCKET_NAME }} --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ env.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/index.html" "/*.html"
