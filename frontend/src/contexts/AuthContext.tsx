@@ -159,6 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuth,
         pathname,
       });
+
       return;
     }
 
@@ -185,6 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       // 未認証の場合
       console.log("[AuthContext] 未認証: /signin にリダイレクト", { pathname });
+
       // 現在のパスが /signin または /signup の場合はリダイレクトしない
       if (pathname !== "/signin" && pathname !== "/signup") {
         router.replace("/signin");
