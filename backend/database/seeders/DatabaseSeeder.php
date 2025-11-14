@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CategoryGroupsTableSeeder::class,
             CategoriesSeeder::class,
+            GuestAccountSeeder::class,
         ]);
 
         // 開発環境

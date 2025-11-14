@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { notFound, usePathname, useRouter } from "next/navigation";
 import {
   checkTokenValidity,
   getCurrentUserInfo,
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setIsAuth(false);
         }
-      } catch (err) {
+      } catch (_err) {
         setIsAuth(false);
         setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
       } finally {
@@ -156,13 +156,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 認証済みの場合
     if (isAuth) {
-      // 無効なパスの場合はダッシュボードにリダイレクト
-      if (!isValidPath) {
-        router.replace("/dashboard");
-
-        return;
-      }
-
       // 現在のパスが認証不要ページの場合はダッシュボードにリダイレクト
       if (
         normalizedPathname === "/signin" ||
@@ -176,13 +169,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } else {
       // 未認証の場合
-      // 無効なパスの場合はサインインページにリダイレクト
-      if (!isValidPath) {
-        router.replace("/signin");
-
-        return;
-      }
-
       if (
         normalizedPathname === "/signin" ||
         normalizedPathname === "/signup"
