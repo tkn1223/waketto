@@ -7,24 +7,38 @@ echo "Start entrypoint.prod.sh"
 echo "Waiting for database connection..."
 max_attempts=5
 attempt=1
-LAST_DB_ERROR=""
+MIGRATIONS_TABLE_EXISTS=""        # unknown / true / false
+LAST_MIGRATE_STATUS_ERROR=""      # 失敗時の最後のエラーメッセージ
 
 while [ $attempt -le $max_attempts ]; do
     echo "Attempt $attempt/$max_attempts: Testing database connection..."
-
+    
     # 設定キャッシュをクリア
     php artisan config:clear || echo "Config clear failed, continuing..."
 
-    # DB接続テスト - migrate:status で接続確認
-    if DB_STATUS_OUTPUT=$(php artisan migrate:status 2>&1); then
-        echo "Database connection successful!"
+    # set -e の影響を避けつつ migrate:status の結果と出力を取得
+    set +e
+    MIGRATION_STATUS_OUTPUT=$(php artisan migrate:status 2>&1)
+    status=$?
+    set -e
+
+    if [ $status -eq 0 ]; then
+        # 接続成功 & migrations テーブルあり
+        echo "Database connection successful (migrations table exists)."
+        MIGRATIONS_TABLE_EXISTS="true"
+        break
+    elif echo "$MIGRATION_STATUS_OUTPUT" | grep -qi "Migration table not found"; then
+        # 接続成功 & migrations テーブルなし（＝新規DB想定）
+        echo "Database connection successful, but migrations table is missing (fresh database)."
+        MIGRATIONS_TABLE_EXISTS="false"
         break
     else
-        LAST_DB_ERROR="$DB_STATUS_OUTPUT"
-        echo "--- Database connection error detail ---"
-        echo "$DB_STATUS_OUTPUT"
-        echo "----------------------------------------"
+        # 本当の接続失敗など
         echo "Database connection failed. Waiting 5 seconds..."
+        echo "--- Database connection error detail ---"
+        echo "$MIGRATION_STATUS_OUTPUT"
+        echo "----------------------------------------"
+        LAST_MIGRATE_STATUS_ERROR="$MIGRATION_STATUS_OUTPUT"
         sleep 5
         attempt=$((attempt + 1))
     fi
@@ -37,9 +51,9 @@ if [ $attempt -gt $max_attempts ]; then
     echo "2. DB_PORT: $DB_PORT"
     echo "3. DB_DATABASE: $DB_DATABASE"
     echo "4. Security groups and network configuration"
-    if [ -n "$LAST_DB_ERROR" ]; then
-        echo "Last error from php artisan migrate:status:" >&2
-        echo "$LAST_DB_ERROR" >&2
+    if [ -n "$LAST_MIGRATE_STATUS_ERROR" ]; then
+        echo "Last error from php artisan migrate:status:"
+        echo "$LAST_MIGRATE_STATUS_ERROR"
     fi
     exit 1
 fi
@@ -51,18 +65,31 @@ if [ "${DB_RESET_ON_STARTUP:-false}" = "true" ]; then
         echo "Database wipe failed."
         exit 1
     fi
+    # db:wipe したので migrations テーブルは必ず消えている前提
+    MIGRATIONS_TABLE_EXISTS="false"
 fi
 
-# マイグレーションテーブルが存在するかを確認（シーダーの初回実行判定）
-echo "Checking if migrations table exists..."
-MIGRATION_STATUS_OUTPUT=$(php artisan migrate:status 2>&1)
+# マイグレーションテーブルが未判定の場合だけ、フォールバックで確認
+if [ -z "$MIGRATIONS_TABLE_EXISTS" ]; then
+    echo "Checking if migrations table exists (fallback)..."
 
-if echo "$MIGRATION_STATUS_OUTPUT" | grep -q "Migration name"; then
-    echo "Migrations table exists."
-    MIGRATIONS_TABLE_EXISTS="true"
+    set +e
+    MIGRATION_STATUS_OUTPUT=$(php artisan migrate:status 2>&1)
+    status=$?
+    set -e
+
+    if [ $status -eq 0 ] && echo "$MIGRATION_STATUS_OUTPUT" | grep -q "Migration name"; then
+        echo "Migrations table exists."
+        MIGRATIONS_TABLE_EXISTS="true"
+    elif echo "$MIGRATION_STATUS_OUTPUT" | grep -qi "Migration table not found"; then
+        echo "Migrations table does not exist."
+        MIGRATIONS_TABLE_EXISTS="false"
+    else
+        echo "Warning: Could not determine migrations table state from migrate:status output."
+        MIGRATIONS_TABLE_EXISTS="unknown"
+    fi
 else
-    echo "Migrations table does not exist."
-    MIGRATIONS_TABLE_EXISTS="false"
+    echo "Migrations table existence already determined during DB check: $MIGRATIONS_TABLE_EXISTS"
 fi
 
 # マイグレーション実行
@@ -72,7 +99,7 @@ if ! php artisan migrate --force; then
     exit 1
 fi
 
-# シーダーは初回のみ実行
+# シーダーは「migrations テーブルがなかったとき」だけ実行
 if [ "$MIGRATIONS_TABLE_EXISTS" = "false" ]; then
     echo "First deployment detected. Running seeders..."
     echo "Running: php artisan db:seed --force"
