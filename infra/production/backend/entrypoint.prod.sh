@@ -7,18 +7,23 @@ echo "Start entrypoint.prod.sh"
 echo "Waiting for database connection..."
 max_attempts=5
 attempt=1
+LAST_DB_ERROR=""
 
 while [ $attempt -le $max_attempts ]; do
     echo "Attempt $attempt/$max_attempts: Testing database connection..."
-    
+
     # 設定キャッシュをクリア
     php artisan config:clear || echo "Config clear failed, continuing..."
-    
+
     # DB接続テスト - migrate:status で接続確認
-    if php artisan migrate:status > /dev/null 2>&1; then
+    if DB_STATUS_OUTPUT=$(php artisan migrate:status 2>&1); then
         echo "Database connection successful!"
         break
     else
+        LAST_DB_ERROR="$DB_STATUS_OUTPUT"
+        echo "--- Database connection error detail ---"
+        echo "$DB_STATUS_OUTPUT"
+        echo "----------------------------------------"
         echo "Database connection failed. Waiting 5 seconds..."
         sleep 5
         attempt=$((attempt + 1))
@@ -32,13 +37,21 @@ if [ $attempt -gt $max_attempts ]; then
     echo "2. DB_PORT: $DB_PORT"
     echo "3. DB_DATABASE: $DB_DATABASE"
     echo "4. Security groups and network configuration"
+    if [ -n "$LAST_DB_ERROR" ]; then
+        echo "Last error from php artisan migrate:status:" >&2
+        echo "$LAST_DB_ERROR" >&2
+    fi
     exit 1
 fi
 
-# DBリセット（必要に応じて）
-echo "Dropping all tables..."
-php artisan db:wipe --force || echo "Database wipe failed, continuing..."
-echo "All tables dropped!"
+# 任意のリセット（DB_RESET_ON_STARTUP=true の場合のみ実行）
+if [ "${DB_RESET_ON_STARTUP:-false}" = "true" ]; then
+    echo "DB_RESET_ON_STARTUP is true. Running: php artisan db:wipe --force"
+    if ! php artisan db:wipe --force; then
+        echo "Database wipe failed."
+        exit 1
+    fi
+fi
 
 # マイグレーションテーブルが存在するかを確認（シーダーの初回実行判定）
 echo "Checking if migrations table exists..."
@@ -54,13 +67,19 @@ fi
 
 # マイグレーション実行
 echo "Running: php artisan migrate --force"
-php artisan migrate --force || echo "Migration failed, but continuing..."
+if ! php artisan migrate --force; then
+    echo "Migration failed. Please check the database connection and migration files."
+    exit 1
+fi
 
 # シーダーは初回のみ実行
 if [ "$MIGRATIONS_TABLE_EXISTS" = "false" ]; then
     echo "First deployment detected. Running seeders..."
     echo "Running: php artisan db:seed --force"
-    php artisan db:seed --force || echo "No seeders to run"
+    if ! php artisan db:seed --force; then
+        echo "Database seeding failed."
+        exit 1
+    fi
     echo "First deployment setup completed."
 fi
 
