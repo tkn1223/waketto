@@ -35,11 +35,6 @@ if [ $attempt -gt $max_attempts ]; then
     exit 1
 fi
 
-# DBリセット（必要に応じて）
-echo "Dropping all tables..."
-php artisan db:wipe --force || echo "Database wipe failed, continuing..."
-echo "All tables dropped!"
-
 # マイグレーションテーブルが存在するかを確認（シーダーの初回実行判定）
 echo "Checking if migrations table exists..."
 MIGRATION_STATUS_OUTPUT=$(php artisan migrate:status 2>&1)
@@ -54,13 +49,19 @@ fi
 
 # マイグレーション実行
 echo "Running: php artisan migrate --force"
-php artisan migrate --force || echo "Migration failed, but continuing..."
+if ! php artisan migrate --force; then
+    echo "Migration failed. Please check the database connection and migration files."
+    exit 1
+fi
 
 # シーダーは初回のみ実行
 if [ "$MIGRATIONS_TABLE_EXISTS" = "false" ]; then
     echo "First deployment detected. Running seeders..."
     echo "Running: php artisan db:seed --force"
-    php artisan db:seed --force || echo "No seeders to run"
+    if ! php artisan db:seed --force; then
+        echo "Database seeding failed."
+        exit 1
+    fi
     echo "First deployment setup completed."
 fi
 
