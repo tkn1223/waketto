@@ -35,6 +35,15 @@ if [ $attempt -gt $max_attempts ]; then
     exit 1
 fi
 
+# 任意のリセット（DB_RESET_ON_STARTUP=true の場合のみ実行）
+if [ "${DB_RESET_ON_STARTUP:-false}" = "true" ]; then
+    echo "DB_RESET_ON_STARTUP is true. Running: php artisan db:wipe --force"
+    if ! php artisan db:wipe --force; then
+        echo "Database wipe failed."
+        exit 1
+    fi
+fi
+
 # マイグレーションテーブルが存在するかを確認（シーダーの初回実行判定）
 echo "Checking if migrations table exists..."
 MIGRATION_STATUS_OUTPUT=$(php artisan migrate:status 2>&1)
