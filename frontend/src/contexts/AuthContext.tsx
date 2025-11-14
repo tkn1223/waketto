@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { notFound, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   checkTokenValidity,
   getCurrentUserInfo,
