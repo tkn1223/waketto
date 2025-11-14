@@ -7,18 +7,23 @@ echo "Start entrypoint.prod.sh"
 echo "Waiting for database connection..."
 max_attempts=5
 attempt=1
+LAST_DB_ERROR=""
 
 while [ $attempt -le $max_attempts ]; do
     echo "Attempt $attempt/$max_attempts: Testing database connection..."
-    
+
     # 設定キャッシュをクリア
     php artisan config:clear || echo "Config clear failed, continuing..."
-    
+
     # DB接続テスト - migrate:status で接続確認
-    if php artisan migrate:status > /dev/null 2>&1; then
+    if DB_STATUS_OUTPUT=$(php artisan migrate:status 2>&1); then
         echo "Database connection successful!"
         break
     else
+        LAST_DB_ERROR="$DB_STATUS_OUTPUT"
+        echo "--- Database connection error detail ---"
+        echo "$DB_STATUS_OUTPUT"
+        echo "----------------------------------------"
         echo "Database connection failed. Waiting 5 seconds..."
         sleep 5
         attempt=$((attempt + 1))
@@ -32,6 +37,10 @@ if [ $attempt -gt $max_attempts ]; then
     echo "2. DB_PORT: $DB_PORT"
     echo "3. DB_DATABASE: $DB_DATABASE"
     echo "4. Security groups and network configuration"
+    if [ -n "$LAST_DB_ERROR" ]; then
+        echo "Last error from php artisan migrate:status:" >&2
+        echo "$LAST_DB_ERROR" >&2
+    fi
     exit 1
 fi
 
