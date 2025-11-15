@@ -27,7 +27,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen max-w-7xl mx-auto py-8 px-10">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-3 gap-6">
         {finance === "expense" && (
           <AnnualExpenseSummary
             isAuth={isAuth}

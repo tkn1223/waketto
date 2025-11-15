@@ -14,7 +14,7 @@ export function ExpenseSection({
 }) {
   return (
     <>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4">
         {/* 毎月固定費 */}
         <div className="space-y-2">
           <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
