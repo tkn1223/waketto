@@ -309,7 +309,7 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
       id: String(user.id),
       user_id: user.user_id,
       name: user.name,
-      couple_id: String(user.couple_id),
+      couple_id: user.couple_id || null,
     };
 
     return userInfo;

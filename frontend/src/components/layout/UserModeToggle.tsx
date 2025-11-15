@@ -8,7 +8,7 @@ import type { UserModeToggleProps } from "@/types/viewmode";
 export function UserModeToggle({ user, setUser }: UserModeToggleProps) {
   const { userInfo } = useAuth();
 
-  if (userInfo.couple_id !== "null") {
+  if (userInfo.couple_id) {
     return (
       <Toggle
         aria-label="Toggle user mode"
