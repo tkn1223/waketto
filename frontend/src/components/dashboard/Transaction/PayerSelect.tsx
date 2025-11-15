@@ -21,7 +21,7 @@ export function PayerSelect({
       <p>支払った人</p>
 
       <ToggleGroup
-        className="flex overflow-hidden rounded-xl border shadow-sm"
+        className="flex overflow-hidden rounded-md border shadow-sm"
         type="single"
         value={getSelectedPayer()}
         onValueChange={(value) => onPayerChange(value || userInfo.id)}
@@ -31,7 +31,7 @@ export function PayerSelect({
           className={[
             "px-6 py-2 text-sm outline-none transition",
             getSelectedPayer() === userInfo.id
-              ? "!bg-sky-600 !text-white"
+              ? "!bg-cyan-600 !text-white"
               : "bg-white text-slate-700 hover:bg-slate-50",
           ].join(" ")}
           value={userInfo.id}
@@ -39,12 +39,18 @@ export function PayerSelect({
           {userInfo.name}
         </ToggleGroupItem>
         <ToggleGroupItem
+          disabled={!userInfo.couple_id}
           className={[
             "px-6 py-2 text-sm outline-none transition",
-            getSelectedPayer() === userInfo.couple_id
-              ? "!bg-sky-600 !text-white"
-              : "bg-white text-slate-700 hover:bg-slate-50",
-          ].join(" ")}
+            // パートナーがいない場合は無効化
+            !userInfo.couple_id
+              ? "bg-gray-700 text-black cursor-not-allowed"
+              : getSelectedPayer() === userInfo.couple_id
+                ? "!bg-cyan-600 !text-white"
+                : "bg-white text-slate-700 hover:bg-slate-50",
+          ]
+            .filter(Boolean)
+            .join(" ")}
           value={userInfo.couple_id || ""}
         >
           パートナー
