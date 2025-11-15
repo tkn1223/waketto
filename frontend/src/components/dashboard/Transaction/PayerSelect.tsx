@@ -11,6 +11,7 @@ export function PayerSelect({
     if (payer === userInfo.id) {
       return userInfo.id;
     }
+
     // partnerのidは取得していないので、couple_idで代用
     return userInfo.couple_id || "";
   };
