@@ -31,7 +31,7 @@ export function AnnualExpenseSummary({
   return (
     <>
       {/* 支出管理表カード */}
-      <div className="lg:col-span-2">
+      <div className="order-2 lg:order-1 sm:col-span-1 lg:col-span-2">
         <ExpenseTable
           expenseReport={expenseReport}
           expenseReportError={expenseReportError}
@@ -42,11 +42,11 @@ export function AnnualExpenseSummary({
         />
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
-      <div className="lg:col-span-1">
+      <div className="order-1 lg:order-2 sm:col-span-1 lg:col-span-1">
         <TransactionDetail onUpdate={handleUpdte} />
       </div>
       {/* 予算消化率 */}
-      <div className="col-span-3 space-y-3">
+      <div className="order-3 lg:order-3 sm:col-span-3 lg:col-span-3 space-y-3">
         <div className="flex justify-between">
           <span className="font-medium text-lg">予算の消化状況</span>
           <YearMonthSelector {...budgetUsageDateSelector} showMonth={false} />
