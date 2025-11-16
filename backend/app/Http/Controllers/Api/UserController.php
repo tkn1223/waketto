@@ -10,7 +10,6 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-
     /**
      * ユーザー情報を取得
      */
