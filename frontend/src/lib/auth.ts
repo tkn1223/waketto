@@ -310,6 +310,7 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
       user_id: user.user_id,
       name: user.name,
       couple_id: user.couple_id || null,
+      partner_user_id: user.partner_user_id || null,
     };
 
     return userInfo;

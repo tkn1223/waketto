@@ -20,15 +20,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// requestにユーザー情報を追加
-Route::middleware('cognito')->get('/user', function (Request $request) {
-    return $request->attributes->get('auth_user');
-});
+// requestにユーザー情報を追加（UserControllerで取得）
+// Route::middleware('cognito')->get('/user', function (Request $request) {
+//     return $request->attributes->get('auth_user');
+// });
 
 // 認証が必要なルート
 Route::middleware('cognito')->group(function () {
     Route::get('/profile', [UserController::class, 'profile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
+
+    // ユーザー情報取得のルート
+    Route::get('/user', [UserController::class, 'getUserInfo']);
 
     // 初回表示時のルート
     Route::get('/categories', [CategoryController::class, 'index']);
@@ -51,7 +54,7 @@ Route::middleware('cognito')->group(function () {
     });
 
     // 設定関連のルート
-    Route::post('/partner-setting/{partnerId}', [SettingController::class, 'entry']);
+    Route::post('/partner-setting/{userName}/{partnerId?}', [SettingController::class, 'entry']);
 });
 
 // パブリックルート（認証不要）
