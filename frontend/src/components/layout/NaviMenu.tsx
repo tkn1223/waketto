@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { LogOutIcon, SettingsIcon } from "lucide-react";
+import { LogOutIcon, SettingsIcon, UserRoundPen } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -23,7 +23,11 @@ export function NaviMenu() {
     <NavigationMenu>
       <NavigationMenuList>
         <NavigationMenuItem>
-          <NavigationMenuTrigger className="cursor-pointer">
+          <NavigationMenuTrigger
+            className="cursor-pointer"
+            onPointerMove={preventPointerEvent}
+            onPointerLeave={preventPointerEvent}
+          >
             メニュー
           </NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -32,7 +36,13 @@ export function NaviMenu() {
                 <NavigationMenuLink asChild>
                   <Link href="/setting" className="flex-row items-center gap-2">
                     <SettingsIcon />
-                    設定
+                    予算設定
+                  </Link>
+                </NavigationMenuLink>
+                <NavigationMenuLink asChild>
+                  <Link href="/account" className="flex-row items-center gap-2">
+                    <UserRoundPen />
+                    アカウント設定
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
@@ -51,4 +61,9 @@ export function NaviMenu() {
       </NavigationMenuList>
     </NavigationMenu>
   );
+}
+
+// ポインターイベントを無効化
+function preventPointerEvent(e: React.PointerEvent<HTMLElement>) {
+  e.preventDefault();
 }
