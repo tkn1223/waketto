@@ -28,7 +28,7 @@ class UserController extends Controller
             'user_id' => $user->user_id,
             'name' => $user->name,
             'couple_id' => $user->couple_id,
-            'partner_user_id' => $partnerUserId
+            'partner_user_id' => $partnerUserId,
         ]);
     }
 
