@@ -11,7 +11,7 @@ export const useSettingForm = () => {
     setPartnerId(value);
   };
 
-  const handleSave = async () => {
+  const handleUserInfoSave = async () => {
     try {
       const response = await postPartnerSetting(partnerId);
 
@@ -35,6 +35,6 @@ export const useSettingForm = () => {
   return {
     partnerId,
     handlePartnerId,
-    handleSave,
+    handleUserInfoSave,
   };
 };
