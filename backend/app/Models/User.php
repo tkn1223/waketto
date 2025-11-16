@@ -140,6 +140,7 @@ class User extends Authenticatable
                 'error' => $e->getMessage(),
                 'user_id' => $user->id,
             ]);
+
             return null;
         }
     }

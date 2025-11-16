@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use App\Models\User;
 
 class UserController extends Controller
 {
@@ -28,7 +28,7 @@ class UserController extends Controller
             'user_id' => $user->user_id,
             'name' => $user->name,
             'couple_id' => $user->couple_id,
-            'partner_user_id' => $partnerUserId
+            'partner_user_id' => $partnerUserId,
         ]);
     }
 
