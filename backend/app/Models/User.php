@@ -130,7 +130,7 @@ class User extends Authenticatable
             $partnerId = self::getPartnerId($user->id);
             $partner = User::where('id', $partnerId)->first();
 
-            if (!$partner) {
+            if (! $partner) {
                 return null;
             }
 

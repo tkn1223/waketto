@@ -50,7 +50,7 @@ class SettingController extends Controller
             try {
                 $partner = User::where('user_id', $partnerId)->first();
 
-                if (!$partner || $user->id === $partner->id) {
+                if (! $partner || $user->id === $partner->id) {
                     return response()->json([
                         'status' => false,
                         'message' => '入力されたIDのユーザーが見つかりません',
@@ -59,7 +59,7 @@ class SettingController extends Controller
 
                 $result = User::setPartner($user, $partner);
 
-                if (!$result) {
+                if (! $result) {
                     return response()->json([
                         'status' => false,
                         'message' => 'パートナー設定に失敗しました',
