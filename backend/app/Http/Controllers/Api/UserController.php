@@ -6,9 +6,33 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class UserController extends Controller
 {
+
+    /**
+     * ユーザー情報を取得
+     */
+    public function getUserInfo(Request $request): JsonResponse
+    {
+        $user = $request->attributes->get('auth_user');
+
+        // パートナーのuser_idを取得
+        $partnerUserId = null;
+        if ($user->couple_id) {
+            $partnerUserId = User::getPartnerUserId($user);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'user_id' => $user->user_id,
+            'name' => $user->name,
+            'couple_id' => $user->couple_id,
+            'partner_user_id' => $partnerUserId
+        ]);
+    }
+
     /**
      * 認証済みユーザーのプロファイルを取得
      */

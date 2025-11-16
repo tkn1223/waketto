@@ -34,7 +34,10 @@ export function NaviMenu() {
             <ul className="grid w-[200px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
-                  <Link href="/setting" className="flex-row items-center gap-2">
+                  <Link
+                    href="/budget-setting"
+                    className="flex-row items-center gap-2"
+                  >
                     <SettingsIcon />
                     予算設定
                   </Link>

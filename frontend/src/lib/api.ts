@@ -95,10 +95,16 @@ export async function getBudgetUsage(
 }
 
 // パートナー設定の保存
-export async function postPartnerSetting(partnerId: string): Promise<Response> {
-  return await fetchApi<Response>(`/partner-setting/${partnerId}`, {
-    method: "POST",
-  });
+export async function postPartnerSetting(
+  userName: string,
+  partnerId?: string
+): Promise<Response> {
+  return await fetchApi<Response>(
+    `/partner-setting/${userName}${partnerId ? `/${partnerId}` : ""}`,
+    {
+      method: "POST",
+    }
+  );
 }
 
 /*

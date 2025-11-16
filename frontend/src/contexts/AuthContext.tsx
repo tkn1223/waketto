@@ -32,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     user_id: "",
     name: "",
     couple_id: null,
+    partner_user_id: null,
   });
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -40,7 +41,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   // 有効なパスのリストを定義
-  const validPaths = ["/", "/dashboard", "/setting", "/signin", "/signup"];
+  const validPaths = [
+    "/",
+    "/dashboard",
+    "/budget-setting",
+    "/account",
+    "/signin",
+    "/signup",
+  ];
 
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
@@ -70,7 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error instanceof Error ? error.message : "ログインに失敗しました"
       );
       setIsAuth(false);
-      setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+      setUserInfo({
+        id: "",
+        user_id: "",
+        name: "",
+        couple_id: null,
+        partner_user_id: null,
+      });
       throw error;
     } finally {
       setIsLoading(false);
@@ -85,7 +99,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signOutUser();
       setIsAuth(false);
-      setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+      setUserInfo({
+        id: "",
+        user_id: "",
+        name: "",
+        couple_id: null,
+        partner_user_id: null,
+      });
       localStorage.clear();
       sessionStorage.clear();
 
@@ -122,19 +142,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setIsAuth(true);
             } else {
               setIsAuth(false);
-              setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+              setUserInfo({
+                id: "",
+                user_id: "",
+                name: "",
+                couple_id: null,
+                partner_user_id: null,
+              });
             }
           } else {
             // トークンが無効な場合は認証状態をリセット
             setIsAuth(false);
-            setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+            setUserInfo({
+              id: "",
+              user_id: "",
+              name: "",
+              couple_id: null,
+              partner_user_id: null,
+            });
           }
         } else {
           setIsAuth(false);
         }
       } catch (_err) {
         setIsAuth(false);
-        setUserInfo({ id: "", user_id: "", name: "", couple_id: null });
+        setUserInfo({
+          id: "",
+          user_id: "",
+          name: "",
+          couple_id: null,
+          partner_user_id: null,
+        });
       } finally {
         setIsLoading(false);
       }

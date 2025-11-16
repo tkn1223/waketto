@@ -5,6 +5,7 @@ export interface User {
   user_id: string;
   cognito_sub: string;
   couple_id: string | null;
+  partner_user_id: string | null;
   created_at: string;
 }
 
@@ -14,6 +15,7 @@ export interface UserInfo {
   user_id: string;
   name: string;
   couple_id: string | null;
+  partner_user_id: string | null;
 }
 
 // ログイン情報の型定義
