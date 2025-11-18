@@ -9,25 +9,33 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { toast } from "sonner";
 
 export function EmailEdit() {
   const { userInfo } = useAuth();
   const [newEmail, setNewEmail] = useState("");
-  const [password, setPassword] = useState("");
-
-  console.log(userInfo);
-
-  const handleNewEmailChangeEmail = (value: string) => {
-    setNewEmail(value);
-  };
-
-  const handlePasswordChangeEmail = (value: string) => {
-    setPassword(value);
-  };
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleEmailSave = () => {
-    console.log("メールアドレスを更新します");
+    if (newEmail === "") {
+      setError("新しいメールアドレスを入力してください");
+      return;
+    }
+    if (currentPassword === "") {
+      setError("現在のパスワードを入力してください");
+      return;
+    }
+
+    try {
+      // const response = await updateEmail(newEmail, currentPassword);
+      toast.success("メールアドレスを更新しました");
+    } catch (error) {
+      console.error("メールアドレス更新エラー:", error);
+      setError("メールアドレスの更新に失敗しました");
+    }
   };
 
   return (
@@ -50,24 +58,27 @@ export function EmailEdit() {
               </Label>
               <Input
                 type="text"
-                className="bg-white lg:w-5/6"
-                placeholder="ユーザー名を入力"
+                className="bg-white lg:w-1/3"
+                placeholder="新しいメールアドレスを入力"
                 value={newEmail}
-                onChange={(e) => handleNewEmailChangeEmail(e.target.value)}
+                onChange={(e) => setNewEmail(e.target.value)}
               />
             </div>
             <div className="flex items-center gap-3">
               <Label className="text-lg font-bold lg:w-1/6">
                 現在のパスワード
               </Label>
-              <Input
-                type="text"
-                className="bg-white lg:w-5/6"
-                placeholder="ユーザー名を入力"
-                value={password}
-                onChange={(e) => handlePasswordChangeEmail(e.target.value)}
-              />
+              <div className="lg:w-1/3">
+                <PasswordInput
+                  className="bg-white"
+                  placeholder="現在のパスワードを入力"
+                  value={currentPassword}
+                  onValueChange={setCurrentPassword}
+                  autoComplete="current-password"
+                />
+              </div>
             </div>
+            {error && <p className="text-red-600 text-sm">{error}</p>}
           </form>
         </CardContent>
         <CardFooter>

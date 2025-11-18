@@ -16,8 +16,6 @@ export const useSettingForm = () => {
   // userInfoが更新された時、フィールドが空の場合のみ初期値を設定
   useEffect(() => {
     if (!userNameInitialized && userInfo?.name) {
-      console.log(userInfo);
-
       setUserName(userInfo.name);
       setUserNameInitialized(true);
     }

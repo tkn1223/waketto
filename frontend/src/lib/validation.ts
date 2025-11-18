@@ -15,6 +15,7 @@ export function validatePassword(password: string): string[] {
   }
 
   const specialChars = /[$*.[\]{}()?\-"!@#%&/\\,><':;|_~`+=]/;
+
   if (!specialChars.test(password)) {
     errors.push(
       "少なくとも1つの特殊文字を含めてください（例: ~ $ * . [ ] { } ( ) ? - \" ! @ # % & / \\ , > < ' : ; | _ ` + =）"
@@ -45,6 +46,7 @@ export function validatePasswordMatch(
   if (password !== passwordConfirm) {
     return "パスワードが一致しません";
   }
+
   return null;
 }
 
@@ -60,8 +62,10 @@ export function validatePasswordComplete(
 ): string[] {
   const errors = validatePassword(password);
   const matchError = validatePasswordMatch(password, passwordConfirm);
+
   if (matchError) {
     errors.push(matchError);
   }
+
   return errors;
 }

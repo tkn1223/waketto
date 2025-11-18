@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -7,12 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import { PasswordInput } from "@/components/ui/passwordinput";
-import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { PasswordInput } from "@/components/ui/passwordinput.tsx";
+import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
 import { changePassword } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
-import { toast } from "sonner";
 
 export function PasswordEdit() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -36,6 +36,7 @@ export function PasswordEdit() {
 
       // すべてのエラーを配列にまとめる
       const allErrors = [...errors];
+
       if (matchError) {
         allErrors.push(matchError);
       }
@@ -51,12 +52,14 @@ export function PasswordEdit() {
 
     // すべてのエラーを配列にまとめる
     const allErrors = [...passwordValidationErrors];
+
     if (matchError) {
       allErrors.push(matchError);
     }
 
     if (allErrors.length > 0) {
       setPasswordErrors(allErrors);
+
       return;
     }
 
@@ -67,6 +70,7 @@ export function PasswordEdit() {
         currentPassword,
         newPassword,
       });
+
       if (result) {
         toast.success("パスワードを更新しました");
         // フォームをリセット

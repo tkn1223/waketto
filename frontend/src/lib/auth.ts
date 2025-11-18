@@ -9,11 +9,11 @@ import {
 } from "aws-amplify/auth";
 import type {
   AuthResult,
+  ChangePasswordProps,
   InfomationForLogin,
   SignUpCredentials,
   User,
   UserInfo,
-  ChangePasswordProps,
 } from "@/types/auth.ts";
 
 // 環境変数の型定義
@@ -405,6 +405,7 @@ export async function changePassword({
     return true;
   } catch (error: unknown) {
     console.error("パスワード変更エラー:", error);
+
     return false;
   }
 }

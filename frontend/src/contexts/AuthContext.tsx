@@ -12,8 +12,6 @@ import {
 } from "@/lib/auth.ts";
 import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
 
-import { getCurrentUser } from "aws-amplify/auth";
-
 interface AuthContextType {
   userInfo: UserInfo;
   isAuth: boolean;

@@ -10,7 +10,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp.tsx";
-import { PasswordInput } from "@/components/ui/passwordinput";
+import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
@@ -96,6 +96,7 @@ export default function SignupPage() {
 
       // すべてのエラーを配列にまとめる
       const allErrors = [...errors];
+
       if (matchError) {
         allErrors.push(matchError);
       }

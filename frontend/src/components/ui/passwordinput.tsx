@@ -4,12 +4,7 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input.tsx";
 import { cn } from "@/lib/utils";
-
-interface PasswordInputProps
-  extends Omit<React.ComponentProps<"input">, "type"> {
-  showToggle?: boolean;
-  onValueChange?: (value: string) => void;
-}
+import type { PasswordInputProps } from "@/types/auth.ts";
 
 export function PasswordInput({
   className,

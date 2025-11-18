@@ -45,3 +45,10 @@ export interface ChangePasswordProps {
   currentPassword: string;
   newPassword: string;
 }
+
+// パスワード入力コンポーネントの型定義
+export interface PasswordInputProps
+  extends Omit<React.ComponentProps<"input">, "type"> {
+  showToggle?: boolean;
+  onValueChange?: (value: string) => void;
+}
