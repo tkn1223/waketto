@@ -16,6 +16,7 @@ export interface UserInfo {
   name: string;
   couple_id: string | null;
   partner_user_id: string | null;
+  email: string | null;
 }
 
 // ログイン情報の型定義
@@ -37,4 +38,10 @@ export interface AuthResult {
   idToken?: string;
   refreshToken?: string;
   error?: string;
+}
+
+// パスワード変更情報の型定義
+export interface ChangePasswordProps {
+  currentPassword: string;
+  newPassword: string;
 }

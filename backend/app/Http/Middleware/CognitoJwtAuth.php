@@ -46,7 +46,7 @@ class CognitoJwtAuth
 
             return $next($request);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('JWT認証エラー', [
                 'error' => $e->getMessage(),
                 'error_type' => get_class($e),
@@ -101,7 +101,7 @@ class CognitoJwtAuth
 
             if (isset($payload->exp) && $payload->exp < time()) {
                 Log::error('JWTトークンの有効期限が切れています', [
-                    'payload' => $payload,
+                    'payload' => json_decode(json_encode($payload), true),
                     'current_time' => time(),
                     'exp' => $payload->exp,
                 ]);
@@ -112,7 +112,7 @@ class CognitoJwtAuth
             // ユーザーを取得または作成
             return $this->getUserFromPayload($payload);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error('JWT検証エラー', [
                 'error' => $e->getMessage(),
                 'error_type' => get_class($e),
@@ -175,6 +175,8 @@ class CognitoJwtAuth
      */
     private function unauthorizedResponse(string $message): JsonResponse
     {
+        Log::error('認証失敗', ['message' => $message]);
+        
         return response()->json([
             'error' => 'Unauthorized',
             'message' => $message,

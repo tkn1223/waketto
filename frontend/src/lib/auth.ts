@@ -5,6 +5,7 @@ import {
   signIn,
   signOut,
   signUp,
+  updatePassword,
 } from "aws-amplify/auth";
 import type {
   AuthResult,
@@ -12,6 +13,7 @@ import type {
   SignUpCredentials,
   User,
   UserInfo,
+  ChangePasswordProps,
 } from "@/types/auth.ts";
 
 // 環境変数の型定義
@@ -304,6 +306,8 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
     }
 
     const user = (await response.json()) as User;
+    const currentUser = await getCurrentUser();
+    const email = currentUser?.signInDetails?.loginId;
 
     const userInfo = {
       id: String(user.id),
@@ -311,6 +315,7 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
       name: user.name,
       couple_id: user.couple_id || null,
       partner_user_id: user.partner_user_id || null,
+      email: email || null,
     };
 
     return userInfo;
@@ -380,6 +385,26 @@ export async function checkTokenValidity(): Promise<boolean> {
     console.error("トークン有効性確認エラー:", error);
     await signOutUser();
 
+    return false;
+  }
+}
+
+/**
+ * パスワードを変更
+ */
+export async function changePassword({
+  currentPassword,
+  newPassword,
+}: ChangePasswordProps): Promise<boolean> {
+  try {
+    await updatePassword({
+      oldPassword: currentPassword,
+      newPassword: newPassword,
+    });
+
+    return true;
+  } catch (error: unknown) {
+    console.error("パスワード変更エラー:", error);
     return false;
   }
 }

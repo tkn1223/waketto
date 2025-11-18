@@ -9,10 +9,14 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export function EmailEdit() {
+  const { userInfo } = useAuth();
   const [newEmail, setNewEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  console.log(userInfo);
 
   const handleNewEmailChangeEmail = (value: string) => {
     setNewEmail(value);
@@ -38,7 +42,7 @@ export function EmailEdit() {
           <form className="space-y-5">
             <div className="flex flex-col lg:flex-row gap-6">
               <p className="text-lg font-bold lg:w-1/6">現在のメールアドレス</p>
-              <p className="lg:w-5/6">********@example.com</p>
+              <p className="lg:w-5/6">{userInfo.email}</p>
             </div>
             <div className="flex items-center gap-3">
               <Label className="text-lg font-bold lg:w-1/6">

@@ -12,6 +12,8 @@ import {
 } from "@/lib/auth.ts";
 import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
 
+import { getCurrentUser } from "aws-amplify/auth";
+
 interface AuthContextType {
   userInfo: UserInfo;
   isAuth: boolean;
@@ -26,14 +28,18 @@ export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
 
+// ユーザー情報の初期値
+const initialUserInfo: UserInfo = {
+  id: "",
+  user_id: "",
+  name: "",
+  couple_id: null,
+  partner_user_id: null,
+  email: null,
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    id: "",
-    user_id: "",
-    name: "",
-    couple_id: null,
-    partner_user_id: null,
-  });
+  const [userInfo, setUserInfo] = useState<UserInfo>(initialUserInfo);
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,13 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error instanceof Error ? error.message : "ログインに失敗しました"
       );
       setIsAuth(false);
-      setUserInfo({
-        id: "",
-        user_id: "",
-        name: "",
-        couple_id: null,
-        partner_user_id: null,
-      });
+      setUserInfo(initialUserInfo);
       throw error;
     } finally {
       setIsLoading(false);
@@ -99,13 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signOutUser();
       setIsAuth(false);
-      setUserInfo({
-        id: "",
-        user_id: "",
-        name: "",
-        couple_id: null,
-        partner_user_id: null,
-      });
+      setUserInfo(initialUserInfo);
       localStorage.clear();
       sessionStorage.clear();
 
@@ -142,37 +136,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setIsAuth(true);
             } else {
               setIsAuth(false);
-              setUserInfo({
-                id: "",
-                user_id: "",
-                name: "",
-                couple_id: null,
-                partner_user_id: null,
-              });
+              setUserInfo(initialUserInfo);
             }
           } else {
             // トークンが無効な場合は認証状態をリセット
             setIsAuth(false);
-            setUserInfo({
-              id: "",
-              user_id: "",
-              name: "",
-              couple_id: null,
-              partner_user_id: null,
-            });
+            setUserInfo(initialUserInfo);
           }
         } else {
           setIsAuth(false);
         }
       } catch (_err) {
         setIsAuth(false);
-        setUserInfo({
-          id: "",
-          user_id: "",
-          name: "",
-          couple_id: null,
-          partner_user_id: null,
-        });
+        setUserInfo(initialUserInfo);
       } finally {
         setIsLoading(false);
       }
