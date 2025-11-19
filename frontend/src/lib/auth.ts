@@ -2,6 +2,7 @@ import {
   confirmSignUp,
   confirmUserAttribute,
   fetchAuthSession,
+  fetchUserAttributes,
   getCurrentUser,
   signIn,
   signOut,
@@ -308,8 +309,22 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
     }
 
     const user = (await response.json()) as User;
-    const currentUser = await getCurrentUser();
-    const email = currentUser?.signInDetails?.loginId;
+
+    let email: string | null = null;
+
+    // 最新のメールアドレスを取得
+    try {
+      const userAttributes = await fetchUserAttributes();
+      email = userAttributes.email || null;
+    } catch {
+      // fetchUserAttributes()が失敗した場合は無視
+    }
+
+    // フォールバックとしてsignInDetailsから取得
+    if (!email) {
+      const currentUser = await getCurrentUser();
+      email = currentUser?.signInDetails?.loginId || null;
+    }
 
     const userInfo = {
       id: String(user.id),
@@ -317,7 +332,7 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
       name: user.name,
       couple_id: user.couple_id || null,
       partner_user_id: user.partner_user_id || null,
-      email: email || null,
+      email: email,
     };
 
     return userInfo;
@@ -401,6 +416,7 @@ export async function updateEmail(email: string): Promise<boolean> {
         email: email,
       },
     });
+
     return true;
   } catch (error: unknown) {
     console.error("メールアドレス変更エラー:", error);
@@ -418,6 +434,7 @@ export async function confirmEmailChange(code: string): Promise<AuthResult> {
       userAttributeKey: "email",
       confirmationCode: code,
     });
+
     return { success: true, error: undefined };
   } catch (error: unknown) {
     console.error("メールアドレス確認エラー:", error);

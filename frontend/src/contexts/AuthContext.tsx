@@ -105,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshUserInfo = async () => {
     try {
       const updatedUserInfo = await getCurrentUserInfo();
+
       if (updatedUserInfo) {
         setUserInfo(updatedUserInfo);
       }

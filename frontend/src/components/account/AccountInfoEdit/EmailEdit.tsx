@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { toast } from "sonner";
+import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -9,10 +11,8 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { confirmEmailChange, updateEmail } from "@/lib/auth.ts";
-import { toast } from "sonner";
 
 export function EmailEdit() {
   const { userInfo, refreshUserInfo } = useAuth();
@@ -24,20 +24,27 @@ export function EmailEdit() {
 
   const handleEmailSave = async () => {
     setError("");
+
     if (newEmail === "") {
       setError("新しいメールアドレスを入力してください");
+
       return;
     }
+
     if (!userInfo.email) {
       setError("ユーザー情報を取得できませんでした");
+
       return;
     }
+
     if (userInfo.email === newEmail) {
       setError("新しいメールアドレスと現在のメールアドレスが同じです");
+
       return;
     }
 
     const result = await updateEmail(newEmail);
+
     if (result) {
       setStep("confirm");
       toast.success(`${newEmail} に確認コードを送信しました`);
@@ -79,7 +86,7 @@ export function EmailEdit() {
       <Card className="mt-4">
         <CardHeader>
           <CardTitle className="text-xl font-bold">
-            メールアドレスの変更（実装中）
+            メールアドレスの変更
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -125,7 +132,10 @@ export function EmailEdit() {
         </CardContent>
         <CardFooter>
           {step === "edit" ? (
-            <Button onClick={() => void handleEmailSave()}>
+            <Button
+              onClick={() => void handleEmailSave()}
+              className="bg-emerald-600"
+            >
               メールアドレスを更新
             </Button>
           ) : (

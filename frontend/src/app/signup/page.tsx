@@ -3,10 +3,10 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
-import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
 
