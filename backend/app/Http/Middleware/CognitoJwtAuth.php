@@ -176,7 +176,7 @@ class CognitoJwtAuth
     private function unauthorizedResponse(string $message): JsonResponse
     {
         Log::error('認証失敗', ['message' => $message]);
-        
+
         return response()->json([
             'error' => 'Unauthorized',
             'message' => $message,
