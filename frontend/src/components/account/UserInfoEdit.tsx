@@ -1,3 +1,5 @@
+"use client";
+
 import { CircleQuestionMark } from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import {
@@ -100,7 +102,12 @@ export function UserInfoEdit() {
           </form>
         </CardContent>
         <CardFooter>
-          <Button onClick={() => void handleUserInfoSave()}>更新</Button>
+          <Button
+            onClick={() => void handleUserInfoSave()}
+            className="bg-emerald-600"
+          >
+            更新
+          </Button>
         </CardFooter>
       </Card>
     </>

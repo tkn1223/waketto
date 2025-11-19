@@ -3,15 +3,12 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
-import { Eye, EyeOff } from "lucide-react";
+import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp.tsx";
+import { PasswordInput } from "@/components/ui/passwordinput.tsx";
+import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
+import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -19,12 +16,11 @@ export default function SignupPage() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [confirmationCode, setConfirmationCode] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
   const [error, setError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
   const [step, setStep] = useState<"signup" | "confirm">("signup");
 
   const router = useRouter();
@@ -81,48 +77,28 @@ export default function SignupPage() {
     }
   };
 
-  // パスワードのバリデーション
-  const validatePassword = (password: string) => {
-    const errors = [];
-
-    if (password.length < 8) {
-      errors.push("8文字以上で入力してください");
-    }
-
-    if (!/\d/.test(password)) {
-      errors.push("少なくとも1つの数字を含めてください");
-    }
-    const specialChars = /[$*.[\]{}()?\-"!@#%&/\\,><':;|_~`+=]/;
-
-    if (!specialChars.test(password)) {
-      errors.push(
-        "少なくとも1つの特殊文字を含めてください（例: ~ $ * . [ ] { } ( ) ? - \" ! @ # % & / \\ , > < ' : ; | _ ` + =）"
-      );
-    }
-
-    if (!/[A-Z]/.test(password)) {
-      errors.push("少なくとも1つの大文字を含めてください");
-    }
-
-    if (!/[a-z]/.test(password)) {
-      errors.push("少なくとも1つの小文字を含めてください");
-    }
-
-    return errors;
-  };
-
-  const validatePasswordMatch = (password: string, passwordConfirm: string) => {
+  // パスワードのバリデーション（デバウンス付き）
+  const handlePasswordValidation = (
+    password: string,
+    passwordConfirm: string
+  ) => {
     if (validationTimer.current) {
       clearTimeout(validationTimer.current);
     }
     validationTimer.current = setTimeout(() => {
-      const passwordErrors = validatePassword(password);
+      const errors = validatePassword(password);
+      const matchError = validatePasswordMatch(password, passwordConfirm);
 
-      if (passwordErrors.length > 0) {
-        setError(passwordErrors[0]);
-      } else if (password !== passwordConfirm) {
-        setError("パスワードが一致しません");
-      } else {
+      // すべてのエラーを配列にまとめる
+      const allErrors = [...errors];
+
+      if (matchError) {
+        allErrors.push(matchError);
+      }
+
+      setPasswordErrors(allErrors);
+
+      if (allErrors.length > 0) {
         setError("");
       }
     }, 500);
@@ -139,59 +115,16 @@ export default function SignupPage() {
             onSubmit={(e) => void handleConfirmSubmit(e)}
             className="px-10 py-8 rounded-sm shadow-sm bg-sky-50"
           >
-            <div className="mb-12 flex flex-col items-center">
-              <label
-                htmlFor="code"
-                className="block text-gray-500 mb-6 leading-relaxed"
-              >
-                {email} に確認コードを送信しました。
-                <br />
-                メールに記載された6桁のコードを入力してください。
-              </label>
-              <InputOTP
-                id="code"
-                required
-                maxLength={6}
-                pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                value={confirmationCode}
-                onChange={(confirmationCode) =>
-                  setConfirmationCode(confirmationCode)
-                }
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot
-                    index={0}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={1}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={2}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={3}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={4}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={5}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm text-center mb-8">
-                {error}
-              </div>
-            )}
+            <VerificationCodeInput
+              email={email}
+              code={confirmationCode}
+              onCodeChange={setConfirmationCode}
+              error={error}
+              id="code"
+              className="mb-12"
+              labelClassName="text-gray-500"
+              errorClassName="mb-8"
+            />
 
             <div className="flex justify-center space-x-10">
               <button
@@ -252,80 +185,45 @@ export default function SignupPage() {
               <label htmlFor="password" className="sr-only">
                 パスワード
               </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none relative block w-full rounded-md px-3 py-2 pr-10 border border-gray-400 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:z-10"
-                  placeholder="パスワード"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    validatePasswordMatch(e.target.value, passwordConfirm);
-                  }}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center justify-center w-8 h-full text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:text-gray-600"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword ? "パスワードを隠す" : "パスワードを表示"
-                  }
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                id="password"
+                name="password"
+                autoComplete="new-password"
+                required
+                className="appearance-none relative block w-full rounded-md px-3 py-2 border border-gray-400 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:z-10"
+                placeholder="パスワード"
+                value={password}
+                onValueChange={(value) => {
+                  setPassword(value);
+                  handlePasswordValidation(value, passwordConfirm);
+                }}
+              />
             </div>
             <div className="mb-6">
               <p className="text-base/6 mb-1 ml-1">パスワード確認用</p>
               <label htmlFor="password-confirm" className="sr-only">
                 もう一度パスワードを入力してください
               </label>
-              <div className="relative">
-                <input
-                  id="password-confirm"
-                  name="password-confirm"
-                  type={showPasswordConfirm ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none relative block w-full rounded-md px-3 py-2 pr-10 border border-gray-400 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:z-10"
-                  placeholder="もう一度パスワードを入力してください"
-                  value={passwordConfirm}
-                  onChange={(e) => {
-                    setPasswordConfirm(e.target.value);
-                    validatePasswordMatch(password, e.target.value);
-                  }}
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center justify-center w-8 h-full text-gray-400 hover:text-gray-600 transition-colors focus:outline-none focus:text-gray-600"
-                  onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                  aria-label={
-                    showPasswordConfirm
-                      ? "パスワードを隠す"
-                      : "パスワードを表示"
-                  }
-                >
-                  {showPasswordConfirm ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
-                </button>
-              </div>
+              <PasswordInput
+                id="password-confirm"
+                name="password-confirm"
+                autoComplete="new-password"
+                required
+                className="appearance-none relative block w-full rounded-md px-3 py-2 border border-gray-400 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:z-10"
+                placeholder="もう一度パスワードを入力してください"
+                value={passwordConfirm}
+                onValueChange={(value) => {
+                  setPasswordConfirm(value);
+                  handlePasswordValidation(password, value);
+                }}
+              />
             </div>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm text-center mb-6">{error}</div>
-          )}
+          <ValidationErrors
+            errors={passwordErrors}
+            className="mb-2 text-center"
+          />
 
           <div>
             <button

@@ -1,13 +1,18 @@
 import {
   confirmSignUp,
+  confirmUserAttribute,
   fetchAuthSession,
+  fetchUserAttributes,
   getCurrentUser,
   signIn,
   signOut,
   signUp,
+  updatePassword,
+  updateUserAttributes,
 } from "aws-amplify/auth";
 import type {
   AuthResult,
+  ChangePasswordProps,
   InfomationForLogin,
   SignUpCredentials,
   User,
@@ -305,12 +310,29 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
 
     const user = (await response.json()) as User;
 
+    let email: string | null = null;
+
+    // 最新のメールアドレスを取得
+    try {
+      const userAttributes = await fetchUserAttributes();
+      email = userAttributes.email || null;
+    } catch {
+      // fetchUserAttributes()が失敗した場合は無視
+    }
+
+    // フォールバックとしてsignInDetailsから取得
+    if (!email) {
+      const currentUser = await getCurrentUser();
+      email = currentUser?.signInDetails?.loginId || null;
+    }
+
     const userInfo = {
       id: String(user.id),
       user_id: user.user_id,
       name: user.name,
       couple_id: user.couple_id || null,
       partner_user_id: user.partner_user_id || null,
+      email: email,
     };
 
     return userInfo;
@@ -379,6 +401,75 @@ export async function checkTokenValidity(): Promise<boolean> {
   } catch (error) {
     console.error("トークン有効性確認エラー:", error);
     await signOutUser();
+
+    return false;
+  }
+}
+
+/**
+ * メールアドレスを変更
+ */
+export async function updateEmail(email: string): Promise<boolean> {
+  try {
+    await updateUserAttributes({
+      userAttributes: {
+        email: email,
+      },
+    });
+
+    return true;
+  } catch (error: unknown) {
+    console.error("メールアドレス変更エラー:", error);
+
+    return false;
+  }
+}
+
+/**
+ * メールアドレス変更の確認コードを検証
+ */
+export async function confirmEmailChange(code: string): Promise<AuthResult> {
+  try {
+    await confirmUserAttribute({
+      userAttributeKey: "email",
+      confirmationCode: code,
+    });
+
+    return { success: true, error: undefined };
+  } catch (error: unknown) {
+    console.error("メールアドレス確認エラー:", error);
+    let errorMessage = "確認コードの検証に失敗しました";
+
+    if (error instanceof Error) {
+      if (error.name === "CodeMismatchException") {
+        errorMessage = "確認コードが正しくありません";
+      } else if (error.name === "ExpiredCodeException") {
+        errorMessage = "確認コードの有効期限が切れています";
+      } else if (error.name === "NotAuthorizedException") {
+        errorMessage = "認証に失敗しました";
+      }
+    }
+
+    return { success: false, error: errorMessage };
+  }
+}
+
+/**
+ * パスワードを変更
+ */
+export async function changePassword({
+  currentPassword,
+  newPassword,
+}: ChangePasswordProps): Promise<boolean> {
+  try {
+    await updatePassword({
+      oldPassword: currentPassword,
+      newPassword: newPassword,
+    });
+
+    return true;
+  } catch (error: unknown) {
+    console.error("パスワード変更エラー:", error);
 
     return false;
   }

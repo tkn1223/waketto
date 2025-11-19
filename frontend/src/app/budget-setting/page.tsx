@@ -1,5 +1,6 @@
 "use client";
 
+import { BackToHomeButton } from "@/components/ui/backtohomebutton.tsx";
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ export default function BudgetSettingPage() {
         </CardContent>
         <CardFooter></CardFooter>
       </Card>
+      <BackToHomeButton />
     </div>
   );
 }

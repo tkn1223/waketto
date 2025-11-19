@@ -10,45 +10,34 @@ import {
   signInWithCognito,
   signOutUser,
 } from "@/lib/auth.ts";
-import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
-
-interface AuthContextType {
-  userInfo: UserInfo;
-  isAuth: boolean;
-  isLoading: boolean;
-  error: string | null;
-  signIn: (infomation: InfomationForLogin) => Promise<void>;
-  signOut: () => Promise<void>;
-}
+import type {
+  AuthContextType,
+  InfomationForLogin,
+  UserInfo,
+} from "@/types/auth.ts";
 
 /* eslint-disable react-refresh/only-export-components */
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );
 
+// ユーザー情報の初期値
+const initialUserInfo: UserInfo = {
+  id: "",
+  user_id: "",
+  name: "",
+  couple_id: null,
+  partner_user_id: null,
+  email: null,
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    id: "",
-    user_id: "",
-    name: "",
-    couple_id: null,
-    partner_user_id: null,
-  });
+  const [userInfo, setUserInfo] = useState<UserInfo>(initialUserInfo);
   const [isAuth, setIsAuth] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-
-  // 有効なパスのリストを定義
-  const validPaths = [
-    "/",
-    "/dashboard",
-    "/budget-setting",
-    "/account",
-    "/signin",
-    "/signup",
-  ];
 
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
@@ -78,13 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         error instanceof Error ? error.message : "ログインに失敗しました"
       );
       setIsAuth(false);
-      setUserInfo({
-        id: "",
-        user_id: "",
-        name: "",
-        couple_id: null,
-        partner_user_id: null,
-      });
+      setUserInfo(initialUserInfo);
       throw error;
     } finally {
       setIsLoading(false);
@@ -99,13 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await signOutUser();
       setIsAuth(false);
-      setUserInfo({
-        id: "",
-        user_id: "",
-        name: "",
-        couple_id: null,
-        partner_user_id: null,
-      });
+      setUserInfo(initialUserInfo);
       localStorage.clear();
       sessionStorage.clear();
 
@@ -121,6 +98,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // ユーザー情報を再取得して更新
+  const refreshUserInfo = async () => {
+    try {
+      const updatedUserInfo = await getCurrentUserInfo();
+
+      if (updatedUserInfo) {
+        setUserInfo(updatedUserInfo);
+      }
+    } catch (error) {
+      console.error("ユーザー情報の更新に失敗しました:", error);
     }
   };
 
@@ -142,37 +132,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               setIsAuth(true);
             } else {
               setIsAuth(false);
-              setUserInfo({
-                id: "",
-                user_id: "",
-                name: "",
-                couple_id: null,
-                partner_user_id: null,
-              });
+              setUserInfo(initialUserInfo);
             }
           } else {
             // トークンが無効な場合は認証状態をリセット
             setIsAuth(false);
-            setUserInfo({
-              id: "",
-              user_id: "",
-              name: "",
-              couple_id: null,
-              partner_user_id: null,
-            });
+            setUserInfo(initialUserInfo);
           }
         } else {
           setIsAuth(false);
         }
       } catch (_err) {
         setIsAuth(false);
-        setUserInfo({
-          id: "",
-          user_id: "",
-          name: "",
-          couple_id: null,
-          partner_user_id: null,
-        });
+        setUserInfo(initialUserInfo);
       } finally {
         setIsLoading(false);
       }
@@ -188,9 +160,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // pathnameを正規化（末尾スラッシュを削除）
     const normalizedPathname = pathname.replace(/\/$/, "") || "/";
-
-    // 有効なパスかどうかをチェック
-    const isValidPath = validPaths.includes(normalizedPathname);
 
     // 認証済みの場合
     if (isAuth) {
@@ -215,11 +184,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       router.replace("/signin");
     }
-  }, [isAuth, isLoading, pathname, router, validPaths]);
+  }, [isAuth, isLoading, pathname, router]);
 
   return (
     <AuthContext.Provider
-      value={{ userInfo, isAuth, isLoading, error, signIn, signOut }}
+      value={{
+        userInfo,
+        isAuth,
+        isLoading,
+        error,
+        signIn,
+        signOut,
+        refreshUserInfo,
+      }}
     >
       {children}
     </AuthContext.Provider>
