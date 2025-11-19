@@ -19,6 +19,17 @@ export interface UserInfo {
   email: string | null;
 }
 
+// 認証コンテキストの型定義
+export interface AuthContextType {
+  userInfo: UserInfo;
+  isAuth: boolean;
+  isLoading: boolean;
+  error: string | null;
+  signIn: (infomation: InfomationForLogin) => Promise<void>;
+  signOut: () => Promise<void>;
+  refreshUserInfo: () => Promise<void>;
+}
+
 // ログイン情報の型定義
 export interface InfomationForLogin {
   email: string;
@@ -38,6 +49,18 @@ export interface AuthResult {
   idToken?: string;
   refreshToken?: string;
   error?: string;
+}
+
+// 確認コード入力の型定義
+export interface VerificationCodeInputProps {
+  email: string;
+  code: string;
+  onCodeChange: (code: string) => void;
+  error?: string;
+  className?: string;
+  labelClassName?: string;
+  errorClassName?: string;
+  id?: string;
 }
 
 // パスワード変更情報の型定義

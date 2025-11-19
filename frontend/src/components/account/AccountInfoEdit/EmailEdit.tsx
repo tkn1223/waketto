@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -9,25 +8,15 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import { PasswordInput } from "@/components/ui/passwordinput.tsx";
+import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import {
-  confirmEmailChange,
-  getCurrentUserInfo,
-  updateEmail,
-} from "@/lib/auth.ts";
+import { confirmEmailChange, updateEmail } from "@/lib/auth.ts";
 import { toast } from "sonner";
 
 export function EmailEdit() {
-  const { userInfo } = useAuth();
+  const { userInfo, refreshUserInfo } = useAuth();
   const [newEmail, setNewEmail] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
   const [step, setStep] = useState<"edit" | "confirm">("edit");
   const [error, setError] = useState("");
   const [confirmationCode, setConfirmationCode] = useState("");
@@ -66,12 +55,12 @@ export function EmailEdit() {
       const result = await confirmEmailChange(confirmationCode);
 
       if (result.success) {
-        // ユーザー情報を再取得
-        await getCurrentUserInfo();
+        // ユーザー情報を再取得してAuthContextの状態を更新
+        await refreshUserInfo();
         toast.success("メールアドレスを変更しました");
+
         // フォームをリセット
         setNewEmail("");
-        setCurrentPassword("");
         setConfirmationCode("");
         setStep("edit");
       } else {
@@ -122,52 +111,14 @@ export function EmailEdit() {
           ) : (
             <>
               <form className="space-y-5">
-                <div className="mb-6 flex flex-col items-center">
-                  <Label className="block text-gray-700 mb-6 leading-relaxed text-center">
-                    {newEmail} に確認コードを送信しました。
-                    <br />
-                    メールに記載された6桁のコードを入力してください。
-                  </Label>
-                  <InputOTP
-                    required
-                    maxLength={6}
-                    pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                    value={confirmationCode}
-                    onChange={(code) => setConfirmationCode(code)}
-                  >
-                    <InputOTPGroup>
-                      <InputOTPSlot
-                        index={0}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                      <InputOTPSlot
-                        index={1}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                      <InputOTPSlot
-                        index={2}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                      <InputOTPSlot
-                        index={3}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                      <InputOTPSlot
-                        index={4}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                      <InputOTPSlot
-                        index={5}
-                        className="w-13 h-13 text-xl bg-zinc-50"
-                      />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-                {error && (
-                  <div className="text-red-600 text-sm text-center mb-4">
-                    {error}
-                  </div>
-                )}
+                <VerificationCodeInput
+                  email={newEmail}
+                  code={confirmationCode}
+                  onCodeChange={setConfirmationCode}
+                  error={error}
+                  className="mb-6"
+                  errorClassName="mb-4"
+                />
               </form>
             </>
           )}

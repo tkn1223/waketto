@@ -10,16 +10,11 @@ import {
   signInWithCognito,
   signOutUser,
 } from "@/lib/auth.ts";
-import type { InfomationForLogin, UserInfo } from "@/types/auth.ts";
-
-interface AuthContextType {
-  userInfo: UserInfo;
-  isAuth: boolean;
-  isLoading: boolean;
-  error: string | null;
-  signIn: (infomation: InfomationForLogin) => Promise<void>;
-  signOut: () => Promise<void>;
-}
+import type {
+  AuthContextType,
+  InfomationForLogin,
+  UserInfo,
+} from "@/types/auth.ts";
 
 /* eslint-disable react-refresh/only-export-components */
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -43,16 +38,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
-
-  // 有効なパスのリストを定義
-  const validPaths = [
-    "/",
-    "/dashboard",
-    "/budget-setting",
-    "/account",
-    "/signin",
-    "/signup",
-  ];
 
   // ログイン処理
   const signIn = async (infomation: InfomationForLogin) => {
@@ -116,6 +101,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ユーザー情報を再取得して更新
+  const refreshUserInfo = async () => {
+    try {
+      const updatedUserInfo = await getCurrentUserInfo();
+      if (updatedUserInfo) {
+        setUserInfo(updatedUserInfo);
+      }
+    } catch (error) {
+      console.error("ユーザー情報の更新に失敗しました:", error);
+    }
+  };
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -163,9 +160,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // pathnameを正規化（末尾スラッシュを削除）
     const normalizedPathname = pathname.replace(/\/$/, "") || "/";
 
-    // 有効なパスかどうかをチェック
-    const isValidPath = validPaths.includes(normalizedPathname);
-
     // 認証済みの場合
     if (isAuth) {
       // 現在のパスが認証不要ページの場合はダッシュボードにリダイレクト
@@ -189,11 +183,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       router.replace("/signin");
     }
-  }, [isAuth, isLoading, pathname, router, validPaths]);
+  }, [isAuth, isLoading, pathname, router]);
 
   return (
     <AuthContext.Provider
-      value={{ userInfo, isAuth, isLoading, error, signIn, signOut }}
+      value={{
+        userInfo,
+        isAuth,
+        isLoading,
+        error,
+        signIn,
+        signOut,
+        refreshUserInfo,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -3,15 +3,10 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp.tsx";
 import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
+import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
 
@@ -120,59 +115,16 @@ export default function SignupPage() {
             onSubmit={(e) => void handleConfirmSubmit(e)}
             className="px-10 py-8 rounded-sm shadow-sm bg-sky-50"
           >
-            <div className="mb-12 flex flex-col items-center">
-              <label
-                htmlFor="code"
-                className="block text-gray-500 mb-6 leading-relaxed"
-              >
-                {email} に確認コードを送信しました。
-                <br />
-                メールに記載された6桁のコードを入力してください。
-              </label>
-              <InputOTP
-                id="code"
-                required
-                maxLength={6}
-                pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                value={confirmationCode}
-                onChange={(confirmationCode) =>
-                  setConfirmationCode(confirmationCode)
-                }
-              >
-                <InputOTPGroup>
-                  <InputOTPSlot
-                    index={0}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={1}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={2}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={3}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={4}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                  <InputOTPSlot
-                    index={5}
-                    className="w-13 h-13 text-xl bg-zinc-50"
-                  />
-                </InputOTPGroup>
-              </InputOTP>
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm text-center mb-8">
-                {error}
-              </div>
-            )}
+            <VerificationCodeInput
+              email={email}
+              code={confirmationCode}
+              onCodeChange={setConfirmationCode}
+              error={error}
+              id="code"
+              className="mb-12"
+              labelClassName="text-gray-500"
+              errorClassName="mb-8"
+            />
 
             <div className="flex justify-center space-x-10">
               <button
