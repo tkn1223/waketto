@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleQuestionMark } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -29,7 +30,9 @@ export function UserInfoEdit() {
   } = useSettingForm();
 
   const handlePartnerReset = () => {
-    console.log("パートナーを解除します");
+    toast.error("パートナーを解除しました", {
+      className: "!bg-red-600 !text-white !border-red-800",
+    });
   };
 
   return (

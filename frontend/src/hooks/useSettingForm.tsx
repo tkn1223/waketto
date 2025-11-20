@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 import { postPartnerSetting } from "@/lib/api.ts";
 
 export const useSettingForm = () => {
-  const { userInfo } = useAuth();
+  const { userInfo, refreshUserInfo } = useAuth();
   const [partnerId, setPartnerId] = useState("");
   const [userName, setUserName] = useState("");
 
@@ -43,11 +43,12 @@ export const useSettingForm = () => {
       const response = await postPartnerSetting(userName, partnerId);
 
       if (response.status) {
-        toast.success("ユーザー情報を保存しました", {
-          className: "!bg-yellow-600 !text-white !border-yellow-800",
-        });
+        // ユーザー情報を再取得して更新
+        await refreshUserInfo();
+
+        toast.success("ユーザー情報を保存しました");
       } else {
-        toast.error(response.message, {
+        toast.error("ユーザー情報の保存に失敗しました", {
           className: "!bg-red-600 !text-white !border-red-800",
         });
       }

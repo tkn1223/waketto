@@ -2,13 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { FinanceModeToggle } from "./FinanceModeToggle.tsx";
 import { NaviMenu } from "./NaviMenu.tsx";
 import { UserModeToggle } from "./UserModeToggle.tsx";
 
+// ダッシュボードのみヘッダーを表示
+const path = "dashboard";
+
 export function Header() {
+  const pathname = usePathname();
   const { isLoading, isAuth } = useAuth();
   const { finance, setFinance, user, setUser } = useViewMode();
 
@@ -29,8 +34,15 @@ export function Header() {
         {!isLoading &&
           (isAuth ? (
             <div className="flex items-center justify-between space-x-3">
-              <UserModeToggle user={user} setUser={setUser} />
-              <FinanceModeToggle finance={finance} setFinance={setFinance} />
+              {path.includes(pathname.split("/")[1]) ? (
+                <>
+                  <UserModeToggle user={user} setUser={setUser} />
+                  <FinanceModeToggle
+                    finance={finance}
+                    setFinance={setFinance}
+                  />
+                </>
+              ) : null}
               <NaviMenu />
             </div>
           ) : null)}

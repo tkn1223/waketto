@@ -78,11 +78,15 @@ export function PasswordEdit() {
         setNewPassword("");
         setNewPasswordConfirm("");
       } else {
-        toast.error("パスワードの更新に失敗しました。");
+        toast.error("パスワードの更新に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
       }
     } catch (error) {
       console.error("パスワード変更エラー:", error);
-      toast.error("パスワードの更新に失敗しました。");
+      toast.error("パスワードの更新に失敗しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
     }
   };
 

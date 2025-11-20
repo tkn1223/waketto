@@ -94,42 +94,29 @@ export async function confirmSignUpWithCognito(
       confirmationCode: code,
     });
 
-    if (isSignUpComplete) {
-      // サインアップ完了後、自動的にログインを実行
-      const signInResult = await signIn({
-        username: email,
-        password: password,
-      });
+    if (!isSignUpComplete) {
+      return {
+        success: false,
+        error: "確認コードが正しくありません",
+      };
+    }
 
-      if (!signInResult.isSignedIn) {
-        return {
-          success: false,
-          error: "ログインに失敗しました",
-        };
-      }
+    // サインアップ完了後、自動的にログインを実行
+    const signInResult = await signIn({
+      username: email,
+      password: password,
+    });
 
-      // バックエンドAPIでユーザー情報を取得/作成
-      const userResponse = await createAuthenticatedRequest("/user", {
-        method: "GET",
-      });
-
-      if (userResponse.ok) {
-        return {
-          success: true,
-          error: undefined,
-        };
-      } else {
-        return {
-          success: false,
-          error: "ユーザー情報の取得に失敗しました",
-        };
-      }
+    if (!signInResult.isSignedIn) {
+      return {
+        success: false,
+        error: "ログインに失敗しました",
+      };
     }
 
     return {
-      // このエラーの可能性ある？だって入力したときの値のはずだから
-      success: false,
-      error: "確認コードが正しくありません",
+      success: true,
+      error: undefined,
     };
   } catch (error: unknown) {
     let errorMessage = "確認に失敗しました";

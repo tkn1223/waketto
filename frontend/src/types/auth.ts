@@ -28,6 +28,7 @@ export interface AuthContextType {
   signIn: (infomation: InfomationForLogin) => Promise<void>;
   signOut: () => Promise<void>;
   refreshUserInfo: () => Promise<void>;
+  checkAuthState: () => Promise<void>;
 }
 
 // ログイン情報の型定義
