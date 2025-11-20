@@ -9,6 +9,8 @@ import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -25,6 +27,7 @@ export default function SignupPage() {
 
   const router = useRouter();
   const validationTimer = useRef<NodeJS.Timeout | null>(null);
+  const { checkAuthState } = useAuth();
 
   // アカウント作成ボタンのハンドリング
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,11 +66,19 @@ export default function SignupPage() {
       );
 
       if (result.success) {
-        window.dispatchEvent(new CustomEvent("signedIn"));
+        // AuthContextの認証状態を更新
+        await checkAuthState();
+
+        toast.success(
+          "アカウント作成に成功しました　支出わけっとへようこそ🎉",
+          {
+            className: "!bg-white !text-emerald-800 !border-emerald-800",
+          }
+        );
         // signedIn後にdashboardにリダイレクト
         router.replace("/dashboard");
       } else {
-        setError(result.error || "確認に失敗しました");
+        setError("コード確認に失敗しました");
       }
     } catch (err) {
       console.error("予期しないエラーが発生しました２", err);
@@ -199,7 +210,7 @@ export default function SignupPage() {
                 }}
               />
             </div>
-            <div className="mb-6">
+            <div className="mb-10">
               <p className="text-base/6 mb-1 ml-1">パスワード確認用</p>
               <label htmlFor="password-confirm" className="sr-only">
                 もう一度パスワードを入力してください

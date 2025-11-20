@@ -114,43 +114,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const authenticated = await isAuthenticated();
+  // 認証状態をチェックして更新
+  const checkAuthState = async () => {
+    try {
+      const authenticated = await isAuthenticated();
 
-        if (authenticated) {
-          // トークンの有効性を事前にチェック
-          const isTokenValid = await checkTokenValidity();
+      if (authenticated) {
+        // トークンの有効性を事前にチェック
+        const isTokenValid = await checkTokenValidity();
 
-          if (isTokenValid) {
-            // トークンが有効な場合のみユーザー情報を取得
-            const userId = await getCurrentUserInfo();
+        if (isTokenValid) {
+          // トークンが有効な場合のみユーザー情報を取得
+          const userId = await getCurrentUserInfo();
 
-            if (userId) {
-              setUserInfo(userId);
-              setIsAuth(true);
-            } else {
-              setIsAuth(false);
-              setUserInfo(initialUserInfo);
-            }
+          if (userId) {
+            setUserInfo(userId);
+            setIsAuth(true);
           } else {
-            // トークンが無効な場合は認証状態をリセット
             setIsAuth(false);
             setUserInfo(initialUserInfo);
           }
         } else {
+          // トークンが無効な場合は認証状態をリセット
           setIsAuth(false);
+          setUserInfo(initialUserInfo);
         }
-      } catch (_err) {
+      } else {
         setIsAuth(false);
-        setUserInfo(initialUserInfo);
-      } finally {
-        setIsLoading(false);
       }
-    };
+    } catch (_err) {
+      setIsAuth(false);
+      setUserInfo(initialUserInfo);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    void checkAuth();
+  useEffect(() => {
+    void checkAuthState();
   }, []);
 
   // 認証状態に応じたリダイレクト処理
@@ -196,6 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         refreshUserInfo,
+        checkAuthState,
       }}
     >
       {children}
