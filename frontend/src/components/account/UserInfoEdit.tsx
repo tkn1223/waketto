@@ -1,6 +1,7 @@
 "use client";
 
 import { CircleQuestionMark } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
 import {
   Card,
@@ -17,7 +18,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
-import { toast } from "sonner";
 
 export function UserInfoEdit() {
   const {

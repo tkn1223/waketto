@@ -3,14 +3,14 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { VerificationCodeInput } from "@/components/auth/VerificationCodeInput.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { PasswordInput } from "@/components/ui/passwordinput.tsx";
 import { ValidationErrors } from "@/components/ui/validationerrors.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 import { confirmSignUpWithCognito, signUpWithCognito } from "@/lib/auth.ts";
 import { validatePassword, validatePasswordMatch } from "@/lib/validation.ts";
-import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
