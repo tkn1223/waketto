@@ -17,6 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
+import { toast } from "sonner";
 
 export function UserInfoEdit() {
   const {
@@ -29,7 +30,9 @@ export function UserInfoEdit() {
   } = useSettingForm();
 
   const handlePartnerReset = () => {
-    console.log("パートナーを解除します");
+    toast.error("パートナーを解除しました", {
+      className: "!bg-red-600 !text-white !border-red-800",
+    });
   };
 
   return (

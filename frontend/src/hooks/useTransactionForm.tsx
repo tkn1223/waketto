@@ -105,9 +105,7 @@ export const useTransactionForm = ({
       const response = await postTransaction(requestData, user);
 
       if (response.status) {
-        toast.success("取引明細を保存しました", {
-          className: "!bg-yellow-600 !text-white !border-yellow-800",
-        });
+        toast.success("取引明細を保存しました");
         resetForm();
         onSuccess();
       } else {
@@ -142,9 +140,7 @@ export const useTransactionForm = ({
       const response = await putTransaction(requestData, transactionPatch?.id);
 
       if (response.status) {
-        toast.success("取引明細を更新しました", {
-          className: "!bg-yellow-600 !text-white !border-yellow-800",
-        });
+        toast.success("取引明細を更新しました");
         resetForm();
         onSuccess();
       } else {
@@ -172,9 +168,7 @@ export const useTransactionForm = ({
       const response = await deleteTransaction(transactionPatch?.id);
 
       if (response.status) {
-        toast.success("取引明細を削除しました", {
-          className: "!bg-yellow-600 !text-white !border-yellow-800",
-        });
+        toast.success("取引明細を削除しました");
         resetForm();
         onSuccess();
       } else {
