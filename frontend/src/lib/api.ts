@@ -90,8 +90,13 @@ export async function getBudgetUsage(
   const queryString = params.toString();
 
   return await fetchApi<BudgetUsageResponse>(
-    `/budget-usage/${userMode}${queryString ? `?${queryString}` : ""}`
+    `/budget/usage/${userMode}${queryString ? `?${queryString}` : ""}`
   );
+}
+
+// 予算設定の一覧を取得
+export async function getBudgetSetting(userMode: UserMode): Promise<any> {
+  return await fetchApi<any>(`/budget/setting/${userMode}`);
 }
 
 // パートナー設定の保存

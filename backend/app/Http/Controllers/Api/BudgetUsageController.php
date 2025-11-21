@@ -53,6 +53,45 @@ class BudgetUsageController extends Controller
         }
     }
 
+    public function budgetSetting(Request $request, $userMode): JsonResponse
+    {
+        $user = $request->attributes->get('auth_user');
+        $userId = $user->id;
+
+        if ($userMode === 'common') {
+            $couple_id = $user->couple_id;
+        } else {
+            $couple_id = null;
+        }
+
+        try {
+            // 予算の取得
+            $budgetSetting = $this->getBudgetData($couple_id, $userId);
+
+            if ($budgetSetting->isEmpty()) {
+                // デフォルト値を追加
+                $defaults = config('budget-default');
+                $budgetSetting = collect($defaults)->values()->flatten(1);
+            }
+
+            Log::info("budgetSetting", [$budgetSetting->toArray()]);
+
+            return response()->json([
+                'status' => true,
+                'data' => $budgetSetting,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('予算設定の取得に失敗しました', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => '予算の取得に失敗しました',
+            ], 500);
+        }
+    }
+
     private function getBudgetData($couple_id, $userId)
     {
         $query = Budget::with(['category:id,name,code'])

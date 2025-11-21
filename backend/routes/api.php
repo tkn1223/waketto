@@ -49,8 +49,9 @@ Route::middleware('cognito')->group(function () {
     });
 
     // 予算関連のルート
-    Route::prefix('budget-usage')->group(function () {
-        Route::get('/{userMode}', [BudgetUsageController::class, 'index']);
+    Route::prefix('budget')->group(function () {
+        Route::get('/usage/{userMode}', [BudgetUsageController::class, 'index']);
+        Route::get('/setting/{userMode}', [BudgetUsageController::class, 'budgetSetting']);
     });
 
     // 設定関連のルート
