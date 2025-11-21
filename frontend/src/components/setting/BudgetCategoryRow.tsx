@@ -7,11 +7,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
+import { BudgetCategory } from "@/types/budget.ts";
 
 export function BudgetCategoryRow({
   categoryGroup,
+  onUpdate,
 }: {
-  categoryGroup: { name: string; code: string; budget: number }[];
+  categoryGroup: BudgetCategory[];
+  onUpdate: (
+    code: string,
+    field: keyof BudgetCategory,
+    value: number | string | null
+  ) => void;
 }) {
   return (
     <div className="grid gap-2">
@@ -28,9 +35,21 @@ export function BudgetCategoryRow({
                 type="number"
                 min={1}
                 max={12}
-                defaultValue={1}
+                value={category.period}
+                onChange={(e) => {
+                  onUpdate(category.code, "period", Number(e.target.value));
+                }}
               />
-              <Select defaultValue="monthly">
+              <Select
+                value={category.periodType}
+                onValueChange={(value) => {
+                  onUpdate(
+                    category.code,
+                    "periodType",
+                    value as "monthly" | "yearly"
+                  );
+                }}
+              >
                 <SelectTrigger className="hover:border-blue-400 hover:border-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -47,6 +66,10 @@ export function BudgetCategoryRow({
                 className="text-center hover:border-blue-400 hover:border-1"
                 type="number"
                 placeholder="0"
+                value={category.budget || ""}
+                onChange={(e) => {
+                  onUpdate(category.code, "budget", Number(e.target.value));
+                }}
               />
               <span>円</span>
             </div>
