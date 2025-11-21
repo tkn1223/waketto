@@ -52,6 +52,7 @@ Route::middleware('cognito')->group(function () {
     Route::prefix('budget')->group(function () {
         Route::get('/usage/{userMode}', [BudgetUsageController::class, 'index']);
         Route::get('/setting/{userMode}', [BudgetUsageController::class, 'budgetSetting']);
+        Route::post('/setting/updateBudget/{userMode}', [BudgetUsageController::class, 'updateBudgetSetting']);
     });
 
     // 設定関連のルート

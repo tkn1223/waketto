@@ -99,6 +99,17 @@ export async function getBudgetSetting(userMode: UserMode): Promise<any> {
   return await fetchApi<any>(`/budget/setting/${userMode}`);
 }
 
+// 予算設定の更新
+export async function updateBudgetSetting(
+  userMode: UserMode,
+  budgetData: any
+): Promise<Response> {
+  return await fetchApi<Response>(`/budget/setting/updateBudget/${userMode}`, {
+    method: "POST",
+    body: JSON.stringify(budgetData),
+  });
+}
+
 // パートナー設定の保存
 export async function postPartnerSetting(
   userName: string,

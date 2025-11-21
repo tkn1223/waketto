@@ -59,9 +59,9 @@ export function BudgetCategoryRow({
                 className="text-center hover:border-blue-400 hover:border-1"
                 type="number"
                 placeholder="0"
-                value={category.budget || ""}
+                value={category.amount || ""}
                 onChange={(e) => {
-                  onUpdate(category.code, "budget", Number(e.target.value));
+                  onUpdate(category.code, "amount", Number(e.target.value));
                 }}
               />
               <span>円</span>

@@ -8,7 +8,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '水道光熱費',
@@ -16,7 +16,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '社会保険料',
@@ -24,7 +24,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '生命保険料',
@@ -32,7 +32,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '教育費',
@@ -40,7 +40,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '通信費',
@@ -48,7 +48,7 @@ return [
       'groupCode' => 'monthly_fixed_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
   'monthly_variable_cost' => [
@@ -58,7 +58,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '日用品費',
@@ -66,7 +66,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '美容費',
@@ -74,7 +74,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '被服費',
@@ -82,7 +82,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '医療費',
@@ -90,7 +90,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '交通費',
@@ -98,7 +98,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => 'ガソリン費',
@@ -106,7 +106,7 @@ return [
       'groupCode' => 'monthly_variable_cost',
       'period' => 1,
       'periodType' => 'monthly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
   'occasional_fixed_cost' => [
@@ -116,7 +116,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '火災保険料',
@@ -124,7 +124,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '自動車保険',
@@ -132,7 +132,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '年会費',
@@ -140,7 +140,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '車検費',
@@ -148,7 +148,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '教育費',
@@ -156,7 +156,7 @@ return [
       'groupCode' => 'occasional_fixed_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
   'occasional_variable_cost' => [
@@ -166,7 +166,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '車修理費',
@@ -174,7 +174,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '冠婚葬祭',
@@ -182,7 +182,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '卒業入学費用',
@@ -190,7 +190,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '治療費',
@@ -198,7 +198,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '引っ越し',
@@ -206,7 +206,7 @@ return [
       'groupCode' => 'occasional_variable_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
   'luxury_consumption_cost' => [
@@ -216,7 +216,7 @@ return [
       'groupCode' => 'luxury_consumption_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '旅行費',
@@ -224,7 +224,7 @@ return [
       'groupCode' => 'luxury_consumption_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
     [
       'name' => '娯楽費',
@@ -232,7 +232,7 @@ return [
       'groupCode' => 'luxury_consumption_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
   'savings_investment_cost' => [
@@ -242,7 +242,7 @@ return [
       'groupCode' => 'savings_investment_cost',
       'period' => 1,
       'periodType' => 'yearly',
-      'budget' => null,
+      'amount' => null,
     ],
   ],
 ];

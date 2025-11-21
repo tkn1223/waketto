@@ -5,7 +5,7 @@ export interface BudgetCategory {
   groupCode: string;
   period: number; // 期間（1-12）
   periodType: "monthly" | "yearly"; // 期間の単位
-  budget: number | null; // 予算額
+  amount: number | null; // 予算額
 }
 
 // 予算カテゴリー行の型定義

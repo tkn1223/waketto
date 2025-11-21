@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button.tsx";
 import { BudgetSetting } from "@/components/setting/BudgetSetting.tsx";
 import { BudgetCategory } from "@/types/budget.ts";
 import { SubscriptionSetting } from "@/components/setting/SubscriptionSetting";
+import { toast } from "sonner";
+import { updateBudgetSetting } from "@/lib/api.ts";
 
 export default function BudgetSettingPage() {
   const { isAuth } = useAuth();
@@ -46,7 +48,21 @@ export default function BudgetSettingPage() {
   };
 
   const handleBudgetSave = async () => {
-    console.log(allCategories);
+    try {
+      const response = await updateBudgetSetting(user, allCategories);
+      if (response.status) {
+        toast.success("予算設定表を保存しました");
+      } else {
+        toast.error("予算設定表の保存に失敗しました", {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
+      }
+    } catch (error) {
+      console.error("API呼び出しエラー:", error);
+      toast.error("予算設定表の保存中に サーバーエラーが発生しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
+    }
   };
 
   const handleSubscriptionSave = async () => {
