@@ -7,19 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import { BudgetCategory } from "@/types/budget.ts";
+import { BudgetCategoryRowProps } from "@/types/budget.ts";
 
 export function BudgetCategoryRow({
   categoryGroup,
   onUpdate,
-}: {
-  categoryGroup: BudgetCategory[];
-  onUpdate: (
-    code: string,
-    field: keyof BudgetCategory,
-    value: number | string | null
-  ) => void;
-}) {
+}: BudgetCategoryRowProps) {
   return (
     <div className="grid gap-2">
       {categoryGroup.map((category) => (

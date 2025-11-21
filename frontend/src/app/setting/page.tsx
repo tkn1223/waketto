@@ -2,18 +2,10 @@
 
 import { useState } from "react";
 import { BackToHomeButton } from "@/components/ui/backtohomebutton.tsx";
-import { Input } from "@/components/ui/input.tsx";
 import { Button } from "@/components/ui/button.tsx";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.tsx";
-import { BudgetCategoryRow } from "@/components/setting/BudgetCategoryRow.tsx";
+import { BudgetSetting } from "@/components/setting/BudgetSetting.tsx";
 import { BudgetCategory } from "@/types/budget.ts";
+import { SubscriptionSetting } from "@/components/setting/SubscriptionSetting";
 
 const monthly_fixed_cost: BudgetCategory[] = [
   {
@@ -282,6 +274,7 @@ export default function BudgetSettingPage() {
   const [allCategories, setAllCategories] = useState<BudgetCategory[]>([
     ...InitialValues.flat(),
   ]);
+  const [allSubscriptions, setAllSubscriptions] = useState<any[]>([]);
 
   const handleCategoryUpdate = (
     code: string,
@@ -291,6 +284,10 @@ export default function BudgetSettingPage() {
     setAllCategories((prev) =>
       prev.map((c) => (c.code === code ? { ...c, [field]: value } : c))
     );
+  };
+
+  const handleSubscriptionUpdate = () => {
+    console.log("サブスク管理表の状態管理");
   };
 
   const handleBudgetSave = async () => {
@@ -314,132 +311,28 @@ export default function BudgetSettingPage() {
         <h2 className="text-2xl font-bold mr-8">予算設定表</h2>
         <Button
           onClick={() => void handleBudgetSave()}
-          className="py-4 bg-emerald-600 hover:bg-emerald-800"
+          className="px-6 bg-emerald-600 hover:bg-emerald-800"
         >
           予算設定表を保存する
         </Button>
       </div>
-      <table className="w-full table-auto mt-4">
-        <thead>
-          <tr className="bg-muted">
-            <th className="w-1/13"></th>
-            <th className="w-6/13 py-2 text-xl border-3">固定費</th>
-            <th className="w-6/13 py-2 text-xl border-3">変動費</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="text-xl font-bold text-center bg-muted border-3">
-              毎月
-            </td>
-            <td className="py-4 px-2 border-2">
-              <BudgetCategoryRow
-                categoryGroup={allCategories.filter(
-                  (category) => category.groupCode === "monthly_fixed_cost"
-                )}
-                onUpdate={handleCategoryUpdate}
-              />
-            </td>
-            <td className="py-4 px-2 border-2">
-              <div className="grid gap-2">
-                <BudgetCategoryRow
-                  categoryGroup={allCategories.filter(
-                    (category) => category.groupCode === "monthly_variable_cost"
-                  )}
-                  onUpdate={handleCategoryUpdate}
-                />
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td className="text-xl font-bold text-center bg-muted border-3">
-              不定期
-            </td>
-            <td className="py-4 px-2 border-2">
-              <BudgetCategoryRow
-                categoryGroup={allCategories.filter(
-                  (category) => category.groupCode === "occasional_fixed_cost"
-                )}
-                onUpdate={handleCategoryUpdate}
-              />
-            </td>
-            <td className="py-4 px-2 border-2">
-              <BudgetCategoryRow
-                categoryGroup={allCategories.filter(
-                  (category) =>
-                    category.groupCode === "occasional_variable_cost"
-                )}
-                onUpdate={handleCategoryUpdate}
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <table className="w-full table-auto mt-4">
-        <thead>
-          <tr className="">
-            <th className="w-1/13"></th>
-            <th className="w-6/13 py-2 text-xl bg-muted border-3">
-              豊かな浪費
-            </th>
-            <th className="w-6/13 py-2 text-xl bg-muted border-3">
-              貯蓄・投資
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td className="text-xl font-bold text-center"></td>
-            <td className="py-2 px-2 border-2">
-              <BudgetCategoryRow
-                categoryGroup={allCategories.filter(
-                  (category) => category.groupCode === "luxury_consumption_cost"
-                )}
-                onUpdate={handleCategoryUpdate}
-              />
-            </td>
-            <td className="py-2 px-2 border-2">
-              <BudgetCategoryRow
-                categoryGroup={allCategories.filter(
-                  (category) => category.groupCode === "savings_investment_cost"
-                )}
-                onUpdate={handleCategoryUpdate}
-              />
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <BudgetSetting
+        allCategories={allCategories}
+        handleCategoryUpdate={handleCategoryUpdate}
+      />
       <div className="flex items-center mt-10">
         <h2 className="text-2xl font-bold mr-8">サブスク管理表</h2>
         <Button
           onClick={() => void handleSubscriptionSave()}
-          className="py-4 bg-emerald-600 hover:bg-emerald-800"
+          className="px-6 bg-emerald-600 hover:bg-emerald-800"
         >
           サブスク管理表を保存する
         </Button>
       </div>
-      <table className="w-full table-auto mt-4">
-        <thead>
-          <tr className="bg-muted border-3">
-            <th className="py-2 text-xl border-3">名称</th>
-            <th className="py-2 text-xl border-3">更新期間</th>
-            <th className="py-2 text-xl border-3">金額</th>
-            <th className="py-2 text-xl border-3">契約期間</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="border-2">
-            <td className="text-center">chatGPT</td>
-            <td className="text-center">月</td>
-            <td className="text-center">1,000</td>
-            <td className="text-center">1年</td>
-            <td className="text-center">
-              <Button>削除</Button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <SubscriptionSetting
+        allSubscriptions={allSubscriptions}
+        handleSubscriptionUpdate={handleSubscriptionUpdate}
+      />
 
       <BackToHomeButton />
     </div>
