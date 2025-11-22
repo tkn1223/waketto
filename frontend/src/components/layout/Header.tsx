@@ -10,7 +10,7 @@ import { NaviMenu } from "./NaviMenu.tsx";
 import { UserModeToggle } from "./UserModeToggle.tsx";
 
 // ダッシュボードのみヘッダーを表示
-const path = "dashboard";
+const path = ["dashboard", "setting"];
 
 export function Header() {
   const pathname = usePathname();

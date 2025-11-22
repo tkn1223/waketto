@@ -22,9 +22,7 @@ export function BudgetUsageList({
     return (
       <div className="text-center py-8 space-y-4 border border-gray-300 rounded-md">
         <p className="text-lg text-gray-500">予算が登録されていません</p>
-        <Button onClick={() => router.push("/budget-setting")}>
-          予算を設定する
-        </Button>
+        <Button onClick={() => router.push("/setting")}>予算を設定する</Button>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import type { BudgetSettingResponse } from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
@@ -8,7 +9,12 @@ import type {
   ExpenseReportResponse,
 } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
-import { getBudgetUsage, getCategories, getExpenseReport } from "./api.ts";
+import {
+  getBudgetSetting,
+  getBudgetUsage,
+  getCategories,
+  getExpenseReport,
+} from "./api.ts";
 
 // デフォルトfetcher
 const defaultFetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -42,7 +48,6 @@ export const useExpenseReport = (
 
   return useSWR(key, () => getExpenseReport(userMode, dateSelector), {
     ...swrConfig,
-    refreshInterval: 30000, // 30秒ごとに更新
   });
 };
 
@@ -62,11 +67,22 @@ export const useBudgetUsage = (
   isAuth?: boolean
 ): ReturnType<typeof useSWR<BudgetUsageResponse, Error>> => {
   const key = isAuth
-    ? `/budget-usage/${userMode}?year=${dateSelector.year}`
+    ? `/budget/usage/${userMode}?year=${dateSelector.year}`
     : null;
 
   return useSWR(key, () => getBudgetUsage(userMode, dateSelector), {
     ...swrConfig,
-    refreshInterval: 30000, // 30秒ごとに更新
+  });
+};
+
+// 予算設定データ取得用のカスタムフック
+export const useBudgetSetting = (
+  userMode: UserMode,
+  isAuth?: boolean
+): ReturnType<typeof useSWR<BudgetSettingResponse, Error>> => {
+  const key = isAuth ? `/budget/usage/${userMode}` : null;
+
+  return useSWR(key, () => getBudgetSetting(userMode), {
+    ...swrConfig,
   });
 };
