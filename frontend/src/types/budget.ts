@@ -27,3 +27,24 @@ export interface BudgetSettingProps {
     value: number | string | null
   ) => void;
 }
+
+// 予算設定APIレスポンスの型定義
+export interface BudgetSettingResponse {
+  status: boolean;
+  data: BudgetCategory[];
+}
+
+// サブスクリプションの型定義
+export interface Subscription {
+  id?: string;
+  name: string;
+  updatePeriod: string;
+  amount: number;
+  contractPeriod: string;
+}
+
+// サブスクリプション設定コンポーネントのprops型定義
+export interface SubscriptionSettingProps {
+  allSubscriptions: Subscription[];
+  handleSubscriptionUpdate: () => void;
+}

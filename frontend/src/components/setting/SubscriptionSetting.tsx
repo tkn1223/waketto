@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button.tsx";
+import type { SubscriptionSettingProps } from "@/types/budget.ts";
 
 export function SubscriptionSetting({
   allSubscriptions,
   handleSubscriptionUpdate,
-}: any) {
+}: SubscriptionSettingProps) {
   return (
     <table className="w-full table-auto mt-4">
       <thead>

@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import { BudgetCategoryRowProps } from "@/types/budget.ts";
+import type { BudgetCategoryRowProps } from "@/types/budget.ts";
 
 export function BudgetCategoryRow({
   categoryGroup,

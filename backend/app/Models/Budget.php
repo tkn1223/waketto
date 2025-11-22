@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class Budget extends Model
 {
@@ -30,7 +29,7 @@ class Budget extends Model
                 ->first()
                 ->id;
 
-            if (!$budgetCheck) {
+            if (! $budgetCheck) {
                 // budgetテーブルを新規作成
                 Budget::create([
                     'recorded_by_user_id' => $userId,

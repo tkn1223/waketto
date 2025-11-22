@@ -1,5 +1,5 @@
 import { BudgetCategoryRow } from "@/components/setting/BudgetCategoryRow.tsx";
-import { BudgetSettingProps } from "@/types/budget.ts";
+import type { BudgetSettingProps } from "@/types/budget.ts";
 
 export function BudgetSetting({
   allCategories,

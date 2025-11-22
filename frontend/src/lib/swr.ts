@@ -1,6 +1,7 @@
 "use client";
 
 import useSWR from "swr";
+import type { BudgetSettingResponse } from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
@@ -9,10 +10,10 @@ import type {
 } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
 import {
+  getBudgetSetting,
   getBudgetUsage,
   getCategories,
   getExpenseReport,
-  getBudgetSetting,
 } from "./api.ts";
 
 // デフォルトfetcher
@@ -78,7 +79,7 @@ export const useBudgetUsage = (
 export const useBudgetSetting = (
   userMode: UserMode,
   isAuth?: boolean
-): ReturnType<typeof useSWR<any, Error>> => {
+): ReturnType<typeof useSWR<BudgetSettingResponse, Error>> => {
   const key = isAuth ? `/budget/usage/${userMode}` : null;
 
   return useSWR(key, () => getBudgetSetting(userMode), {

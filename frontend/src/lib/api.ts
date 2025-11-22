@@ -1,5 +1,6 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
+import type { BudgetCategory, BudgetSettingResponse } from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
@@ -17,7 +18,7 @@ const COGNITO_CONFIG = {
 export interface Response {
   status: boolean;
   message?: string;
-  errors?: Record<string, string>;
+  errors?: Record<string, string[] | string>;
 }
 
 /*
@@ -95,14 +96,16 @@ export async function getBudgetUsage(
 }
 
 // 予算設定の一覧を取得
-export async function getBudgetSetting(userMode: UserMode): Promise<any> {
-  return await fetchApi<any>(`/budget/setting/${userMode}`);
+export async function getBudgetSetting(
+  userMode: UserMode
+): Promise<BudgetSettingResponse> {
+  return await fetchApi<BudgetSettingResponse>(`/budget/setting/${userMode}`);
 }
 
 // 予算設定の更新
 export async function updateBudgetSetting(
   userMode: UserMode,
-  budgetData: any
+  budgetData: BudgetCategory[]
 ): Promise<Response> {
   return await fetchApi<Response>(`/budget/setting/updateBudget/${userMode}`, {
     method: "POST",
@@ -175,12 +178,20 @@ export async function fetchApi<T>(
       throw new Error("認証に失敗しました。再度ログインしてください。");
     }
 
-    const errorData = (await response.json().catch(() => null)) as unknown;
+    const errorData = (await response.json().catch(() => null)) as
+      | Response
+      | null;
     console.error("API Error:", {
       status: response.status,
       statusText: response.statusText,
-      errorData: errorData as Record<string, unknown>,
+      errorData,
     });
+
+    // エラーデータがある場合は、それを返す（バリデーションエラーなど）
+    if (errorData && typeof errorData === "object" && "status" in errorData) {
+      return errorData as T;
+    }
+
     throw new Error(`APIリクエストに失敗しました: ${response.statusText}`);
   }
 
