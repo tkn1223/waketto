@@ -1,4 +1,4 @@
-export type FinanceMode = "expense" | "budget"; // expense(支出管理) budget(家計簿)
+export type FinanceMode = "expense" | "household"; // expense(支出管理) household(家計簿)
 export type UserMode = "alone" | "common"; // alone(個人) common(共有)
 
 export interface ViewModeContextType {

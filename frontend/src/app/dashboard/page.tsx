@@ -1,6 +1,6 @@
 "use client";
 
-import { AnnualBudgetSummary } from "@/components/dashboard/AnnualBudgetSummary.tsx";
+import { AnnualHouseholdSummary } from "@/components/dashboard/AnnualHouseholdSummary.tsx";
 import { AnnualExpenseSummary } from "@/components/dashboard/AnnualExpenseSummary.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useViewMode } from "@/contexts/ViewModeContext.tsx";
@@ -36,8 +36,8 @@ export default function DashboardPage() {
             budgetUsageDateSelector={budgetUsageDateSelector}
           />
         )}
-        {finance === "budget" && (
-          <AnnualBudgetSummary isAuth={isAuth} user={user} />
+        {finance === "household" && (
+          <AnnualHouseholdSummary isAuth={isAuth} user={user} />
         )}
       </div>
     </div>

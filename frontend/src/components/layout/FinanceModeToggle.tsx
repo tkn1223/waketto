@@ -19,8 +19,8 @@ export function FinanceModeToggle({
         </TabsTrigger>
         <TabsTrigger
           className="w-1/2 cursor-pointer"
-          value="budget"
-          onClick={() => setFinance("budget")}
+          value="household"
+          onClick={() => setFinance("household")}
         >
           家計簿
         </TabsTrigger>
