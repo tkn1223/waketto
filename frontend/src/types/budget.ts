@@ -38,13 +38,20 @@ export interface BudgetSettingResponse {
 export interface Subscription {
   id?: string;
   name: string;
-  updatePeriod: string;
-  amount: number;
-  contractPeriod: string;
+  updatePeriod: string; // "monthly" | "yearly"
+  amount: number | null; // 数値または空文字列
+  startDate: Date | null;
+  finishDate: Date | null;
 }
 
 // サブスクリプション設定コンポーネントのprops型定義
 export interface SubscriptionSettingProps {
   allSubscriptions: Subscription[];
-  handleSubscriptionUpdate: () => void;
+  handleSubscriptionUpdate: (subscriptions: Subscription[]) => void;
+}
+
+// サブスクリプション設定APIレスポンスの型定義
+export interface SubscriptionSettingResponse {
+  status: boolean;
+  data: Subscription[];
 }

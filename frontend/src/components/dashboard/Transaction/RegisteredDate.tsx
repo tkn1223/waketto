@@ -10,13 +10,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover.tsx";
+import { cn } from "@/lib/utils.ts";
 
 interface RegisteredDateProps {
   date: Date;
   onDateChange: (date: Date) => void;
+  className?: string;
 }
 
-export function RegisteredDate({ date, onDateChange }: RegisteredDateProps) {
+export function RegisteredDate({
+  date,
+  onDateChange,
+  className,
+}: RegisteredDateProps) {
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
@@ -26,7 +32,10 @@ export function RegisteredDate({ date, onDateChange }: RegisteredDateProps) {
           variant="outline"
           id="date"
           data-empty={!date}
-          className="data-[empty=true]:text-muted-foreground justify-between w-full"
+          className={cn(
+            "data-[empty=true]:text-muted-foreground justify-between w-full",
+            className
+          )}
         >
           <CalendarIcon />
           {date ? format(date, "yyyy/M/d") : null}
@@ -38,6 +47,8 @@ export function RegisteredDate({ date, onDateChange }: RegisteredDateProps) {
           mode="single"
           selected={date}
           captionLayout="dropdown"
+          startMonth={new Date(new Date().getFullYear(), -1)}
+          endMonth={new Date(new Date().getFullYear() + 10, 11)}
           onSelect={(selectedDate) => {
             if (selectedDate) {
               onDateChange(selectedDate);

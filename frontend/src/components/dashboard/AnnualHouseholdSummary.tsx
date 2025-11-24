@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useExpenseReport } from "@/lib/swr.ts";
 import type { UserMode } from "@/types/viewmode";
 
-export function AnnualBudgetSummary({
+export function AnnualHouseholdSummary({
   isAuth,
   user,
 }: {

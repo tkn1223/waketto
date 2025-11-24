@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BudgetUsageController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ExpenseReportController;
 use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -53,6 +54,12 @@ Route::middleware('cognito')->group(function () {
         Route::get('/usage/{userMode}', [BudgetUsageController::class, 'index']);
         Route::get('/setting/{userMode}', [BudgetUsageController::class, 'budgetSetting']);
         Route::post('/setting/updateBudget/{userMode}', [BudgetUsageController::class, 'updateBudgetSetting']);
+    });
+
+    // サブスクリプション関連のルート
+    Route::prefix('subscription')->group(function () {
+        Route::get('/setting/{userMode}', [SubscriptionController::class, 'getSubscriptions']);
+        Route::post('/setting/updateSubscriptions/{userMode}', [SubscriptionController::class, 'updateSubscriptions']);
     });
 
     // 設定関連のルート

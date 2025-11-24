@@ -21,7 +21,7 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       const currentFinance = localStorage.getItem("financeMode");
 
-      if (currentFinance === "expense" || currentFinance === "budget") {
+      if (currentFinance === "expense" || currentFinance === "household") {
         return currentFinance;
       }
     }

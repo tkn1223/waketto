@@ -11,13 +11,13 @@ export function BudgetSetting({
         <thead>
           <tr className="bg-muted">
             <th className="w-1/13"></th>
-            <th className="w-6/13 py-2 text-xl border-3">固定費</th>
-            <th className="w-6/13 py-2 text-xl border-3">変動費</th>
+            <th className="w-6/13 py-2 text-lg border-3">固定費</th>
+            <th className="w-6/13 py-2 text-lg border-3">変動費</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td className="text-xl font-bold text-center bg-muted border-3">
+            <td className="text-lg font-bold text-center bg-muted border-3">
               毎月
             </td>
             <td className="py-4 px-2 border-2 align-top">
@@ -40,7 +40,7 @@ export function BudgetSetting({
             </td>
           </tr>
           <tr>
-            <td className="text-xl font-bold text-center bg-muted border-3">
+            <td className="text-lg font-bold text-center bg-muted border-3">
               不定期
             </td>
             <td className="py-4 px-2 border-2 align-top">
@@ -66,19 +66,19 @@ export function BudgetSetting({
 
       <table className="w-full table-auto mt-4">
         <thead>
-          <tr className="">
+          <tr>
             <th className="w-1/13"></th>
-            <th className="w-6/13 py-2 text-xl bg-muted border-3">
+            <th className="w-6/13 py-2 text-lg bg-muted border-3">
               豊かな浪費
             </th>
-            <th className="w-6/13 py-2 text-xl bg-muted border-3">
+            <th className="w-6/13 py-2 text-lg bg-muted border-3">
               貯蓄・投資
             </th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td className="text-xl font-bold text-center align-top"></td>
+            <td></td>
             <td className="py-2 px-2 border-2">
               <BudgetCategoryRow
                 categoryGroup={allCategories.filter(

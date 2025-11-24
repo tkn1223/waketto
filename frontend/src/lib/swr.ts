@@ -1,7 +1,10 @@
 "use client";
 
 import useSWR from "swr";
-import type { BudgetSettingResponse } from "@/types/budget.ts";
+import type {
+  BudgetSettingResponse,
+  SubscriptionSettingResponse,
+} from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
@@ -14,6 +17,7 @@ import {
   getBudgetUsage,
   getCategories,
   getExpenseReport,
+  getSubscriptions,
 } from "./api.ts";
 
 // デフォルトfetcher
@@ -80,9 +84,21 @@ export const useBudgetSetting = (
   userMode: UserMode,
   isAuth?: boolean
 ): ReturnType<typeof useSWR<BudgetSettingResponse, Error>> => {
-  const key = isAuth ? `/budget/usage/${userMode}` : null;
+  const key = isAuth ? `/budget/setting/${userMode}` : null;
 
   return useSWR(key, () => getBudgetSetting(userMode), {
+    ...swrConfig,
+  });
+};
+
+// サブスクリプション設定データ取得用のカスタムフック
+export const useSubscriptions = (
+  userMode: UserMode,
+  isAuth?: boolean
+): ReturnType<typeof useSWR<SubscriptionSettingResponse, Error>> => {
+  const key = isAuth ? `/subscription/setting/${userMode}` : null;
+
+  return useSWR(key, () => getSubscriptions(userMode), {
     ...swrConfig,
   });
 };

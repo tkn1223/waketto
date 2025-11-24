@@ -1,6 +1,11 @@
 import { fetchAuthSession } from "aws-amplify/auth";
 import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
-import type { BudgetCategory, BudgetSettingResponse } from "@/types/budget.ts";
+import type {
+  BudgetCategory,
+  BudgetSettingResponse,
+  Subscription,
+  SubscriptionSettingResponse,
+} from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type { BudgetUsageResponse } from "@/types/summary.ts";
 import type {
@@ -109,8 +114,31 @@ export async function updateBudgetSetting(
 ): Promise<Response> {
   return await fetchApi<Response>(`/budget/setting/updateBudget/${userMode}`, {
     method: "POST",
-    body: JSON.stringify(budgetData),
+    body: JSON.stringify({ categories: budgetData }),
   });
+}
+
+// サブスクリプション設定の取得
+export async function getSubscriptions(
+  userMode: UserMode
+): Promise<SubscriptionSettingResponse> {
+  return await fetchApi<SubscriptionSettingResponse>(
+    `/subscription/setting/${userMode}`
+  );
+}
+
+// サブスクリプション設定の更新
+export async function updateSubscriptions(
+  userMode: UserMode,
+  subscriptions: Subscription[]
+): Promise<Response> {
+  return await fetchApi<Response>(
+    `/subscription/setting/updateSubscriptions/${userMode}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ subscriptions }),
+    }
+  );
 }
 
 // パートナー設定の保存
@@ -178,9 +206,9 @@ export async function fetchApi<T>(
       throw new Error("認証に失敗しました。再度ログインしてください。");
     }
 
-    const errorData = (await response.json().catch(() => null)) as
-      | Response
-      | null;
+    const errorData = (await response
+      .json()
+      .catch(() => null)) as Response | null;
     console.error("API Error:", {
       status: response.status,
       statusText: response.statusText,
