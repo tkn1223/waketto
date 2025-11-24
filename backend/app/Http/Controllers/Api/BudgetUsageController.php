@@ -106,6 +106,8 @@ class BudgetUsageController extends Controller
 
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
     {
+        Log::info("更新処理開始");
+        
         // バリデーションチェック
         $validator = Validator::make($request->all(), [
             'categories' => 'required|array|min:1',
@@ -161,13 +163,13 @@ class BudgetUsageController extends Controller
         }
         $budgetCheck = $budgetCheckQuery->exists();
 
-        // 予算設定データを取得
-        $categories = $request->json()->all();
+        // 予算設定データを取得（categoriesキーから配列を取得）
+        $categories = $request->input('categories');
 
         if (empty($categories) || ! is_array($categories)) {
             Log::error('渡された予算設定データが不正です', [
                 'categories' => $categories,
-                'requestBody' => $categories,
+                'request_all' => $request->all(),
             ]);
 
             return response()->json([
