@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover.tsx";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils.ts";
 
 interface RegisteredDateProps {
   date: Date;

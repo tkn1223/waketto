@@ -1,5 +1,7 @@
-import { Input } from "@/components/ui/input.tsx";
+import { CirclePlus } from "lucide-react";
+import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate.tsx";
 import { Button } from "@/components/ui/button.tsx";
+import { Input } from "@/components/ui/input.tsx";
 import {
   Select,
   SelectContent,
@@ -8,8 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx";
-import { CirclePlus } from "lucide-react";
-import { RegisteredDate } from "@/components/dashboard/Transaction/RegisteredDate.tsx";
 import type { Subscription, SubscriptionSettingProps } from "@/types/budget.ts";
 
 export function SubscriptionSetting({
@@ -64,7 +64,7 @@ export function SubscriptionSetting({
                 placeholder="サービス名を入力"
                 value={subscription.name || ""}
                 onChange={(e) => {
-                  handleFieldUpdate(subscription.id!, "name", e.target.value);
+                  handleFieldUpdate(subscription.id, "name", e.target.value);
                 }}
               />
             </td>
@@ -72,7 +72,7 @@ export function SubscriptionSetting({
               <Select
                 value={subscription.updatePeriod}
                 onValueChange={(value) => {
-                  handleFieldUpdate(subscription.id!, "updatePeriod", value);
+                  handleFieldUpdate(subscription.id, "updatePeriod", value);
                 }}
               >
                 <SelectTrigger className="w-full hover:border-blue-400 hover:border-1">
@@ -101,7 +101,7 @@ export function SubscriptionSetting({
                   // 空文字列の場合はnull、それ以外は数値に変換
                   const numValue = value === "" ? null : Number(value);
                   handleFieldUpdate(
-                    subscription.id!,
+                    subscription.id,
                     "amount",
                     numValue !== null && isNaN(numValue) ? null : numValue
                   );
@@ -115,7 +115,7 @@ export function SubscriptionSetting({
                     className="hover:border-blue-400 hover:border-1"
                     date={subscription.startDate ?? new Date()}
                     onDateChange={(date) => {
-                      handleFieldUpdate(subscription.id!, "startDate", date);
+                      handleFieldUpdate(subscription.id, "startDate", date);
                     }}
                   />
                 </div>
@@ -125,7 +125,7 @@ export function SubscriptionSetting({
                     className="hover:border-blue-400 hover:border-1"
                     date={subscription.finishDate ?? new Date()}
                     onDateChange={(date) => {
-                      handleFieldUpdate(subscription.id!, "finishDate", date);
+                      handleFieldUpdate(subscription.id, "finishDate", date);
                     }}
                   />
                 </div>

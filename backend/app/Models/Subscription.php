@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Subscription extends Model
 {
@@ -22,4 +21,3 @@ class Subscription extends Model
         'finish_date' => 'date',
     ];
 }
-

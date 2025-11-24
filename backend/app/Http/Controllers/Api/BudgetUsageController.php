@@ -106,8 +106,8 @@ class BudgetUsageController extends Controller
 
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
     {
-        Log::info("更新処理開始");
-        
+        Log::info('更新処理開始');
+
         // バリデーションチェック
         $validator = Validator::make($request->all(), [
             'categories' => 'required|array|min:1',

@@ -1,7 +1,7 @@
 "use client";
 
-import { AnnualHouseholdSummary } from "@/components/dashboard/AnnualHouseholdSummary.tsx";
 import { AnnualExpenseSummary } from "@/components/dashboard/AnnualExpenseSummary.tsx";
+import { AnnualHouseholdSummary } from "@/components/dashboard/AnnualHouseholdSummary.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { useDateSelector } from "@/hooks/useDateSelector.tsx";

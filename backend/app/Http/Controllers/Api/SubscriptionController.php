@@ -97,7 +97,7 @@ class SubscriptionController extends Controller
             foreach ($subscriptions as $index => $subscription) {
                 $startDate = $subscription['startDate'] ?? null;
                 $finishDate = $subscription['finishDate'] ?? null;
-                
+
                 if ($startDate && $finishDate && $finishDate < $startDate) {
                     $validator->errors()->add(
                         "subscriptions.{$index}.finishDate",
@@ -131,7 +131,7 @@ class SubscriptionController extends Controller
         // サブスクリプションデータを取得
         $subscriptions = $request->input('subscriptions');
 
-        if (!is_array($subscriptions)) {
+        if (! is_array($subscriptions)) {
             Log::error('渡されたサブスクリプションデータが不正です', [
                 'subscriptions' => $subscriptions,
                 'request_all' => $request->all(),
@@ -190,4 +190,3 @@ class SubscriptionController extends Controller
         }
     }
 }
-
