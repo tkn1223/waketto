@@ -3,23 +3,23 @@ import { ExpenseTable } from "@/components/dashboard/ExpenseReport/ExpenseTable.
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import { useBudgetUsage, useExpenseReport } from "@/lib/swr.ts";
-import type { AnnualExpenseSummaryProps } from "@/types/summary.ts";
+import type { SpendingManagementPageProps } from "@/types/summary.ts";
 
-export function AnnualExpenseSummary({
+export function SpendingManagementPage({
   isAuth,
   user,
-  expenseDateSelector,
-  budgetUsageDateSelector,
-}: AnnualExpenseSummaryProps) {
+  monthlyAndYearlyDateSelector,
+  monthlyDateSelector,
+}: SpendingManagementPageProps) {
   const {
     data: expenseReport,
     error: expenseReportError,
     isLoading: isExpenseReportLoading,
     mutate: expenseMutate,
-  } = useExpenseReport(user, expenseDateSelector, isAuth);
+  } = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
   const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
     user,
-    budgetUsageDateSelector,
+    monthlyDateSelector,
     isAuth
   );
 
@@ -38,7 +38,7 @@ export function AnnualExpenseSummary({
           isExpenseReportLoading={isExpenseReportLoading}
           expenseMutate={() => void expenseMutate()}
           handleUpdte={() => void handleUpdte()}
-          expenseDateSelector={expenseDateSelector}
+          monthlyAndYearlyDateSelector={monthlyAndYearlyDateSelector}
         />
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
@@ -49,7 +49,7 @@ export function AnnualExpenseSummary({
       <div className="order-3 lg:order-3 sm:col-span-3 lg:col-span-3 space-y-3">
         <div className="flex justify-between">
           <span className="font-medium text-lg">予算の消化状況</span>
-          <YearMonthSelector {...budgetUsageDateSelector} showMonth={false} />
+          <YearMonthSelector {...monthlyDateSelector} showMonth={false} />
         </div>
         <BudgetUsageList budgetUsage={budgetUsage} />
       </div>

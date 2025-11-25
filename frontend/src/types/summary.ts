@@ -2,11 +2,18 @@ import type { DateSelector } from "@/types/expense.ts";
 import type { Category } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
 
-export interface AnnualExpenseSummaryProps {
+export interface SpendingManagementPageProps {
   isAuth: boolean;
   user: UserMode;
-  expenseDateSelector: DateSelector;
-  budgetUsageDateSelector: DateSelector;
+  monthlyAndYearlyDateSelector: DateSelector;
+  monthlyDateSelector: DateSelector;
+}
+
+export interface HouseholdManagementPageProps {
+  isAuth: boolean;
+  user: UserMode;
+  monthlyAndYearlyDateSelector: DateSelector;
+  monthlyDateSelector: DateSelector;
 }
 
 export interface BudgetUsageResponse {
