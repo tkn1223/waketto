@@ -1,3 +1,5 @@
+import type { Category } from "./transaction.ts";
+
 // 予算カテゴリーの型定義
 export interface BudgetCategory {
   name: string;
@@ -54,4 +56,21 @@ export interface SubscriptionSettingProps {
 export interface SubscriptionSettingResponse {
   status: boolean;
   data: Subscription[];
+}
+
+// 予算使用量APIレスポンスの型定義
+export interface BudgetUsageResponse {
+  status: boolean;
+  data: {
+    id: number;
+    category: Category;
+    budget_amount: number;
+    monthly_data: {
+      month: number;
+      category_id: number;
+      amount: number;
+      payment_ids: string;
+    }[];
+    residue_budget: number;
+  }[];
 }

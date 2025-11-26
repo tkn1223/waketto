@@ -1,7 +1,9 @@
-import type { DateSelector } from "@/types/expense.ts";
-import type { Category } from "@/types/transaction.ts";
-import type { UserMode } from "@/types/viewmode.ts";
+import { DateSelector } from "@/types/expense.ts";
+import { UserMode } from "@/types/viewmode.ts";
+import { TransactionData } from "@/types/transaction.ts";
+import { ExpenseReportData } from "@/types/transaction.ts";
 
+// 支出管理ページのprops型定義
 export interface SpendingManagementPageProps {
   isAuth: boolean;
   user: UserMode;
@@ -9,6 +11,7 @@ export interface SpendingManagementPageProps {
   monthlyDateSelector: DateSelector;
 }
 
+// 家計簿ページのprops型定義
 export interface HouseholdManagementPageProps {
   isAuth: boolean;
   user: UserMode;
@@ -16,18 +19,33 @@ export interface HouseholdManagementPageProps {
   monthlyDateSelector: DateSelector;
 }
 
-export interface BudgetUsageResponse {
-  status: boolean;
-  data: {
-    id: number;
-    category: Category;
-    budget_amount: number;
-    monthly_data: {
-      month: number;
-      category_id: number;
-      amount: number;
-      payment_ids: string;
-    }[];
-    residue_budget: number;
-  }[];
+// 支出の内訳カードのprops型定義
+export interface SpendingBreakdownSectionProps {
+  isAuth: boolean;
+  user: UserMode;
+  monthlyAndYearlyDateSelector: DateSelector;
+  monthlyDateSelector: DateSelector;
+  householdReport: ExpenseReportData;
+}
+
+// カテゴリー毎の合計
+export interface CategoryTotal {
+  [categoryCode: string]: number;
+}
+
+// user毎の合計
+export interface UserTotal {
+  [userId: string]: number;
+}
+
+// user毎の明細レコード
+export interface UserRecord {
+  [userId: string]: TransactionData[];
+}
+
+// Props
+export interface ExpenseReportTransformProps {
+  CategoryTotals: CategoryTotal;
+  UserTotals: UserTotal;
+  UserRecords: UserRecord;
 }

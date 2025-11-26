@@ -16,17 +16,32 @@ export function HouseholdManagementPage({
     monthlyAndYearlyDateSelector,
     isAuth
   );
+  const {
+    data: householdReport,
+    error: householdReportError,
+    isLoading: isHouseholdReportLoading,
+    mutate: householdMutate,
+  } = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
+
+  console.log(householdReport);
 
   return (
     <>
-      {/* 支出管理表カード */}
+      {/* 支出の内訳カード */}
       <div className="lg:col-span-2 space-y-2">
-        <SpendingBreakdownSection />
+        <SpendingBreakdownSection
+          isAuth={isAuth}
+          user={user}
+          monthlyAndYearlyDateSelector={monthlyAndYearlyDateSelector}
+          monthlyDateSelector={monthlyDateSelector}
+          householdReport={householdReport?.data ?? {}}
+        />
       </div>
       {/* 取引明細カード(mutateでデータ更新) */}
       <div className="lg:col-span-1">
         <TransactionDetail onUpdate={() => void mutate()} />
       </div>
+      {/* 支出の推移グラフ */}
       <div className="col-span-2">
         <MonthlyBarChart />
       </div>

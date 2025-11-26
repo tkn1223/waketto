@@ -7,7 +7,7 @@ import type {
   SubscriptionSettingResponse,
 } from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
-import type { BudgetUsageResponse } from "@/types/summary.ts";
+import type { BudgetUsageResponse } from "@/types/budget.ts";
 import type {
   CategoriesResponse,
   ExpenseReportResponse,
