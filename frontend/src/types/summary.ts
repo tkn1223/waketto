@@ -49,3 +49,9 @@ export interface ExpenseReportTransformProps {
   UserTotals: UserTotal;
   UserRecords: UserRecord;
 }
+
+// ユーザーごとの合計値と全体の合計値を格納する型
+export interface ExpenseReportTotals {
+  totalAmount: number;
+  userTotals: Record<string, number>;
+}

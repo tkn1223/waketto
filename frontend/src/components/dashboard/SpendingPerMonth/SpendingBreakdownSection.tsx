@@ -28,7 +28,7 @@ export function SpendingBreakdownSection({
       </CardHeader>
       <CardContent className="flex-1 pb-0 space-y-6">
         {/* 支出の内訳ドーナツチャート */}
-        <SpendingDonutChart householdReport={householdReport} />
+        <SpendingDonutChart householdReport={householdReport} user={user} />
         {/* 支出の内訳詳細テーブル */}
         <div className="grid grid-cols-2 gap-4">
           <div className="border">
