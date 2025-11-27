@@ -2,6 +2,7 @@ import { DateSelector } from "@/types/expense.ts";
 import { UserMode } from "@/types/viewmode.ts";
 import { TransactionData } from "@/types/transaction.ts";
 import { ExpenseReportData } from "@/types/transaction.ts";
+import { UserInfo } from "@/types/auth.ts";
 
 // 支出管理ページのprops型定義
 export interface SpendingManagementPageProps {
@@ -21,11 +22,13 @@ export interface HouseholdManagementPageProps {
 
 // 支出の内訳カードのprops型定義
 export interface SpendingBreakdownSectionProps {
+  userInfo: UserInfo;
   isAuth: boolean;
   user: UserMode;
   monthlyAndYearlyDateSelector: DateSelector;
   monthlyDateSelector: DateSelector;
   householdReport: ExpenseReportData;
+  onTransactionUpdate: () => void;
 }
 
 // カテゴリー毎の合計

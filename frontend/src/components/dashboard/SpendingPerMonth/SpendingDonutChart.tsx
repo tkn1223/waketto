@@ -5,10 +5,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart.tsx";
-import type { ChartConfig } from "@/components/ui/chart.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import type { ExpenseReportData } from "@/types/transaction.ts";
 import { calculateExpenseTotals } from "@/utils/expenseReportTransformer.ts";
+import {
+  aggregateByCategory,
+  generateChartDataAndConfig,
+} from "@/utils/spendingChartTransformer.ts";
 import { UserMode } from "@/types/viewmode.ts";
 
 interface SpendingDonutChartProps {
@@ -16,69 +19,26 @@ interface SpendingDonutChartProps {
   user: UserMode;
 }
 
-// const chartConfig: ChartConfig = {
-//   monthly_fixed_cost: { color: "#0088FE" },
-//   monthly_variable_cost: { color: "#00C49F" },
-//   occasional_fixed_cost: { color: "#FFBB28" },
-//   occasional_variable_cost: { color: "#FF8042" },
-// };
-
-// const chartData = [
-//   { name: "Chrome", value: 4000 },
-//   { name: "Firefox", value: 3000 },
-//   { name: "Safari", value: 2000 },
-//   { name: "Opera", value: 2780 },
-//   { name: "Navigator", value: 1890 },
-// ];
-
-const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-];
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "var(--chart-1)",
-  },
-  safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "var(--chart-3)",
-  },
-  edge: {
-    label: "Edge",
-    color: "var(--chart-4)",
-  },
-  other: {
-    label: "Other",
-    color: "var(--chart-5)",
-  },
-} satisfies ChartConfig;
-
 export function SpendingDonutChart({
   householdReport,
   user,
 }: SpendingDonutChartProps) {
   const { userInfo } = useAuth();
-  console.log(userInfo);
 
-  // 表示用にデータの変換（円グラフ、各ユーザーの合計）
+  // ユーザーごとの合計値と全体の合計値を計算
   const viewData = useMemo(
     () => calculateExpenseTotals(householdReport),
     [householdReport]
   );
 
+  // 小カテゴリーごとの集計とチャートデータの生成
+  const { chartData, chartConfig } = useMemo(() => {
+    const categoryTotals = aggregateByCategory(householdReport);
+    return generateChartDataAndConfig(categoryTotals);
+  }, [householdReport]);
+
   // データが存在しない場合
-  if (!viewData) {
+  if (!viewData || chartData.length === 0) {
     return (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="text-center text-2xl font-bold">
@@ -101,8 +61,8 @@ export function SpendingDonutChart({
           />
           <Pie
             data={chartData}
-            dataKey="visitors"
-            nameKey="browser"
+            dataKey="amount"
+            nameKey="category"
             innerRadius={60}
           />
         </PieChart>
