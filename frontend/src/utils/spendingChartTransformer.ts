@@ -1,13 +1,14 @@
+import type { ChartConfig } from "@/components/ui/chart.tsx";
 import type {
-  ExpenseReportData,
-  CategoryWithPayments,
-} from "@/types/transaction.ts";
-import { ChartConfig } from "@/components/ui/chart.tsx";
-import {
   CategoryTotal,
-  ChartDataItem,
   CategoryTotalMapValue,
+  ChartDataItem,
 } from "@/types/summary.ts";
+import type {
+  CategoryGroupData,
+  ExpenseReportData,
+  SavedTransactionData,
+} from "@/types/transaction.ts";
 
 // 小カテゴリーごとの合計金額を計算
 export function aggregateByCategory(
@@ -18,27 +19,29 @@ export function aggregateByCategory(
   // 小カテゴリーの合計金額を格納するMap（中間データ）
   const categoryTotalsMap = new Map<string, CategoryTotalMapValue>();
 
-  Object.values(expenseReportData).forEach((categoryGroup) => {
+  (
+    Object.values(expenseReportData) as (CategoryGroupData | undefined)[]
+  ).forEach((categoryGroup) => {
     if (!categoryGroup) return;
 
-    (
-      Object.entries(categoryGroup.categories) as [
-        string,
-        CategoryWithPayments,
-      ][]
-    ).forEach(([categoryCode, category]) => {
-      const totalAmount = category.payments.reduce((sum, payment) => {
-        return sum + (payment.amount ?? 0);
-      }, 0);
+    Object.entries(categoryGroup.categories).forEach(
+      ([categoryCode, category]) => {
+        const totalAmount = category.payments.reduce(
+          (sum: number, payment: SavedTransactionData) => {
+            return sum + (payment.amount ?? 0);
+          },
+          0
+        );
 
-      // 値が0以上のカテゴリーのみを追加（0のカテゴリーは表示させない）
-      if (totalAmount > 0) {
-        categoryTotalsMap.set(categoryCode, {
-          name: category.category_name,
-          amount: totalAmount,
-        });
+        // 値が0以上のカテゴリーのみを追加（0のカテゴリーは表示させない）
+        if (totalAmount > 0) {
+          categoryTotalsMap.set(categoryCode, {
+            name: category.category_name,
+            amount: totalAmount,
+          });
+        }
       }
-    });
+    );
   });
 
   // Mapを配列に変換し、金額の降順でソート
@@ -93,6 +96,7 @@ export function generateChartDataAndConfig(categoryTotals: CategoryTotal[]): {
   // 円グラフのセグメントサイズを指定（amountの値に比例）
   const chartData: ChartDataItem[] = categoryTotals.map((item) => {
     const categoryKey = sanitizeCategoryKey(item.categoryCode);
+
     return {
       category: categoryKey,
       amount: item.amount,
@@ -112,6 +116,7 @@ export function generateChartDataAndConfig(categoryTotals: CategoryTotal[]): {
         label: item.categoryName,
         color: CHART_COLORS[colorIndex],
       };
+
       return config;
     }, {} as ChartConfig),
   };

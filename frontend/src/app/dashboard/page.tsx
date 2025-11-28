@@ -1,7 +1,7 @@
 "use client";
 
-import { SpendingManagementPage } from "@/components/dashboard/SpendingManagementPage";
-import { HouseholdManagementPage } from "@/components/dashboard/HouseholdManagementPage";
+import { HouseholdManagementPage } from "@/components/dashboard/HouseholdManagementPage.tsx";
+import { SpendingManagementPage } from "@/components/dashboard/SpendingManagementPage.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { useDateSelector } from "@/hooks/useDateSelector.tsx";

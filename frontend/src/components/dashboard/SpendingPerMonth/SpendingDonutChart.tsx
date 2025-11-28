@@ -6,12 +6,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import type { SpendingDonutChartProps } from "@/types/summary.ts";
 import { calculateExpenseTotals } from "@/utils/expenseReportTransformer.ts";
 import {
   aggregateByCategory,
   generateChartDataAndConfig,
 } from "@/utils/spendingChartTransformer.ts";
-import { SpendingDonutChartProps } from "@/types/summary.ts";
 
 export function SpendingDonutChart({
   householdReport,
@@ -28,6 +28,7 @@ export function SpendingDonutChart({
   // 円グラフ表示用のデータを生成
   const { chartData, chartConfig } = useMemo(() => {
     const categoryTotals = aggregateByCategory(householdReport);
+
     return generateChartDataAndConfig(categoryTotals);
   }, [householdReport]);
 

@@ -1,10 +1,10 @@
 import { MonthlyBarChart } from "@/components/dashboard/ExpenseGraph/MonthlyBarChart.tsx";
 import { YearlyBarChart } from "@/components/dashboard/ExpenseGraph/YearlyBarChart.tsx";
-import { SpendingBreakdownSection } from "@/components/dashboard/SpendingPerMonth/SpendingBreakdownSection";
+import { SpendingBreakdownSection } from "@/components/dashboard/SpendingPerMonth/SpendingBreakdownSection.tsx";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useExpenseReport } from "@/lib/swr.ts";
 import type { HouseholdManagementPageProps } from "@/types/summary.ts";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 
 export function HouseholdManagementPage({
   isAuth,
@@ -17,12 +17,11 @@ export function HouseholdManagementPage({
     monthlyAndYearlyDateSelector,
     isAuth
   );
-  const {
-    data: householdReport,
-    error: householdReportError,
-    isLoading: isHouseholdReportLoading,
-    mutate: householdMutate,
-  } = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
+  const { data: householdReport, mutate: householdMutate } = useExpenseReport(
+    user,
+    monthlyAndYearlyDateSelector,
+    isAuth
+  );
   const { userInfo } = useAuth();
 
   console.log(householdReport);
@@ -33,10 +32,8 @@ export function HouseholdManagementPage({
       <div className="lg:col-span-2 space-y-2">
         <SpendingBreakdownSection
           userInfo={userInfo}
-          isAuth={isAuth}
           user={user}
           monthlyAndYearlyDateSelector={monthlyAndYearlyDateSelector}
-          monthlyDateSelector={monthlyDateSelector}
           householdReport={householdReport?.data ?? {}}
           onTransactionUpdate={() => void householdMutate()}
         />

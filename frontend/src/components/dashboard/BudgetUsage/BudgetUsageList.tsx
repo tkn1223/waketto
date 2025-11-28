@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button.tsx";
-import { formatToMan } from "@/types/displayFormat.ts";
 import type { BudgetUsageResponse } from "@/types/budget.ts";
+import { formatToMan } from "@/types/displayFormat.ts";
 
 export function BudgetUsageList({
   budgetUsage,

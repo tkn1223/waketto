@@ -1,3 +1,5 @@
+import { SpendingDetailList } from "@/components/dashboard/SpendingPerMonth/SpendingDetailList.tsx";
+import { SpendingDonutChart } from "@/components/dashboard/SpendingPerMonth/SpendingDonutChart.tsx";
 import {
   Card,
   CardContent,
@@ -5,24 +7,20 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
-
-import { SpendingDetailList } from "@/components/dashboard/SpendingPerMonth/SpendingDetailList.tsx";
-import { SpendingDonutChart } from "@/components/dashboard/SpendingPerMonth/SpendingDonutChart.tsx";
-import { SpendingBreakdownSectionProps } from "@/types/summary.ts";
+import type { SpendingBreakdownSectionProps } from "@/types/summary.ts";
+import type { CategoryGroupData } from "@/types/transaction.ts";
 
 export function SpendingBreakdownSection({
   userInfo,
-  isAuth,
   user,
   monthlyAndYearlyDateSelector,
-  monthlyDateSelector,
   householdReport,
   onTransactionUpdate,
 }: SpendingBreakdownSectionProps) {
   // householdReportのデータの有無を確認
-  const isEmptyReport = Object.values(householdReport).every(
-    (group) => Object.values(group.categories).length === 0
-  );
+  const isEmptyReport = (
+    Object.values(householdReport) as (CategoryGroupData | undefined)[]
+  ).every((group) => group && Object.values(group.categories).length === 0);
 
   return (
     <Card className="flex flex-col">

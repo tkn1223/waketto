@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { SpendingDetailRow } from "@/components/dashboard/SpendingPerMonth/SpendingDetailRow.tsx";
+import type { SpendingDetailListProps } from "@/types/summary.ts";
 import { groupPaymentsByUser } from "@/utils/spendingDetailTransformer.ts";
-import { SpendingDetailListProps } from "@/types/summary.ts";
 
 export function SpendingDetailList({
   householdReport,
