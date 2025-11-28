@@ -31,30 +31,28 @@ export interface SpendingBreakdownSectionProps {
   onTransactionUpdate: () => void;
 }
 
-// カテゴリー毎の合計
-export interface CategoryTotal {
-  [categoryCode: string]: number;
-}
-
-// user毎の合計
-export interface UserTotal {
-  [userId: string]: number;
-}
-
-// user毎の明細レコード
-export interface UserRecord {
-  [userId: string]: TransactionData[];
-}
-
-// Props
-export interface ExpenseReportTransformProps {
-  CategoryTotals: CategoryTotal;
-  UserTotals: UserTotal;
-  UserRecords: UserRecord;
-}
-
 // ユーザーごとの合計値と全体の合計値を格納する型
 export interface ExpenseReportTotals {
   totalAmount: number;
   userTotals: Record<string, number>;
+}
+
+// 円グラフ用のデータ形式
+export interface ChartDataItem {
+  category: string;
+  amount: number;
+  fill: string;
+}
+
+// 小カテゴリーごとの集計結果
+export interface CategoryTotal {
+  categoryCode: string;
+  categoryName: string;
+  amount: number;
+}
+
+// カテゴリー合計のMapに格納する値の型
+export interface CategoryTotalMapValue {
+  name: string;
+  amount: number;
 }
