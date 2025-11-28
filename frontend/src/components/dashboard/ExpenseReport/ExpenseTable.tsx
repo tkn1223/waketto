@@ -16,7 +16,7 @@ export function ExpenseTable({
   expenseReportError,
   expenseMutate,
   handleUpdte,
-  expenseDateSelector,
+  monthlyAndYearlyDateSelector,
 }: ExpenseTableProps) {
   const { userInfo } = useAuth();
 
@@ -25,7 +25,10 @@ export function ExpenseTable({
       <Card>
         <CardHeader className="flex justify-between">
           <CardTitle>{userInfo?.name} の支出管理表</CardTitle>
-          <YearMonthSelector {...expenseDateSelector} showMonth={true} />
+          <YearMonthSelector
+            {...monthlyAndYearlyDateSelector}
+            showMonth={true}
+          />
         </CardHeader>
         <CardContent>
           {isExpenseReportLoading ? (

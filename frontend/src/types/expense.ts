@@ -21,5 +21,5 @@ export interface ExpenseTableProps {
   expenseReportError: Error | undefined;
   expenseMutate: () => void;
   handleUpdte: () => void;
-  expenseDateSelector: DateSelector;
+  monthlyAndYearlyDateSelector: DateSelector;
 }

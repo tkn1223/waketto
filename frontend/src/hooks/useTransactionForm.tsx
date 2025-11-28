@@ -67,7 +67,7 @@ export const useTransactionForm = ({
 
   useEffect(() => {
     setTransactionData(createTransactionData(transactionPatch));
-  }, [transactionPatch]); // createTransactionData を依存関係から除外
+  }, [transactionPatch, createTransactionData]);
 
   const handleAmountChange = (amount: number) => {
     setTransactionData((prev) => ({ ...prev, amount }));

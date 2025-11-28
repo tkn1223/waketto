@@ -34,6 +34,11 @@ export interface SavedTransactionData {
   category_group_code?: string;
 }
 
+// 月別支出表示用の取引明細型（カテゴリー名を含む）
+export interface PaymentWithCategory extends SavedTransactionData {
+  category_name: string;
+}
+
 // 支出管理表のAPIレスポンス型定義
 export interface ExpenseReportResponse {
   status: boolean;

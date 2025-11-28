@@ -43,7 +43,7 @@ export function TransactionRow({
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value={category.category_name} className="space-y-1.5">
-        <AccordionTrigger className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none hover:no-underline cursor-pointer">
+        <AccordionTrigger className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-100 hover:border-blue-400 hover:shadow-none hover:no-underline cursor-pointer">
           <span className="col-span-4">{category.category_name}</span>
           <span className="col-span-7 text-right">
             {totalAmount.toLocaleString()} 円
@@ -59,7 +59,7 @@ export function TransactionRow({
               onClick={() => {
                 handleOpneDialog(payment);
               }}
-              className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none cursor-pointer w-full text-left"
+              className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-100 hover:border-blue-400 hover:shadow-none cursor-pointer w-full text-left"
             >
               <span className="col-span-3 text-sm">
                 {formatDate(payment.date ?? Date.now().toString())}
