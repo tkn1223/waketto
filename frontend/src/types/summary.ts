@@ -31,6 +31,12 @@ export interface SpendingBreakdownSectionProps {
   onTransactionUpdate: () => void;
 }
 
+// 円グラフ表示用のデータを生成するためのprops型定義
+export interface SpendingDonutChartProps {
+  householdReport: ExpenseReportData;
+  user: UserMode;
+}
+
 // ユーザーごとの合計値と全体の合計値を格納する型
 export interface ExpenseReportTotals {
   totalAmount: number;
@@ -55,4 +61,12 @@ export interface CategoryTotal {
 export interface CategoryTotalMapValue {
   name: string;
   amount: number;
+}
+
+// 支出の内訳詳細リストのprops型定義
+export interface SpendingDetailListProps {
+  householdReport: ExpenseReportData;
+  user: UserMode;
+  userInfo: UserInfo;
+  onTransactionUpdate: () => void;
 }

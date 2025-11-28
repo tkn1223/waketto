@@ -1,91 +1,104 @@
-import { useCallback, useMemo, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area.tsx";
-import { formatDate } from "@/types/displayFormat.ts";
-import type { SavedTransactionData } from "@/types/transaction.ts";
-import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
+import { useMemo } from "react";
+import { SpendingDetailRow } from "@/components/dashboard/SpendingPerMonth/SpendingDetailRow.tsx";
 import { groupPaymentsByUser } from "@/utils/spendingDetailTransformer.ts";
-import type { ExpenseReportData } from "@/types/transaction.ts";
-
-interface SpendingDetailListProps {
-  householdReport: ExpenseReportData;
-  onTransactionUpdate: () => void;
-  filterByUserId?: string; // 特定のユーザーIDでフィルタリング（オプション）
-}
+import { SpendingDetailListProps } from "@/types/summary.ts";
 
 export function SpendingDetailList({
   householdReport,
+  user,
+  userInfo,
   onTransactionUpdate,
-  filterByUserId,
 }: SpendingDetailListProps) {
-  const [selectedPayment, setSelectedPayment] =
-    useState<SavedTransactionData | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // 支払った人ごとにグループ化
+  const paymentsByUser = useMemo(
+    () => groupPaymentsByUser(householdReport),
+    [householdReport]
+  );
 
-  // 支払った人ごとにグループ化し、指定されたユーザーIDの配列を取得
-  const allPayments = useMemo(() => {
-    const paymentsByUser = groupPaymentsByUser(householdReport);
+  // 支払った人の一覧を取得（データから実際に支払いがある人のIDを取得）
+  const payerIds = useMemo(() => {
+    const userIds = Object.keys(paymentsByUser);
 
-    // 特定のユーザーIDが指定されている場合、そのユーザーの配列を返す
-    if (filterByUserId) {
-      return paymentsByUser[filterByUserId] || [];
+    // 個人モードの場合、自分のIDのみ
+    if (user === "alone") {
+      return userIds.filter((id) => id === userInfo.id);
     }
 
-    // 指定されていない場合、すべてのユーザーの配列を結合（個人モード用）
-    return Object.values(paymentsByUser).flat();
-  }, [householdReport, filterByUserId]);
+    // 共通モードの場合、自分とパートナーのIDを優先順位で並べる
+    const sortedIds: string[] = [];
 
-  const handleOpenDialog = useCallback((payment: SavedTransactionData) => {
-    setSelectedPayment(payment);
-    setIsDialogOpen(true);
-  }, []);
+    // 自分のIDを最初に
+    if (userIds.includes(userInfo.id)) {
+      sortedIds.push(userInfo.id);
+    }
 
-  const handleCloseDialog = useCallback(() => {
-    setIsDialogOpen(false);
-    setSelectedPayment(null);
-  }, []);
+    // パートナーのIDを次に（partner_user_idまたはcouple_idで代用）
+    const partnerId = userInfo.partner_user_id || userInfo.couple_id;
+    if (
+      partnerId &&
+      userIds.includes(partnerId) &&
+      !sortedIds.includes(partnerId)
+    ) {
+      sortedIds.push(partnerId);
+    }
 
-  const handleUpdate = useCallback(() => {
-    onTransactionUpdate();
-  }, [onTransactionUpdate]);
+    // その他のID（もしあれば）
+    userIds.forEach((id) => {
+      if (!sortedIds.includes(id)) {
+        sortedIds.push(id);
+      }
+    });
+
+    return sortedIds;
+  }, [paymentsByUser, userInfo, user]);
+
+  // 支払った人の名前を取得する関数
+  const getPayerName = (payerId: string): string => {
+    if (payerId === userInfo.id) {
+      return userInfo.name;
+    }
+    // パートナーの場合
+    if (
+      payerId === userInfo.partner_user_id ||
+      payerId === userInfo.couple_id
+    ) {
+      return userInfo.partner_user_id || "パートナー";
+    }
+    // その他の場合（IDをそのまま表示）
+    return payerId;
+  };
 
   return (
     <>
-      <ScrollArea className="h-[180px] w-full">
-        <div className="space-y-2 pr-3">
-          {allPayments.length > 0 ? (
-            allPayments.map((payment, index) => (
-              <button
-                key={`payment-${payment.id ?? index}`}
-                type="button"
-                onClick={() => {
-                  handleOpenDialog(payment);
-                }}
-                className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-200 hover:border-gray-200 hover:shadow-none cursor-pointer w-full text-left"
-              >
-                <span className="col-span-3 text-sm">
-                  {formatDate(payment.date ?? Date.now().toString())}
-                </span>
-                <span className="col-span-6 text-sm">
-                  {payment.shop_name ?? "未設定"}
-                </span>
-                <span className="col-span-3 text-right">
-                  {payment.amount?.toLocaleString()} 円
-                </span>
-              </button>
-            ))
-          ) : (
-            <div className="text-sm text-gray-500">明細が未登録です</div>
-          )}
+      {user === "common" ? (
+        // 共通モード：支払った人ごとに分けて表示
+        payerIds.map((payerId) => {
+          const payerPayments = paymentsByUser[payerId] || [];
+          return (
+            <div key={payerId} className="space-y-2">
+              <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
+                {getPayerName(payerId)}
+              </h4>
+              <SpendingDetailRow
+                householdReport={householdReport}
+                onTransactionUpdate={onTransactionUpdate}
+                filterByUserId={payerId}
+              />
+            </div>
+          );
+        })
+      ) : (
+        // 個人モード：自分のみ表示
+        <div className="space-y-2">
+          <h4 className="text-sm font-medium text-gray-700 border-b pb-1">
+            {userInfo.name}
+          </h4>
+          <SpendingDetailRow
+            householdReport={householdReport}
+            onTransactionUpdate={onTransactionUpdate}
+            filterByUserId={userInfo.id}
+          />
         </div>
-      </ScrollArea>
-
-      {selectedPayment && (
-        <TransactionDetailDialog
-          payment={selectedPayment}
-          isOpen={isDialogOpen}
-          onClose={handleCloseDialog}
-          onUpdate={handleUpdate}
-        />
       )}
     </>
   );

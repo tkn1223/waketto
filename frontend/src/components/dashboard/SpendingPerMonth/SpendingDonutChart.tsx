@@ -6,18 +6,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import type { ExpenseReportData } from "@/types/transaction.ts";
 import { calculateExpenseTotals } from "@/utils/expenseReportTransformer.ts";
 import {
   aggregateByCategory,
   generateChartDataAndConfig,
 } from "@/utils/spendingChartTransformer.ts";
-import { UserMode } from "@/types/viewmode.ts";
-
-interface SpendingDonutChartProps {
-  householdReport: ExpenseReportData;
-  user: UserMode;
-}
+import { SpendingDonutChartProps } from "@/types/summary.ts";
 
 export function SpendingDonutChart({
   householdReport,
@@ -31,22 +25,11 @@ export function SpendingDonutChart({
     [householdReport]
   );
 
-  // 小カテゴリーごとの集計とチャートデータの生成
+  // 円グラフ表示用のデータを生成
   const { chartData, chartConfig } = useMemo(() => {
     const categoryTotals = aggregateByCategory(householdReport);
     return generateChartDataAndConfig(categoryTotals);
   }, [householdReport]);
-
-  // データが存在しない場合
-  if (!viewData || chartData.length === 0) {
-    return (
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="text-center text-2xl font-bold">
-          データが存在しません
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -74,7 +57,7 @@ export function SpendingDonutChart({
             <tr>
               <td className="text-2xl py-2">合計</td>
               <td className="text-4xl text-left py-2">
-                ¥{viewData.totalAmount ?? "-"}
+                ¥{viewData?.totalAmount ?? "-"}
               </td>
             </tr>
             <tr>
@@ -82,7 +65,7 @@ export function SpendingDonutChart({
                 {userInfo.name ?? "ユーザー"} の負担
               </td>
               <td className="text-4xl text-left py-2">
-                ¥{viewData.userTotals[userInfo.id]}
+                ¥{viewData?.userTotals[userInfo.id] ?? "-"}
               </td>
             </tr>
             {user === "common" && userInfo.partner_user_id && (
@@ -91,7 +74,7 @@ export function SpendingDonutChart({
                   {userInfo.partner_user_id ?? "パートナー"}の負担
                 </td>
                 <td className="text-4xl text-left py-2">
-                  ¥{viewData.userTotals[userInfo.partner_user_id] ?? "-"}
+                  ¥{viewData?.userTotals[userInfo.partner_user_id] ?? "-"}
                 </td>
               </tr>
             )}
