@@ -42,7 +42,7 @@ export function SpendingBreakdownSection({
           <SpendingDonutChart householdReport={householdReport} user={user} />
           {/* 支出の内訳詳細リスト */}
           <div className="space-y-4">
-            <h3 className="font-bold pb-1">１カ月の明細</h3>
+            <h3 className="font-bold pb-1">1カ月の明細</h3>
             <SpendingDetailList
               householdReport={householdReport}
               user={user}

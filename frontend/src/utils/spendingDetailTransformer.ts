@@ -2,20 +2,19 @@ import type {
   ExpenseReportData,
   SavedTransactionData,
   CategoryWithPayments,
+  PaymentWithCategory,
 } from "@/types/transaction.ts";
 
 /**
  * 支払った人ごとにpaymentsをグループ化する
- * 個人モード・共有モードの両方に対応（filterByUserIdでフィルタリング可能）
- * @param expenseReportData - 支出レポートデータ
- * @returns 支払った人のIDをキーとした、支払い明細の配列のマップ
+ * カテゴリー名を含むPaymentWithCategory[]を返す
  */
 export function groupPaymentsByUser(
   expenseReportData: ExpenseReportData | undefined
-): Record<string, SavedTransactionData[]> {
+): Record<string, PaymentWithCategory[]> {
   if (!expenseReportData) return {};
 
-  const paymentsByUser: Record<string, SavedTransactionData[]> = {};
+  const paymentsByUser: Record<string, PaymentWithCategory[]> = {};
 
   // すべてのカテゴリーグループを走査
   Object.values(expenseReportData).forEach((categoryGroup) => {
@@ -35,7 +34,11 @@ export function groupPaymentsByUser(
           if (!paymentsByUser[userId]) {
             paymentsByUser[userId] = [];
           }
-          paymentsByUser[userId].push(payment);
+          // category_nameを付与してPaymentWithCategoryとして追加
+          paymentsByUser[userId].push({
+            ...payment,
+            category_name: category.category_name,
+          });
         });
       }
     );
