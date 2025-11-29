@@ -1,16 +1,15 @@
-import { MonthlyBarChart } from "@/components/dashboard/ExpenseGraph/MonthlyBarChart.tsx";
-import { YearlyBarChart } from "@/components/dashboard/ExpenseGraph/YearlyBarChart.tsx";
 import { SpendingBreakdownSection } from "@/components/dashboard/SpendingPerMonth/SpendingBreakdownSection.tsx";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useExpenseReport } from "@/lib/swr.ts";
 import type { HouseholdManagementPageProps } from "@/types/summary.ts";
+import { TrendsSection } from "@/components/dashboard/ExpenseGraph/TrendsSection.tsx";
 
 export function HouseholdManagementPage({
   isAuth,
   user,
   monthlyAndYearlyDateSelector,
-  monthlyDateSelector,
+  yearlyDateSelector,
 }: HouseholdManagementPageProps) {
   const { mutate } = useExpenseReport(
     user,
@@ -43,11 +42,8 @@ export function HouseholdManagementPage({
         <TransactionDetail onUpdate={() => void mutate()} />
       </div>
       {/* 支出の推移グラフ */}
-      <div className="col-span-2">
-        <MonthlyBarChart />
-      </div>
-      <div className="col-span-1">
-        <YearlyBarChart />
+      <div className="lg:col-span-3">
+        <TrendsSection yearlyDateSelector={yearlyDateSelector} />
       </div>
     </>
   );

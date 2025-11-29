@@ -9,7 +9,7 @@ export function SpendingManagementPage({
   isAuth,
   user,
   monthlyAndYearlyDateSelector,
-  monthlyDateSelector,
+  yearlyDateSelector,
 }: SpendingManagementPageProps) {
   const {
     data: expenseReport,
@@ -19,7 +19,7 @@ export function SpendingManagementPage({
   } = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
   const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
     user,
-    monthlyDateSelector,
+    yearlyDateSelector,
     isAuth
   );
 
@@ -49,7 +49,7 @@ export function SpendingManagementPage({
       <div className="order-3 lg:order-3 sm:col-span-3 lg:col-span-3 space-y-3">
         <div className="flex justify-between">
           <span className="font-medium text-lg">予算の消化状況</span>
-          <YearMonthSelector {...monthlyDateSelector} showMonth={false} />
+          <YearMonthSelector {...yearlyDateSelector} showMonth={false} />
         </div>
         <BudgetUsageList budgetUsage={budgetUsage} />
       </div>

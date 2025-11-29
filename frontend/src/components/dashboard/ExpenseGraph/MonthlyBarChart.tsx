@@ -10,8 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import type {
-  ChartConfig} from "@/components/ui/chart.tsx";
+import type { ChartConfig } from "@/components/ui/chart.tsx";
 import {
   ChartContainer,
   ChartLegend,
