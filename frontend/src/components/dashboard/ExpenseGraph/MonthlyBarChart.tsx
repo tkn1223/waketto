@@ -5,8 +5,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart.tsx";
-import { transformTrendsBarChartData } from "@/utils/TrendsBarChartTransformer.ts";
 import type { BudgetUsageResponse } from "@/types/budget.ts";
+import { transformTrendsBarChartData } from "@/utils/TrendsBarChartTransformer.ts";
 
 export function MonthlyBarChart({
   TrendsReport,

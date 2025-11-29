@@ -1,9 +1,9 @@
+import { TrendsSection } from "@/components/dashboard/ExpenseGraph/TrendsSection.tsx";
 import { SpendingBreakdownSection } from "@/components/dashboard/SpendingPerMonth/SpendingBreakdownSection.tsx";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import { useExpenseReport, useBudgetUsage } from "@/lib/swr.ts";
+import { useBudgetUsage,useExpenseReport } from "@/lib/swr.ts";
 import type { HouseholdManagementPageProps } from "@/types/summary.ts";
-import { TrendsSection } from "@/components/dashboard/ExpenseGraph/TrendsSection.tsx";
 
 export function HouseholdManagementPage({
   isAuth,

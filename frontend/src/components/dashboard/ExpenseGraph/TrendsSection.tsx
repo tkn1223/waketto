@@ -1,13 +1,13 @@
 import { MonthlyBarChart } from "@/components/dashboard/ExpenseGraph/MonthlyBarChart.tsx";
-import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx";
-import type { DateSelector } from "@/types/expense.ts";
+import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import type { BudgetUsageResponse } from "@/types/budget.ts";
+import type { DateSelector } from "@/types/expense.ts";
 
 export interface TrendsSectionProps {
   yearlyDateSelector: DateSelector;

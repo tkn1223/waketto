@@ -1,11 +1,11 @@
-import { ChartConfig } from "@/components/ui/chart";
-import { BudgetUsageResponse } from "@/types/budget.ts";
+import type { ChartConfig } from "@/components/ui/chart";
+import type { BudgetUsageResponse } from "@/types/budget.ts";
 
-type MonthlyAmountData = { month: number; [key: string]: number | string };
-type CategoryMonthlyData = {
+interface MonthlyAmountData { month: number; [key: string]: number | string }
+interface CategoryMonthlyData {
   category: string;
   monthlyAmounts: Map<number, number>;
-};
+}
 
 const CHART_COLORS = [
   "var(--chart-1)",
@@ -28,7 +28,7 @@ const CHART_COLORS = [
 export function transformTrendsBarChartData(
   TrendsBarChartData: BudgetUsageResponse | undefined
 ): {
-  chartData: Array<MonthlyAmountData>;
+  chartData: MonthlyAmountData[];
   chartConfig: ChartConfig;
 } {
   if (!TrendsBarChartData) {
@@ -89,7 +89,7 @@ function aggregateCategoryMonthlyData(
 
 function generateChartData(
   categoryMonthlyData: Map<string, CategoryMonthlyData>
-): Array<MonthlyAmountData> {
+): MonthlyAmountData[] {
   // 月ごとの合計金額を計算（チャート表示）
   const chartData = Array.from({ length: 12 }, (_, i) => {
     const month = i + 1;
