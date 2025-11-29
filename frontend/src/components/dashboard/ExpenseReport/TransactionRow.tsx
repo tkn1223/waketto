@@ -36,10 +36,6 @@ export function TransactionRow({
     setSelectedPayment(null);
   }, []); // 依存関係なし
 
-  const handleUpdate = useCallback(() => {
-    onTransactionUpdate();
-  }, [onTransactionUpdate]); // 依存関係を明示
-
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value={category.category_name} className="space-y-1.5">
@@ -79,7 +75,7 @@ export function TransactionRow({
             payment={selectedPayment}
             isOpen={isDialogOpen}
             onClose={handleCloseDialog}
-            onUpdate={handleUpdate}
+            onUpdate={onTransactionUpdate}
           />
         )}
       </AccordionItem>

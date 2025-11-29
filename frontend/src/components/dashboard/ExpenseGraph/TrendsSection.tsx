@@ -1,5 +1,4 @@
 import { MonthlyBarChart } from "@/components/dashboard/ExpenseGraph/MonthlyBarChart.tsx";
-import { YearlyBarChart } from "@/components/dashboard/ExpenseGraph/YearlyBarChart.tsx";
 import { YearMonthSelector } from "@/components/ui/YearMonthSelector.tsx";
 import {
   Card,
@@ -8,12 +7,17 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx";
 import type { DateSelector } from "@/types/expense.ts";
+import type { BudgetUsageResponse } from "@/types/budget.ts";
 
 export interface TrendsSectionProps {
   yearlyDateSelector: DateSelector;
+  TrendsReport: BudgetUsageResponse;
 }
 
-export function TrendsSection({ yearlyDateSelector }: TrendsSectionProps) {
+export function TrendsSection({
+  yearlyDateSelector,
+  TrendsReport,
+}: TrendsSectionProps) {
   return (
     <Card>
       <CardHeader className="flex justify-between">
@@ -21,14 +25,7 @@ export function TrendsSection({ yearlyDateSelector }: TrendsSectionProps) {
         <YearMonthSelector {...yearlyDateSelector} showMonth={false} />
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-3 gap-6">
-          <div className="col-span-2">
-            <MonthlyBarChart />
-          </div>
-          <div className="col-span-1">
-            <YearlyBarChart />
-          </div>
-        </div>
+        <MonthlyBarChart TrendsReport={TrendsReport} />
       </CardContent>
     </Card>
   );
