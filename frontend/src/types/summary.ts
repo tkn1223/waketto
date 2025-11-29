@@ -8,7 +8,7 @@ export interface SpendingManagementPageProps {
   isAuth: boolean;
   user: UserMode;
   monthlyAndYearlyDateSelector: DateSelector;
-  monthlyDateSelector: DateSelector;
+  yearlyDateSelector: DateSelector;
 }
 
 // 家計簿ページのprops型定義
@@ -16,7 +16,7 @@ export interface HouseholdManagementPageProps {
   isAuth: boolean;
   user: UserMode;
   monthlyAndYearlyDateSelector: DateSelector;
-  monthlyDateSelector: DateSelector;
+  yearlyDateSelector: DateSelector;
 }
 
 // 支出の内訳カードのprops型定義

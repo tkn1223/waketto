@@ -10,7 +10,7 @@ export default function DashboardPage() {
   const { userInfo, isAuth, isLoading } = useAuth();
   const { user, finance } = useViewMode();
   const MonthlyAndYearlyDateSelector = useDateSelector(); // 支出管理および家計簿の年月セレクタ
-  const MonthlyDateSelector = useDateSelector(); // 予算消化率の年月セレクタ
+  const YearlyDateSelector = useDateSelector(); // 予算消化率の年月セレクタ
 
   // リダイレクト処理はAuthContextで実施
 
@@ -33,7 +33,7 @@ export default function DashboardPage() {
             isAuth={isAuth}
             user={user}
             monthlyAndYearlyDateSelector={MonthlyAndYearlyDateSelector}
-            monthlyDateSelector={MonthlyDateSelector}
+            yearlyDateSelector={YearlyDateSelector}
           />
         )}
         {finance === "household" && (
@@ -41,7 +41,7 @@ export default function DashboardPage() {
             isAuth={isAuth}
             user={user}
             monthlyAndYearlyDateSelector={MonthlyAndYearlyDateSelector}
-            monthlyDateSelector={MonthlyDateSelector}
+            yearlyDateSelector={YearlyDateSelector}
           />
         )}
       </div>
