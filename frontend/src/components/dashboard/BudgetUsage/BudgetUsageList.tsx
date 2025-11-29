@@ -31,50 +31,56 @@ export function BudgetUsageList({
 
   return (
     <>
-      {budgetUsage.data.map((item, i) => (
-        <div key={`budget-usage-${i}`} className="p-3 border border-gray-300">
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <div className="flex items-end justify-center">
-              <span className="text-gray-500">項目：</span>
-              <span className="text-lg font-medium">{item.category.name}</span>
+      {budgetUsage.data
+        .filter(
+          (item) => item.period_type === "yearly" && item.budget_amount > 0
+        )
+        .map((item, i) => (
+          <div key={`budget-usage-${i}`} className="p-3 border border-gray-300">
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="flex items-end justify-center">
+                <span className="text-gray-500">項目：</span>
+                <span className="text-lg font-medium">
+                  {item.category.name}
+                </span>
+              </div>
+              <div className="flex items-end justify-center">
+                <span className="text-gray-500">予算：</span>
+                <span className="text-lg font-medium">
+                  {formatToMan(item.budget_amount)}
+                </span>
+              </div>
+              <div className="flex items-end justify-center">
+                <span className="text-gray-500">残り：</span>
+                <span className="text-lg font-medium">
+                  {formatToMan(item.residue_budget)}
+                </span>
+              </div>
             </div>
-            <div className="flex items-end justify-center">
-              <span className="text-gray-500">予算：</span>
-              <span className="text-lg font-medium">
-                {formatToMan(item.budget_amount)}
-              </span>
-            </div>
-            <div className="flex items-end justify-center">
-              <span className="text-gray-500">残り：</span>
-              <span className="text-lg font-medium">
-                {formatToMan(item.residue_budget)}
-              </span>
-            </div>
-          </div>
 
-          <div className="grid grid-cols-12 gap-1">
-            {Array.from({ length: 12 }, (_, i) => (
-              <span
-                key={`month-lavel-${i}`}
-                className="p-2 text-x flex items-center justify-center bg-gray-200 border border-gray-200"
-              >
-                {i + 1} 月
-              </span>
-            ))}
-          </div>
+            <div className="grid grid-cols-12 gap-1">
+              {Array.from({ length: 12 }, (_, i) => (
+                <span
+                  key={`month-lavel-${i}`}
+                  className="p-2 text-x flex items-center justify-center bg-gray-200 border border-gray-200"
+                >
+                  {i + 1} 月
+                </span>
+              ))}
+            </div>
 
-          <div className="grid grid-cols-12 gap-1">
-            {item.monthly_data.map((monthData, i) => (
-              <span
-                key={`month-data-${i}`}
-                className="p-2 font-medium flex items-center justify-center border-b border-r border-l border-gray-200"
-              >
-                {monthData.amount.toLocaleString()} 円
-              </span>
-            ))}
+            <div className="grid grid-cols-12 gap-1">
+              {item.monthly_data.map((monthData, i) => (
+                <span
+                  key={`month-data-${i}`}
+                  className="p-2 font-medium flex items-center justify-center border-b border-r border-l border-gray-200"
+                >
+                  {monthData.amount.toLocaleString()} 円
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
     </>
   );
 }

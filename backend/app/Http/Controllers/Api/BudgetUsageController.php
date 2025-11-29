@@ -106,8 +106,6 @@ class BudgetUsageController extends Controller
 
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
     {
-        Log::info('更新処理開始');
-
         // バリデーションチェック
         $validator = Validator::make($request->all(), [
             'categories' => 'required|array|min:1',
@@ -203,8 +201,6 @@ class BudgetUsageController extends Controller
     {
         $query = Budget::with(['category:id,name,code'])
             ->select('id', 'amount', 'category_id', 'period_type');
-        
-        Log::info($query->get()->toArray());
 
         return $couple_id
             ? $query->where('couple_id', $couple_id)->get()
@@ -256,6 +252,7 @@ class BudgetUsageController extends Controller
             return [
                 'id' => $budgetItem->id,
                 'category' => $budgetItem->category,
+                'period_type' => $budgetItem->period_type,
                 'budget_amount' => $budgetItem->amount,
                 'monthly_data' => $monthlyData,
                 'residue_budget' => $residueBudget,

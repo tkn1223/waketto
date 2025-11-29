@@ -65,6 +65,7 @@ export interface BudgetUsageResponse {
     id: number;
     category: Category;
     budget_amount: number;
+    period_type: "monthly" | "yearly";
     monthly_data: {
       month: number;
       category_id: number;
