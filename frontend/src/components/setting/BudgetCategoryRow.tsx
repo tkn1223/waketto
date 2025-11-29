@@ -23,16 +23,6 @@ export function BudgetCategoryRow({
           <span className="w-1/3">{category.name}</span>
           <div className="flex items-center justify-end gap-4 w-2/3">
             <div className="flex justify-end gap-1 w-1/2">
-              <Input
-                className="w-1/4 px-0.5 py-0.5 text-center hover:border-blue-400 hover:border-1"
-                type="number"
-                min={1}
-                max={12}
-                value={category.period}
-                onChange={(e) => {
-                  onUpdate(category.code, "period", Number(e.target.value));
-                }}
-              />
               <Select
                 value={category.periodType}
                 onValueChange={(value) => {
@@ -48,8 +38,8 @@ export function BudgetCategoryRow({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="monthly">カ月</SelectItem>
-                    <SelectItem value="yearly">年</SelectItem>
+                    <SelectItem value="monthly">1カ月</SelectItem>
+                    <SelectItem value="yearly">1年</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

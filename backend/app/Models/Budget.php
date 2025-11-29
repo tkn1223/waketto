@@ -35,7 +35,7 @@ class Budget extends Model
                     'recorded_by_user_id' => $userId,
                     'couple_id' => $couple_id,
                     'category_id' => $categoryId,
-                    'period' => $category['period'],
+                    'period' => 1,
                     'period_type' => $category['periodType'],
                     'amount' => $category['amount'] ?? 0,
                 ]);
@@ -45,7 +45,7 @@ class Budget extends Model
                 $budgetRecord = $budgetData->where('category_id', $categoryId)->first();
                 // 予算設定を更新
                 $budgetRecord->update([
-                    'period' => $category['period'],
+                    'period' => 1,
                     'period_type' => $category['periodType'],
                     'amount' => $category['amount'] ?? 0,
                 ]);

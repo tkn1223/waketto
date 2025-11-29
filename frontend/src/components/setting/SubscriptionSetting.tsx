@@ -80,8 +80,8 @@ export function SubscriptionSetting({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="monthly">カ月</SelectItem>
-                    <SelectItem value="yearly">年</SelectItem>
+                    <SelectItem value="monthly">1カ月</SelectItem>
+                    <SelectItem value="yearly">1年</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>

@@ -27,6 +27,8 @@ export function BudgetUsageList({
     );
   }
 
+  console.log(budgetUsage.data);
+
   return (
     <>
       {budgetUsage.data.map((item, i) => (
