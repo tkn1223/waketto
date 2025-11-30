@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Couple;
 use App\Models\Budget;
+use App\Models\Couple;
 use App\Models\Payment;
 use App\Models\Subscription;
+use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SettingController extends Controller
 {
@@ -95,16 +95,16 @@ class SettingController extends Controller
         $user = $request->attributes->get('auth_user');
         $coupleId = $user->couple_id;
         $partner = User::where('couple_id', $coupleId)
-            ->where('id', '!=', $user->id)
+            ->where('id', '! =', $user->id)
             ->first();
-        
+
         if (! $partner) {
             return response()->json([
                 'status' => false,
                 'message' => 'パートナーが見つかりません',
             ], 404);
         }
-        
+
         try {
             DB::beginTransaction();
 

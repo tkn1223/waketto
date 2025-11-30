@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext.tsx";
 import { CircleQuestionMark } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
@@ -14,13 +13,14 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { ResultDialog } from "@/components/ui/result-dialog.tsx";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
-import { ResultDialog } from "@/components/ui/result-dialog.tsx";
 import { postPartnerReset } from "@/lib/api.ts";
 
 export function UserInfoEdit() {
@@ -149,7 +149,7 @@ export function UserInfoEdit() {
       <ResultDialog
         isOpen={isDialogOpen}
         onClose={handleCloseDialog}
-        onAccept={handlePartnerReset}
+        onAccept={() => void handlePartnerReset()}
         title="パートナー情報を解除しますか？"
         content={
           <>
