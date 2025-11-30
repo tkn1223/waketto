@@ -95,7 +95,7 @@ class SettingController extends Controller
         $user = $request->attributes->get('auth_user');
         $coupleId = $user->couple_id;
         $partner = User::where('couple_id', $coupleId)
-            ->where('id', '! =', $user->id)
+            ->where('id', '!=', $user->id)
             ->first();
 
         if (! $partner) {

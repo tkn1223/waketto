@@ -20,10 +20,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
+import { useViewMode } from "@/contexts/ViewModeContext.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
 import { postPartnerReset } from "@/lib/api.ts";
 
 export function UserInfoEdit() {
+  const { refreshUserInfo } = useAuth();
+  const { setUser } = useViewMode();
   const {
     userInfo,
     userName,
@@ -33,7 +36,6 @@ export function UserInfoEdit() {
     handleUserInfoSave,
   } = useSettingForm();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { refreshUserInfo } = useAuth();
 
   const handleOpenResultDialog = () => {
     setIsDialogOpen(true);
@@ -49,9 +51,10 @@ export function UserInfoEdit() {
 
       if (response.status) {
         await refreshUserInfo();
-        toast.success("パートナーを解除しました");
+        setUser("alone");
         handlePartnerId("");
         setIsDialogOpen(false);
+        toast.success("パートナーを解除しました");
       } else {
         toast.error(response.message, {
           className: "!bg-red-600 !text-white !border-red-800",
