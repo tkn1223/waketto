@@ -63,7 +63,10 @@ Route::middleware('cognito')->group(function () {
     });
 
     // 設定関連のルート
-    Route::post('/partner-setting/{userName}/{partnerId?}', [SettingController::class, 'entry']);
+    Route::prefix('partner-setting')->group(function () {
+        Route::post('/{userName}/{partnerId?}', [SettingController::class, 'entry']);
+        Route::delete('/reset', [SettingController::class, 'reset']);
+    });
 });
 
 // パブリックルート（認証不要）

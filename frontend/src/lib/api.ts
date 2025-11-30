@@ -3,8 +3,10 @@ import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
 import type {
   BudgetCategory,
   BudgetSettingResponse,
- BudgetUsageResponse,  Subscription,
-  SubscriptionSettingResponse } from "@/types/budget.ts";
+  BudgetUsageResponse,
+  Subscription,
+  SubscriptionSettingResponse,
+} from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type {
   CategoriesResponse,
@@ -150,6 +152,13 @@ export async function postPartnerSetting(
       method: "POST",
     }
   );
+}
+
+// パートナー設定の解除
+export async function postPartnerReset(): Promise<Response> {
+  return await fetchApi<Response>(`/partner-setting/reset`, {
+    method: "DELETE",
+  });
 }
 
 /*
