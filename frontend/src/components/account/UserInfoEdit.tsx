@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { CircleQuestionMark } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button.tsx";
@@ -12,12 +13,15 @@ import {
 } from "@/components/ui/card.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import { Label } from "@/components/ui/label.tsx";
+import { ResultDialog } from "@/components/ui/result-dialog.tsx";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip.tsx";
+import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useSettingForm } from "@/hooks/useSettingForm.tsx";
+import { postPartnerReset } from "@/lib/api.ts";
 
 export function UserInfoEdit() {
   const {
@@ -28,11 +32,37 @@ export function UserInfoEdit() {
     handlePartnerId,
     handleUserInfoSave,
   } = useSettingForm();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { refreshUserInfo } = useAuth();
 
-  const handlePartnerReset = () => {
-    toast.error("パートナーを解除しました", {
-      className: "!bg-red-600 !text-white !border-red-800",
-    });
+  const handleOpenResultDialog = () => {
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
+
+  const handlePartnerReset = async () => {
+    try {
+      const response = await postPartnerReset();
+
+      if (response.status) {
+        await refreshUserInfo();
+        toast.success("パートナーを解除しました");
+        handlePartnerId("");
+        setIsDialogOpen(false);
+      } else {
+        toast.error(response.message, {
+          className: "!bg-red-600 !text-white !border-red-800",
+        });
+      }
+    } catch (error) {
+      console.error("API呼び出しエラー:", error);
+      toast.error("パートナーの解除中に サーバーエラーが発生しました", {
+        className: "!bg-red-600 !text-white !border-red-800",
+      });
+    }
   };
 
   return (
@@ -83,9 +113,10 @@ export function UserInfoEdit() {
                   <div className="flex items-center justify-between lg:w-2/3 w-full">
                     <p>登録済：{userInfo.partner_user_id}</p>
                     <Button
+                      type="button"
                       variant="destructive"
                       size="sm"
-                      onClick={() => void handlePartnerReset()}
+                      onClick={() => void handleOpenResultDialog()}
                     >
                       解除
                     </Button>
@@ -106,6 +137,7 @@ export function UserInfoEdit() {
         </CardContent>
         <CardFooter>
           <Button
+            type="button"
             onClick={() => void handleUserInfoSave()}
             className="bg-emerald-600"
           >
@@ -113,6 +145,26 @@ export function UserInfoEdit() {
           </Button>
         </CardFooter>
       </Card>
+
+      <ResultDialog
+        isOpen={isDialogOpen}
+        onClose={handleCloseDialog}
+        onAccept={() => void handlePartnerReset()}
+        title="パートナー情報を解除しますか？"
+        content={
+          <>
+            <p className="mb-4">パートナー情報を解除すると</p>
+            <ul className="list-disc font-bold pl-6">
+              <li>振り分けを行った取引明細</li>
+              <li>予算管理表の設定</li>
+              <li>サブスクリプションの設定</li>
+            </ul>
+            <p className="mt-4">などの情報が削除され、閲覧ができなくなります</p>
+          </>
+        }
+        acceptButtonText="解除する"
+        cancelButtonText="キャンセル"
+      />
     </>
   );
 }
