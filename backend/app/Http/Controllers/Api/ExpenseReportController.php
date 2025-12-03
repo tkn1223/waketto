@@ -117,10 +117,12 @@ class ExpenseReportController extends Controller
                     $paymentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
                 }
 
+                $paymentAmount = $subscription->billing_interval === 'monthly' ? $subscription->amount : ceil($subscription->amount / 12);
+
                 $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost']['payments'][] = [
                     'id' => $subscription->id,
                     'user' => $subscription->recorded_by_user_id,
-                    'amount' => $subscription->amount,
+                    'amount' => $paymentAmount,
                     'date' => $paymentDate,
                     'category' => $subscriptionCategory->id,
                     'shop_name' => $subscription->service_name,
