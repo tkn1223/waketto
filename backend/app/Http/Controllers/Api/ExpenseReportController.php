@@ -78,6 +78,7 @@ class ExpenseReportController extends Controller
                 'shop_name' => $payment->store_name,
                 'memo' => $payment->note,
                 'category_group_code' => $groupCode,
+                'is_subscription' => false,
             ];
         }
 
@@ -128,6 +129,7 @@ class ExpenseReportController extends Controller
                     'shop_name' => $subscription->service_name,
                     'memo' => null,
                     'category_group_code' => 'monthly_fixed_cost',
+                    'is_subscription' => true, // サブスクリプションかどうか
                 ];
             }
         }

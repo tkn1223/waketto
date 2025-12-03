@@ -32,6 +32,7 @@ export interface SavedTransactionData {
   shop_name?: string | null;
   memo?: string | null;
   category_group_code?: string;
+  is_subscription?: boolean;
 }
 
 // 月別支出表示用の取引明細型（カテゴリー名を含む）
@@ -128,6 +129,7 @@ export interface TransactionFormProps {
   isSaveDisabled: boolean;
   saveButtonText: string; // ボタンのテキスト
   deleteButtonText: string; // ボタンのテキスト
+  isSubscription?: boolean; // サブスクリプションかどうか
   // handler
   onAmountChange: (amount: number) => void;
   onDateChange: (date: Date) => void;
