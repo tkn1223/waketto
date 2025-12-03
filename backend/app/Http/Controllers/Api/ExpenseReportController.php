@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\CategoryGroup;
 use App\Models\Category;
+use App\Models\CategoryGroup;
 use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ExpenseReportController extends Controller
 {
@@ -99,14 +98,14 @@ class ExpenseReportController extends Controller
 
         // subscription_costカテゴリーを初期化（subscriptionDataが存在する場合のみ）
         $subscriptionCategory = Category::where('code', 'subscription_cost')->first();
-        if ($subscriptionCategory && !$subscriptionData->isEmpty() && ! isset($sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'])) {
+        if ($subscriptionCategory && ! $subscriptionData->isEmpty() && ! isset($sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'])) {
             $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'] = [
                 'category_name' => $subscriptionCategory->name,
                 'payments' => [],
             ];
         }
 
-        if ($subscriptionCategory && !$subscriptionData->isEmpty()) {
+        if ($subscriptionCategory && ! $subscriptionData->isEmpty()) {
             foreach ($subscriptionData as $subscription) {
                 // 日付を作成
                 $day = date('d', strtotime($subscription->start_date));

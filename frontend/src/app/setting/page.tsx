@@ -153,6 +153,7 @@ export default function BudgetSettingPage() {
   useEffect(() => {
     if (window.location.hash === "#subscription") {
       const element = document.getElementById("subscription");
+
       if (element) {
         setTimeout(() => {
           element.scrollIntoView({ behavior: "smooth", block: "start" });
