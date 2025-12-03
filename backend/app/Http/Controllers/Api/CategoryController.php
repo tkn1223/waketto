@@ -16,6 +16,7 @@ class CategoryController extends Controller
     {
         $categories = Category::select('id', 'name', 'code', 'group_code')
             ->with('categoryGroup:code,name')
+            ->where('code', '!=', 'subscription_cost')
             ->get();
 
         // データをグループ化して整形
