@@ -54,6 +54,7 @@ export const TransactionDetailDialog = memo(function TransactionDetailDialog({
             userInfo={userInfo}
             transactionData={transactionData}
             isSaveDisabled={isSaveDisabled}
+            isSubscription={payment.is_subscription}
             onAmountChange={handleAmountChange}
             onDateChange={handleDateChange}
             onCategoryChange={handleCategoryChange}

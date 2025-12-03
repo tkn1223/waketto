@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\Payment;
+use App\Models\Subscription;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -75,7 +77,60 @@ class ExpenseReportController extends Controller
                 'shop_name' => $payment->store_name,
                 'memo' => $payment->note,
                 'category_group_code' => $groupCode,
+                'is_subscription' => false,
             ];
+        }
+
+        if (isset($couple_id) && $couple_id !== null) {
+            // commonモード
+            $subscriptionData = Subscription::where('couple_id', $couple_id)
+                ->whereDate('start_date', '<=', $endDate)
+                ->whereDate('finish_date', '>=', $startDate)
+                ->get();
+        } else {
+            // aloneモード（自分が記録したデータのみ + couple_idがnull)
+            $subscriptionData = Subscription::where('recorded_by_user_id', $userId)
+                ->whereNull('couple_id')
+                ->whereDate('start_date', '<=', $endDate)
+                ->whereDate('finish_date', '>=', $startDate)
+                ->get();
+        }
+
+        // subscription_costカテゴリーを初期化（subscriptionDataが存在する場合のみ）
+        $subscriptionCategory = Category::where('code', 'subscription_cost')->first();
+        if ($subscriptionCategory && ! $subscriptionData->isEmpty() && ! isset($sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'])) {
+            $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'] = [
+                'category_name' => $subscriptionCategory->name,
+                'payments' => [],
+            ];
+        }
+
+        if ($subscriptionCategory && ! $subscriptionData->isEmpty()) {
+            foreach ($subscriptionData as $subscription) {
+                // 日付を作成
+                $day = date('d', strtotime($subscription->start_date));
+
+                // 有効な日付かチェック（例：2月30日は存在しない）
+                if (! checkdate($month, $day, $year)) {
+                    $paymentDate = date('Y-m-t', strtotime("{$year}-{$month}-01"));
+                } else {
+                    $paymentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+                }
+
+                $paymentAmount = $subscription->billing_interval === 'monthly' ? $subscription->amount : ceil($subscription->amount / 12);
+
+                $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost']['payments'][] = [
+                    'id' => $subscription->id,
+                    'user' => $subscription->recorded_by_user_id,
+                    'amount' => $paymentAmount,
+                    'date' => $paymentDate,
+                    'category' => $subscriptionCategory->id,
+                    'shop_name' => $subscription->service_name,
+                    'memo' => null,
+                    'category_group_code' => 'monthly_fixed_cost',
+                    'is_subscription' => true, // サブスクリプションかどうか
+                ];
+            }
         }
 
         return response()->json([

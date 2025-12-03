@@ -66,7 +66,7 @@ export function SpendingDonutChart({
                 {userInfo.name ?? "ユーザー"} の負担
               </td>
               <td className="text-4xl py-2 text-left">
-                ¥{viewData?.userTotals[userInfo.id].toLocaleString() ?? "-"}
+                ¥{viewData?.userTotals?.[userInfo.id]?.toLocaleString() ?? "-"}
               </td>
             </tr>
             {user === "common" && userInfo.partner_user_id && (
@@ -76,9 +76,9 @@ export function SpendingDonutChart({
                 </td>
                 <td className="text-4xl py-2 text-left">
                   ¥
-                  {viewData?.userTotals[
+                  {viewData?.userTotals?.[
                     userInfo.partner_user_id
-                  ].toLocaleString() ?? "-"}
+                  ]?.toLocaleString() ?? "-"}
                 </td>
               </tr>
             )}
