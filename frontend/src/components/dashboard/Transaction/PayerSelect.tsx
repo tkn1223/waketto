@@ -1,6 +1,6 @@
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group.tsx";
-import type { PayerSelectProps } from "@/types/transaction.ts";
 import { useViewMode } from "@/contexts/ViewModeContext.tsx";
+import type { PayerSelectProps } from "@/types/transaction.ts";
 
 export function PayerSelect({
   userInfo,
