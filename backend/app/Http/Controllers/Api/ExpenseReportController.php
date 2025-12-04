@@ -35,11 +35,13 @@ class ExpenseReportController extends Controller
 
         if (isset($couple_id) && $couple_id !== null) {
             // commonモード
-            $paymentData = Payment::where('couple_id', $couple_id)
+            $paymentData = Payment::with('category.budget')
+                ->where('couple_id', $couple_id)
                 ->whereBetween('payment_date', [$startDate, $endDate]);
         } else {
             // aloneモード（自分が記録したデータのみ + couple_idがnull)
-            $paymentData = Payment::where('recorded_by_user_id', $userId)
+            $paymentData = Payment::with('category.budget')
+                ->where('recorded_by_user_id', $userId)
                 ->whereNull('couple_id')
                 ->whereBetween('payment_date', [$startDate, $endDate]);
         }
@@ -62,8 +64,17 @@ class ExpenseReportController extends Controller
             $categoryCode = $payment->category->code;
 
             if (! isset($sortedByCategoryData[$groupCode]['categories'][$categoryCode])) {
+
+                // 月ごとに設定した予算のみ取得（年ごとは予実で管理しているため）
+                $budgetAmount = $payment->category->budget
+                    ->where('category_id', $payment->category_id)
+                    ->where('period_type', 'monthly')
+                    ->first()
+                    ?->amount;
+
                 $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [
                     'category_name' => $payment->category->name,
+                    'budget_amount' => $budgetAmount,
                     'payments' => [],
                 ];
             }
@@ -101,6 +112,7 @@ class ExpenseReportController extends Controller
         if ($subscriptionCategory && ! $subscriptionData->isEmpty() && ! isset($sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'])) {
             $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'] = [
                 'category_name' => $subscriptionCategory->name,
+                'budget_amount' => null,
                 'payments' => [],
             ];
         }
