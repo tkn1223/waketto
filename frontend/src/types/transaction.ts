@@ -65,6 +65,7 @@ export interface CategoryGroupData {
 // 支出管理表の型定義（カテゴリと取引明細詳細）
 export interface CategoryWithPayments {
   category_name: string;
+  budget_amount: number | null;
   payments: SavedTransactionData[];
 }
 

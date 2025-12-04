@@ -36,12 +36,19 @@ export function TransactionRow({
     setSelectedPayment(null);
   }, []); // 依存関係なし
 
+  console.log(category);
+
   return (
     <Accordion type="single" collapsible className="w-full">
       <AccordionItem value={category.category_name} className="space-y-1.5">
         <AccordionTrigger className="grid grid-cols-12 items-center p-1.5 rounded shadow-sm border-1 border-gray-50 hover:bg-gray-100 hover:border-blue-400 hover:shadow-none hover:no-underline cursor-pointer">
           <span className="col-span-4">{category.category_name}</span>
-          <span className="col-span-7 text-right">
+          <span className="col-span-4 text-right text-gray-500 text-xs">
+            {category.budget_amount !== null
+              ? `予算 ${category.budget_amount?.toLocaleString()} 円`
+              : ``}
+          </span>
+          <span className="col-span-3 text-right">
             {totalAmount.toLocaleString()} 円
           </span>
         </AccordionTrigger>
