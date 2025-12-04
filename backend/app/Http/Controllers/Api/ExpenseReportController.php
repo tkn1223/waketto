@@ -35,12 +35,20 @@ class ExpenseReportController extends Controller
 
         if (isset($couple_id) && $couple_id !== null) {
             // commonモード
-            $paymentData = Payment::with('category.budget')
+            $paymentData = Payment::with(['category.budget' => function ($query) use ($couple_id) {
+                $query->where('couple_id', $couple_id)
+                    ->whereNull('recorded_by_user_id')
+                    ->where('period_type', 'monthly');
+            }])
                 ->where('couple_id', $couple_id)
                 ->whereBetween('payment_date', [$startDate, $endDate]);
         } else {
             // aloneモード（自分が記録したデータのみ + couple_idがnull)
-            $paymentData = Payment::with('category.budget')
+            $paymentData = Payment::with(['category.budget' => function ($query) use ($userId) {
+                $query->where('recorded_by_user_id', $userId)
+                    ->whereNull('couple_id')
+                    ->where('period_type', 'monthly');
+            }])
                 ->where('recorded_by_user_id', $userId)
                 ->whereNull('couple_id')
                 ->whereBetween('payment_date', [$startDate, $endDate]);
@@ -68,7 +76,6 @@ class ExpenseReportController extends Controller
                 // 月ごとに設定した予算のみ取得（年ごとは予実で管理しているため）
                 $budgetAmount = $payment->category->budget
                     ->where('category_id', $payment->category_id)
-                    ->where('period_type', 'monthly')
                     ->first()
                     ?->amount;
 
