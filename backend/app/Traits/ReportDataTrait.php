@@ -65,11 +65,11 @@ trait ReportDataTrait
 
             // 予算データを取得
             $budget = $category->budget->first();
-            
+
             // period_typeに応じて予算金額を計算
             if ($budget) {
-                $budgetAmount = $budget->period_type === 'monthly' 
-                    ? $budget->amount 
+                $budgetAmount = $budget->period_type === 'monthly'
+                    ? $budget->amount
                     : ceil($budget->amount / 12);
             } else {
                 $budgetAmount = null;
