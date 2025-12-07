@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\Payment;
 use App\Models\Subscription;
-use Illuminate\Support\Facades\Log;
 
 trait ReportDataTrait
 {
@@ -48,8 +47,6 @@ trait ReportDataTrait
                 ->whereBetween('payment_date', [$startDate, $endDate])
                 ->orderBy('payment_date', 'asc')
                 ->get();
-            
-            Log::info($paymentData);
         }
 
         // カテゴリグループの構造を初期化
@@ -66,7 +63,17 @@ trait ReportDataTrait
             $groupCode = $category->group_code;
             $categoryCode = $category->code;
 
-            $budgetAmount = $category->budget->first()?->amount;
+            // 予算データを取得
+            $budget = $category->budget->first();
+            
+            // period_typeに応じて予算金額を計算
+            if ($budget) {
+                $budgetAmount = $budget->period_type === 'monthly' 
+                    ? $budget->amount 
+                    : ceil($budget->amount / 12);
+            } else {
+                $budgetAmount = null;
+            }
 
             if (isset($sortedByCategoryData[$groupCode])) {
                 $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [
