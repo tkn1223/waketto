@@ -46,6 +46,12 @@ export interface ExpenseReportResponse {
   data: ExpenseReportData;
 }
 
+// 家計簿のAPIレスポンス型定義
+export interface HouseholdReportResponse {
+  status: boolean;
+  data: ExpenseReportData;
+}
+
 // 支出管理表の型定義（カテゴリーグループ）
 export interface ExpenseReportData {
   monthly_fixed_cost?: CategoryGroupData;

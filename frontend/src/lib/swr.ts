@@ -3,11 +3,14 @@
 import useSWR from "swr";
 import type {
   BudgetSettingResponse,
- BudgetUsageResponse,  SubscriptionSettingResponse } from "@/types/budget.ts";
+  BudgetUsageResponse,
+  SubscriptionSettingResponse,
+} from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type {
   CategoriesResponse,
   ExpenseReportResponse,
+  HouseholdReportResponse,
 } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
 import {
@@ -15,8 +18,10 @@ import {
   getBudgetUsage,
   getCategories,
   getExpenseReport,
+  getHouseholdReport,
   getSubscriptions,
 } from "./api.ts";
+import { useDateSelector } from "@/hooks/useDateSelector.tsx";
 
 // デフォルトfetcher
 const defaultFetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -49,6 +54,21 @@ export const useExpenseReport = (
     : null;
 
   return useSWR(key, () => getExpenseReport(userMode, dateSelector), {
+    ...swrConfig,
+  });
+};
+
+// 家計簿データ取得用のカスタムフック
+export const useHouseholdReport = (
+  userMode: UserMode,
+  dateSelector: DateSelector,
+  isAuth?: boolean
+): ReturnType<typeof useSWR<HouseholdReportResponse, Error>> => {
+  const key = isAuth
+    ? `/household-report/${userMode}?year=${dateSelector.year}&month=${dateSelector.month}`
+    : null;
+
+  return useSWR(key, () => getHouseholdReport(userMode, dateSelector), {
     ...swrConfig,
   });
 };

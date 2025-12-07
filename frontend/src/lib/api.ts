@@ -11,6 +11,7 @@ import type { DateSelector } from "@/types/expense.ts";
 import type {
   CategoriesResponse,
   ExpenseReportResponse,
+  HouseholdReportResponse,
   TransactionRequestData,
 } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
@@ -51,6 +52,25 @@ export async function getExpenseReport(
 
   return await fetchApi<ExpenseReportResponse>(
     `/expense-report/${userMode}${queryString ? `?${queryString}` : ""}`
+  );
+}
+
+// 家計簿の一覧を取得
+export async function getHouseholdReport(
+  userMode: UserMode,
+  dateSelector: DateSelector
+): Promise<HouseholdReportResponse> {
+  // クエリパラメータを作成
+  const params = new URLSearchParams();
+
+  if (dateSelector.year) params.append("year", dateSelector.year);
+
+  if (dateSelector.month) params.append("month", dateSelector.month);
+
+  const queryString = params.toString();
+
+  return await fetchApi<HouseholdReportResponse>(
+    `/household-report/${userMode}${queryString ? `?${queryString}` : ""}`
   );
 }
 

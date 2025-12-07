@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Traits\ReportDataTrait;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
+use App\Traits\ReportDataTrait;
 
-class ExpenseReportController extends Controller
+class HouseholdReportController extends Controller
 {
     use ReportDataTrait;
 
