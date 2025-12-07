@@ -29,6 +29,8 @@ export function SpendingManagementPage({
     isAuth
   );
 
+  console.log(expenseReport);
+
   const handleUpdte = () => {
     void expenseMutate();
     void budgetUsageMutate();
