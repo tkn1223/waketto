@@ -2,19 +2,20 @@
 
 namespace App\Traits;
 
+use App\Models\Category;
 use App\Models\CategoryGroup;
 use App\Models\Payment;
 use App\Models\Subscription;
-use App\Models\Category;
 
-trait ReportDataTrait {
+trait ReportDataTrait
+{
     /**
      * Paymentを取得しカテゴリー毎にグループ化
-     * 
-     * @param int|null $couple_id
-     * @param int $userId
-     * @param string $startDate
-     * @param string $endDate
+     *
+     * @param  int|null  $couple_id
+     * @param  int  $userId
+     * @param  string  $startDate
+     * @param  string  $endDate
      * @return array $sortedByCategoryData
      */
     public function getBaseReportData($couple_id, $userId, $startDate, $endDate)
@@ -92,10 +93,11 @@ trait ReportDataTrait {
 
     /**
      * サブスクリプションデータを取得
-     * @param int|null $couple_id
-     * @param int $userId
-     * @param string $startDate
-     * @param string $endDate
+     *
+     * @param  int|null  $couple_id
+     * @param  int  $userId
+     * @param  string  $startDate
+     * @param  string  $endDate
      * @return array $subscriptionData
      */
     public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
@@ -117,7 +119,7 @@ trait ReportDataTrait {
 
         return $subscriptionData;
     }
-    
+
     public function initializeSubscriptionCategory($sortedByCategoryData, $subscriptionData)
     {
         $subscriptionCategory = Category::where('code', 'subscription_cost')->first();
@@ -130,8 +132,8 @@ trait ReportDataTrait {
         }
 
         return [
-          'subscriptionCategory' => $subscriptionCategory,
-          'sortedByCategoryData' => $sortedByCategoryData,
+            'subscriptionCategory' => $subscriptionCategory,
+            'sortedByCategoryData' => $sortedByCategoryData,
         ];
     }
 }

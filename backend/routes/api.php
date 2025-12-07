@@ -3,11 +3,11 @@
 use App\Http\Controllers\Api\BudgetUsageController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ExpenseReportController;
+use App\Http\Controllers\Api\HouseholdReportController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,6 +47,11 @@ Route::middleware('cognito')->group(function () {
     // 支出管理表関連のルート
     Route::prefix('expense-report')->group(function () {
         Route::get('/{userMode}', [ExpenseReportController::class, 'index']);
+    });
+
+    // 家計簿関連のルート
+    Route::prefix('household-report')->group(function () {
+        Route::get('/{userMode}', [HouseholdReportController::class, 'index']);
     });
 
     // 予算関連のルート

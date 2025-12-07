@@ -21,7 +21,6 @@ import {
   getHouseholdReport,
   getSubscriptions,
 } from "./api.ts";
-import { useDateSelector } from "@/hooks/useDateSelector.tsx";
 
 // デフォルトfetcher
 const defaultFetcher = (url: string) => fetch(url).then((res) => res.json());
