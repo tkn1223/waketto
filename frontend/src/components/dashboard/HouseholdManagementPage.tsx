@@ -2,7 +2,7 @@ import { TrendsSection } from "@/components/dashboard/ExpenseGraph/TrendsSection
 import { SpendingBreakdownSection } from "@/components/dashboard/SpendingPerMonth/SpendingBreakdownSection.tsx";
 import { TransactionDetail } from "@/components/dashboard/Transaction/TransactionDetail.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
-import { useBudgetUsage,useExpenseReport } from "@/lib/swr.ts";
+import { useBudgetUsage, useHouseholdReport } from "@/lib/swr.ts";
 import type { HouseholdManagementPageProps } from "@/types/summary.ts";
 
 export function HouseholdManagementPage({
@@ -11,7 +11,7 @@ export function HouseholdManagementPage({
   monthlyAndYearlyDateSelector,
   yearlyDateSelector,
 }: HouseholdManagementPageProps) {
-  const { data: householdReport, mutate } = useExpenseReport(
+  const { data: householdReport, mutate } = useHouseholdReport(
     user,
     monthlyAndYearlyDateSelector,
     isAuth
