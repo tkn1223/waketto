@@ -137,6 +137,13 @@ trait ReportDataTrait
         return $subscriptionData;
     }
 
+    /**
+     * サブスクリプションカテゴリーを初期化
+     *
+     * @param  array  $sortedByCategoryData
+     * @param  Collection  $subscriptionData
+     * @return array $subscriptionCategory, $sortedByCategoryData
+     */
     public function initializeSubscriptionCategory($sortedByCategoryData, $subscriptionData)
     {
         $subscriptionCategory = Category::where('code', 'subscription_cost')->first();
@@ -152,5 +159,35 @@ trait ReportDataTrait
             'subscriptionCategory' => $subscriptionCategory,
             'sortedByCategoryData' => $sortedByCategoryData,
         ];
+    }
+
+    /**
+     * 合計金額を算出
+     *
+     * @param  array  $sortedByCategoryData
+     * @return array $sortedByCategoryData with totals
+     */
+    public function getTotalExpenseData($sortedByCategoryData)
+    {
+        $data = collect($sortedByCategoryData);
+
+        $totalBudget = $data->sum(function ($group) {
+            return collect($group['categories'])->sum('budget_amount');
+        });
+
+        $totalPayment = $data->sum(function ($group) {
+            return collect($group['categories'])->sum(function ($category) {
+                return collect($category['payments'])->sum('amount');
+            });
+        });
+
+        $defference = $totalBudget - $totalPayment;
+
+        // 総合計データを配列に追加
+        $sortedByCategoryData['totalBudget'] = $totalBudget;
+        $sortedByCategoryData['totalPayment'] = $totalPayment;
+        $sortedByCategoryData['defference'] = $defference;
+
+        return $sortedByCategoryData;
     }
 }

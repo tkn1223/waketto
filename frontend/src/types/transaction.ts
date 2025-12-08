@@ -60,6 +60,9 @@ export interface ExpenseReportData {
   occasional_variable_cost?: CategoryGroupData;
   luxury_consumption_cost?: CategoryGroupData;
   savings_investment_cost?: CategoryGroupData;
+  totalBudget?: number;
+  totalPayment?: number;
+  defference?: number;
 }
 
 // 支出管理表の型定義（カテゴリーグループとカテゴリ詳細）

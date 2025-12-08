@@ -70,6 +70,8 @@ class ExpenseReportController extends Controller
             }
         }
 
+        $sortedByCategoryData = $this->getTotalExpenseData($sortedByCategoryData);
+
         return response()->json([
             'status' => true,
             'data' => $sortedByCategoryData,
