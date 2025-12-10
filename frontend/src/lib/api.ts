@@ -166,12 +166,13 @@ export async function postPartnerSetting(
   userName: string,
   partnerId?: string
 ): Promise<Response> {
-  return await fetchApi<Response>(
-    `/partner-setting/${userName}${partnerId ? `/${partnerId}` : ""}`,
-    {
-      method: "POST",
-    }
-  );
+  return await fetchApi<Response>("/partner-setting", {
+    method: "POST",
+    body: JSON.stringify({
+      name: userName,
+      partner_id: partnerId || null,
+    }),
+  });
 }
 
 // パートナー設定の解除

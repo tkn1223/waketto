@@ -16,31 +16,37 @@ use Illuminate\Support\Facades\Log;
 
 class SettingController extends Controller
 {
-    public function entry(Request $request, $userName, $partnerId = null): JsonResponse
+    public function entry(Request $request): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
 
+        // リクエストボディからデータを取得
+        $userName = $request->input('name');
+        $partnerId = $request->input('partner_id');
+
         // ユーザー名を更新
-        try {
-            if (mb_strlen($userName) > 10) {
+        if ($userName !== null) {
+            try {
+                if (mb_strlen($userName) > 10) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'ユーザー名は10文字以内で入力してください',
+                    ], 422);
+                }
+
+                $user->update(['name' => $userName]);
+            } catch (Exception $e) {
+                Log::error('ユーザー名の更新に失敗しました', [
+                    'user_id' => $user->id,
+                    'user_name' => $userName,
+                    'error' => $e->getMessage(),
+                ]);
+
                 return response()->json([
                     'status' => false,
-                    'message' => 'ユーザー名は10文字以内で入力してください',
-                ], 422);
+                    'message' => 'ユーザー名の更新に失敗しました',
+                ], 500);
             }
-
-            $user->update(['name' => $userName]);
-        } catch (Exception $e) {
-            Log::error('ユーザー名の更新に失敗しました', [
-                'user_id' => $user->id,
-                'user_name' => $userName,
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'ユーザー名の更新に失敗しました',
-            ], 500);
         }
 
         // パートナーを設定
