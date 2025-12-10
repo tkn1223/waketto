@@ -69,7 +69,7 @@ Route::middleware('cognito')->group(function () {
 
     // 設定関連のルート
     Route::prefix('partner-setting')->group(function () {
-        Route::post('/{userName}/{partnerId?}', [SettingController::class, 'entry']);
+        Route::post('/', [SettingController::class, 'entry']);
         Route::delete('/reset', [SettingController::class, 'reset']);
     });
 });
