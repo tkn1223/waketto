@@ -18,7 +18,7 @@ class SettingController extends Controller
 {
     public function entry(Request $request): JsonResponse
     {
-        Log::warning('[DEBUG] entry method 開始しました', [
+        Log::error('[DEBUG] entry method 開始しました', [
             'request_data' => $request->all(),
         ]);
 
@@ -37,7 +37,7 @@ class SettingController extends Controller
         $userName = $request->input('name');
         $partnerId = $request->input('partner_id');
 
-        Log::warning('[DEBUG] パラメータを取得しました', [
+        Log::error('[DEBUG] パラメータを取得しました', [
             'userName' => $userName,
             'partnerId' => $partnerId,
         ]);
@@ -70,11 +70,11 @@ class SettingController extends Controller
         // パートナーを設定
         if ($user->couple_id === null && $partnerId !== null) {
             try {
-                Log::warning('[DEBUG] パートナーを検索しました');
+                Log::error('[DEBUG] パートナーを検索しました');
                 $partner = User::where('user_id', $partnerId)->first();
 
                 if (! $partner || $user->id === $partner->id) {
-                    Log::warning('[DEBUG] パートナーが見つかりません', [
+                    Log::error('[DEBUG] パートナーが見つかりません', [
                         'partner_found' => $partner ? 'yes' : 'no',
                         'same_user' => $partner && $user->id === $partner->id,
                     ]);
@@ -85,14 +85,14 @@ class SettingController extends Controller
                     ], 404);
                 }
 
-                Log::warning('[DEBUG] setPartnerを呼び出しました', [
+                Log::error('[DEBUG] setPartnerを呼び出しました', [
                     'user_id' => $user->id,
                     'partner_id' => $partner->id,
                 ]);
 
                 $result = User::setPartner($user, $partner);
 
-                Log::warning('[DEBUG] setPartnerの結果を取得しました', ['result' => $result]);
+                Log::error('[DEBUG] setPartnerの結果を取得しました', ['result' => $result]);
 
                 if (! $result) {
                     Log::error('[DEBUG] setPartnerがfalseを返しました');
