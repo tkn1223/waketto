@@ -19,7 +19,6 @@ class User extends Authenticatable
         'user_id',
         'cognito_sub',
         'couple_id',
-        'pair_index',
     ];
 
     /**
@@ -88,7 +87,6 @@ class User extends Authenticatable
 
             $user->update([
                 'couple_id' => $couple->id,
-                'pair_index' => 1,
             ]);
 
             Log::error('[DEBUG] User更新成功');
@@ -100,7 +98,6 @@ class User extends Authenticatable
 
             $partner->update([
                 'couple_id' => $couple->id,
-                'pair_index' => 2,
             ]);
 
             Log::error('[DEBUG] Partner更新成功');
