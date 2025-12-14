@@ -115,14 +115,14 @@ jobs:
              --arg AWS_REGION "${{ env.AWS_REGION }}" \
              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
               .containerDefinitions |= map(
-                if .name == "backend" then 
+                if .name == "laravel" then 
                   .image = $BACKEND_IMAGE |
                   .logConfiguration = {
                     "logDriver": "awslogs",
                     "options": {
                       "awslogs-group": $LOG_GROUP,
                       "awslogs-region": $AWS_REGION,
-                      "awslogs-stream-prefix": "backend"
+                      "awslogs-stream-prefix": "laravel"
                     }
                   } |
                   (.environment //= []) |
