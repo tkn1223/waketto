@@ -17,7 +17,6 @@ class GuestAccountSeeder extends Seeder
             'user_id' => 'guestuser1',
             'cognito_sub' => 'c704eaf8-a0d1-7029-d1df-8730f8653078',
             'couple_id' => null,
-            'pair_index' => null,
         ]);
     }
 }

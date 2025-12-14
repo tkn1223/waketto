@@ -142,12 +142,10 @@ class SettingController extends Controller
 
             $user->update([
                 'couple_id' => null,
-                'pair_index' => null,
             ]);
 
             $partner->update([
                 'couple_id' => null,
-                'pair_index' => null,
             ]);
 
             Couple::where('id', $coupleId)->delete();
