@@ -67,8 +67,23 @@ class User extends Authenticatable
         DB::beginTransaction();
 
         try {
+            Log::warning('[DEBUG] Couple作成開始', [
+                'user_user_id' => $user->user_id,
+                'partner_user_id' => $partner->user_id,
+            ]);
+
             $couple = Couple::create([
                 'name' => $user->user_id.' & '.$partner->user_id,
+            ]);
+
+            Log::warning('[DEBUG] Couple作成成功', [
+                'couple_id' => $couple->id,
+                'couple_name' => $couple->name,
+            ]);
+
+            Log::warning('[DEBUG] User更新開始', [
+                'user_id' => $user->id,
+                'couple_id' => $couple->id,
             ]);
 
             $user->update([
@@ -76,12 +91,23 @@ class User extends Authenticatable
                 'pair_index' => 1,
             ]);
 
+            Log::warning('[DEBUG] User更新成功');
+
+            Log::warning('[DEBUG] Partner更新開始', [
+                'partner_id' => $partner->id,
+                'couple_id' => $couple->id,
+            ]);
+
             $partner->update([
                 'couple_id' => $couple->id,
                 'pair_index' => 2,
             ]);
 
+            Log::warning('[DEBUG] Partner更新成功');
+
+            Log::warning('[DEBUG] トランザクションコミット開始');
             DB::commit();
+            Log::warning('[DEBUG] トランザクションコミット成功');
 
             return true;
         } catch (\Exception $e) {
