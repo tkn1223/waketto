@@ -24,6 +24,8 @@ env:
   S3_BUCKET_NAME: waketto-s3-bucket
   # CloudFront ディストリビューションID
   CLOUDFRONT_DISTRIBUTION_ID: E22UL8VHKB6QY3
+  # CloudWatch ロググループ名
+  CLOUDWATCH_LOG_GROUP: /ecs/waketto-backend
 
 # ECR push するための権限設定
 permissions:
@@ -106,13 +108,36 @@ jobs:
             --region ${{ env.AWS_REGION }} \
             --query 'taskDefinition' > task-def.json
 
-          # 新しいイメージ URI に更新（backend と nginx の両方）
+          # 新しいイメージ URI に更新、logConfiguration を追加、環境変数を追加（backend と nginx の両方）
           jq --arg BACKEND_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG" \
              --arg NGINX_IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_NGINX:$IMAGE_TAG" \
+             --arg LOG_GROUP "${{ env.CLOUDWATCH_LOG_GROUP }}" \
+             --arg AWS_REGION "${{ env.AWS_REGION }}" \
              'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy) |
               .containerDefinitions |= map(
-                if .name == "backend" then .image = $BACKEND_IMAGE
-                elif .name == "nginx" then .image = $NGINX_IMAGE
+                if .name == "backend" then 
+                  .image = $BACKEND_IMAGE |
+                  .logConfiguration = {
+                    "logDriver": "awslogs",
+                    "options": {
+                      "awslogs-group": $LOG_GROUP,
+                      "awslogs-region": $AWS_REGION,
+                      "awslogs-stream-prefix": "backend"
+                    }
+                  } |
+                  (.environment //= []) |
+                  (.environment |= map(select(.name != "LOG_CHANNEL"))) |
+                  (.environment += [{"name": "LOG_CHANNEL", "value": "stderr"}])
+                elif .name == "nginx" then 
+                  .image = $NGINX_IMAGE |
+                  .logConfiguration = {
+                    "logDriver": "awslogs",
+                    "options": {
+                      "awslogs-group": $LOG_GROUP,
+                      "awslogs-region": $AWS_REGION,
+                      "awslogs-stream-prefix": "nginx"
+                    }
+                  }
                 else . end
               )' task-def.json > new-task-def.json
 
