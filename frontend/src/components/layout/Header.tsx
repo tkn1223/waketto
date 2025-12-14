@@ -37,10 +37,12 @@ export function Header() {
               {path.includes(pathname.split("/")[1]) ? (
                 <>
                   <UserModeToggle user={user} setUser={setUser} />
-                  <FinanceModeToggle
-                    finance={finance}
-                    setFinance={setFinance}
-                  />
+                  {pathname.split("/")[1] === "dashboard" && (
+                    <FinanceModeToggle
+                      finance={finance}
+                      setFinance={setFinance}
+                    />
+                  )}
                 </>
               ) : null}
               <NaviMenu />

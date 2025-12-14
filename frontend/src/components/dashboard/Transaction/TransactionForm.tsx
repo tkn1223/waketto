@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { CategoryList } from "@/components/dashboard/Transaction/CategoryList.tsx";
 import { Memo } from "@/components/dashboard/Transaction/Memo.tsx";
 import { PayerSelect } from "@/components/dashboard/Transaction/PayerSelect.tsx";
@@ -15,6 +16,7 @@ export function TransactionForm({
   isSaveDisabled,
   saveButtonText,
   deleteButtonText,
+  isSubscription = false,
   onAmountChange,
   onDateChange,
   onCategoryChange,
@@ -25,6 +27,8 @@ export function TransactionForm({
   onUpdate,
   onDelete,
 }: TransactionFormProps) {
+  const router = useRouter();
+
   return (
     <>
       {/* 金額 */}
@@ -75,31 +79,47 @@ export function TransactionForm({
         <Memo memo={transactionData.memo} onMemoChange={onMemoChange} />
       </div>
 
-      {deleteButtonText ? (
-        <div className="flex gap-4">
+      {isSubscription ? (
+        <div className="flex flex-col items-center justify-center">
+          <p className="text-center mb-2 text-gray-500">
+            サブスクリプションの変更は予算設定から行えます
+          </p>
           <Button
-            className="flex-[2] text-xl py-6"
-            onClick={onUpdate}
-            disabled={isSaveDisabled}
+            className="w-full py-6 rounded-md"
+            onClick={() => router.push("/setting#subscription")}
           >
-            {saveButtonText}
-          </Button>
-          <Button
-            className="flex-[1] text-md py-6 rounded-full"
-            variant="destructive"
-            onClick={onDelete}
-          >
-            {deleteButtonText}
+            予算設定へ
           </Button>
         </div>
       ) : (
-        <Button
-          className="w-full text-xl py-6"
-          onClick={onSave}
-          disabled={isSaveDisabled}
-        >
-          {saveButtonText}
-        </Button>
+        <>
+          {deleteButtonText ? (
+            <div className="flex gap-4">
+              <Button
+                className="flex-[2] text-xl py-6"
+                onClick={onUpdate}
+                disabled={isSaveDisabled}
+              >
+                {saveButtonText}
+              </Button>
+              <Button
+                className="flex-[1] text-md py-6 rounded-full"
+                variant="destructive"
+                onClick={onDelete}
+              >
+                {deleteButtonText}
+              </Button>
+            </div>
+          ) : (
+            <Button
+              className="w-full text-xl py-6"
+              onClick={onSave}
+              disabled={isSaveDisabled}
+            >
+              {saveButtonText}
+            </Button>
+          )}
+        </>
       )}
     </>
   );

@@ -32,6 +32,7 @@ export interface SavedTransactionData {
   shop_name?: string | null;
   memo?: string | null;
   category_group_code?: string;
+  is_subscription?: boolean;
 }
 
 // 月別支出表示用の取引明細型（カテゴリー名を含む）
@@ -45,6 +46,12 @@ export interface ExpenseReportResponse {
   data: ExpenseReportData;
 }
 
+// 家計簿のAPIレスポンス型定義
+export interface HouseholdReportResponse {
+  status: boolean;
+  data: ExpenseReportData;
+}
+
 // 支出管理表の型定義（カテゴリーグループ）
 export interface ExpenseReportData {
   monthly_fixed_cost?: CategoryGroupData;
@@ -53,6 +60,9 @@ export interface ExpenseReportData {
   occasional_variable_cost?: CategoryGroupData;
   luxury_consumption_cost?: CategoryGroupData;
   savings_investment_cost?: CategoryGroupData;
+  totalBudget?: number;
+  totalPayment?: number;
+  defference?: number;
 }
 
 // 支出管理表の型定義（カテゴリーグループとカテゴリ詳細）
@@ -64,6 +74,7 @@ export interface CategoryGroupData {
 // 支出管理表の型定義（カテゴリと取引明細詳細）
 export interface CategoryWithPayments {
   category_name: string;
+  budget_amount: number | null;
   payments: SavedTransactionData[];
 }
 
@@ -128,6 +139,7 @@ export interface TransactionFormProps {
   isSaveDisabled: boolean;
   saveButtonText: string; // ボタンのテキスト
   deleteButtonText: string; // ボタンのテキスト
+  isSubscription?: boolean; // サブスクリプションかどうか
   // handler
   onAmountChange: (amount: number) => void;
   onDateChange: (date: Date) => void;

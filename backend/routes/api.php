@@ -3,11 +3,11 @@
 use App\Http\Controllers\Api\BudgetUsageController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ExpenseReportController;
+use App\Http\Controllers\Api\HouseholdReportController;
 use App\Http\Controllers\Api\SettingController;
 use App\Http\Controllers\Api\SubscriptionController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -49,6 +49,11 @@ Route::middleware('cognito')->group(function () {
         Route::get('/{userMode}', [ExpenseReportController::class, 'index']);
     });
 
+    // 家計簿関連のルート
+    Route::prefix('household-report')->group(function () {
+        Route::get('/{userMode}', [HouseholdReportController::class, 'index']);
+    });
+
     // 予算関連のルート
     Route::prefix('budget')->group(function () {
         Route::get('/usage/{userMode}', [BudgetUsageController::class, 'index']);
@@ -63,7 +68,10 @@ Route::middleware('cognito')->group(function () {
     });
 
     // 設定関連のルート
-    Route::post('/partner-setting/{userName}/{partnerId?}', [SettingController::class, 'entry']);
+    Route::prefix('partner-setting')->group(function () {
+        Route::post('/', [SettingController::class, 'entry']);
+        Route::delete('/reset', [SettingController::class, 'reset']);
+    });
 });
 
 // パブリックルート（認証不要）

@@ -3,12 +3,15 @@ import { checkTokenValidity, signOutUser } from "@/lib/auth.ts";
 import type {
   BudgetCategory,
   BudgetSettingResponse,
- BudgetUsageResponse,  Subscription,
-  SubscriptionSettingResponse } from "@/types/budget.ts";
+  BudgetUsageResponse,
+  Subscription,
+  SubscriptionSettingResponse,
+} from "@/types/budget.ts";
 import type { DateSelector } from "@/types/expense.ts";
 import type {
   CategoriesResponse,
   ExpenseReportResponse,
+  HouseholdReportResponse,
   TransactionRequestData,
 } from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
@@ -49,6 +52,25 @@ export async function getExpenseReport(
 
   return await fetchApi<ExpenseReportResponse>(
     `/expense-report/${userMode}${queryString ? `?${queryString}` : ""}`
+  );
+}
+
+// 家計簿の一覧を取得
+export async function getHouseholdReport(
+  userMode: UserMode,
+  dateSelector: DateSelector
+): Promise<HouseholdReportResponse> {
+  // クエリパラメータを作成
+  const params = new URLSearchParams();
+
+  if (dateSelector.year) params.append("year", dateSelector.year);
+
+  if (dateSelector.month) params.append("month", dateSelector.month);
+
+  const queryString = params.toString();
+
+  return await fetchApi<HouseholdReportResponse>(
+    `/household-report/${userMode}${queryString ? `?${queryString}` : ""}`
   );
 }
 
@@ -144,12 +166,20 @@ export async function postPartnerSetting(
   userName: string,
   partnerId?: string
 ): Promise<Response> {
-  return await fetchApi<Response>(
-    `/partner-setting/${userName}${partnerId ? `/${partnerId}` : ""}`,
-    {
-      method: "POST",
-    }
-  );
+  return await fetchApi<Response>("/partner-setting", {
+    method: "POST",
+    body: JSON.stringify({
+      name: userName,
+      partner_id: partnerId || null,
+    }),
+  });
+}
+
+// パートナー設定の解除
+export async function postPartnerReset(): Promise<Response> {
+  return await fetchApi<Response>(`/partner-setting/reset`, {
+    method: "DELETE",
+  });
 }
 
 /*

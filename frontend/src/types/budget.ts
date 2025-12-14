@@ -5,7 +5,7 @@ export interface BudgetCategory {
   name: string;
   code: string;
   groupCode: string;
-  period: number; // 期間（1-12）
+  period: number | null; // 拡張予定。予算の期間（1-12）
   periodType: "monthly" | "yearly"; // 期間の単位
   amount: number | null; // 予算額
 }
@@ -65,6 +65,7 @@ export interface BudgetUsageResponse {
     id: number;
     category: Category;
     budget_amount: number;
+    period_type: "monthly" | "yearly";
     monthly_data: {
       month: number;
       category_id: number;

@@ -30,10 +30,6 @@ export function SpendingDetailRow({
     setSelectedPayment(null);
   }, []);
 
-  const handleUpdate = useCallback(() => {
-    onTransactionUpdate();
-  }, [onTransactionUpdate]);
-
   return (
     <>
       <ScrollArea className="h-[180px] w-full">
@@ -70,7 +66,7 @@ export function SpendingDetailRow({
           payment={selectedPayment}
           isOpen={isDialogOpen}
           onClose={handleCloseDialog}
-          onUpdate={handleUpdate}
+          onUpdate={onTransactionUpdate}
         />
       )}
     </>

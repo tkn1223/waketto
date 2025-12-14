@@ -106,13 +106,11 @@ class BudgetUsageController extends Controller
 
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
     {
-        Log::info('更新処理開始');
-
         // バリデーションチェック
         $validator = Validator::make($request->all(), [
             'categories' => 'required|array|min:1',
             'categories.*.code' => 'required|string|exists:categories,code',
-            'categories.*.period' => 'required|integer|min:1|max:12',
+            'categories.*.period' => 'nullable|integer|min:1|max:12',
             'categories.*.periodType' => 'required|string|in:monthly,yearly',
             'categories.*.amount' => 'nullable|numeric|min:0',
         ], [
@@ -122,7 +120,7 @@ class BudgetUsageController extends Controller
             'categories.*.code.required' => '値が読み込めません。リロードしてください。',
             'categories.*.code.string' => '値が読み込めません。リロードしてください。',
             'categories.*.code.exists' => '指定されたカテゴリーコードは存在しません',
-            'categories.*.period.required' => '期間は必須です',
+            // 'categories.*.period.nullable' => '期間は必須です',
             'categories.*.period.integer' => '期間は整数で入力してください',
             'categories.*.period.min' => '期間は1~12の間で入力してください',
             'categories.*.period.max' => '期間は1~12の間で入力してください',
@@ -164,7 +162,7 @@ class BudgetUsageController extends Controller
         $budgetCheck = $budgetCheckQuery->exists();
 
         // 予算設定データを取得（categoriesキーから配列を取得）
-        $categories = $request->input('categories');
+        $categories = $validator->validated()['categories'];
 
         if (empty($categories) || ! is_array($categories)) {
             Log::error('渡された予算設定データが不正です', [
@@ -202,7 +200,7 @@ class BudgetUsageController extends Controller
     private function getBudgetData($couple_id, $userId)
     {
         $query = Budget::with(['category:id,name,code'])
-            ->select('id', 'amount', 'category_id');
+            ->select('id', 'amount', 'category_id', 'period_type');
 
         return $couple_id
             ? $query->where('couple_id', $couple_id)->get()
@@ -254,6 +252,7 @@ class BudgetUsageController extends Controller
             return [
                 'id' => $budgetItem->id,
                 'category' => $budgetItem->category,
+                'period_type' => $budgetItem->period_type,
                 'budget_amount' => $budgetItem->amount,
                 'monthly_data' => $monthlyData,
                 'residue_budget' => $residueBudget,

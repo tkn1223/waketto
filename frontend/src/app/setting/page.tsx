@@ -149,6 +149,19 @@ export default function BudgetSettingPage() {
     }
   }, [subscriptionSetting?.data]);
 
+  // #subscriptionがある場合はサブスクリプション設定を表示
+  useEffect(() => {
+    if (window.location.hash === "#subscription") {
+      const element = document.getElementById("subscription");
+
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, []);
+
   // ローディング中の表示
   if (isBudgetSettingLoading || isSubscriptionSettingLoading) {
     return (
@@ -200,7 +213,9 @@ export default function BudgetSettingPage() {
         handleCategoryUpdate={handleCategoryUpdate}
       />
       <div className="flex items-center mt-10">
-        <h2 className="text-2xl font-bold mr-8">サブスク管理表</h2>
+        <h2 className="text-2xl font-bold mr-8" id="subscription">
+          サブスク管理表
+        </h2>
         <Button
           onClick={() => void handleSubscriptionSave()}
           className="px-6 bg-emerald-600 hover:bg-emerald-800"
