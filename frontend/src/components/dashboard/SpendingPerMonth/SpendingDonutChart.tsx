@@ -58,7 +58,7 @@ export function SpendingDonutChart({
             <tr>
               <td className="text-2xl py-2 [vertical-align:bottom]">合計</td>
               <td className="text-4xl py-2 text-left">
-                ¥{viewData?.totalAmount.toLocaleString() ?? "-"}
+                ¥ {viewData?.totalAmount.toLocaleString() ?? "0"}
               </td>
             </tr>
             <tr>
@@ -66,7 +66,7 @@ export function SpendingDonutChart({
                 {userInfo.name ?? "ユーザー"} の負担
               </td>
               <td className="text-4xl py-2 text-left">
-                ¥{viewData?.userTotals?.[userInfo.id]?.toLocaleString() ?? "-"}
+                ¥ {viewData?.userTotals?.[userInfo.id]?.toLocaleString() ?? "0"}
               </td>
             </tr>
             {user === "common" && userInfo.partner_user_id && (
@@ -75,10 +75,10 @@ export function SpendingDonutChart({
                   {userInfo.partner_user_id ?? "パートナー"}の負担
                 </td>
                 <td className="text-4xl py-2 text-left">
-                  ¥
+                  ¥{" "}
                   {viewData?.userTotals?.[
                     userInfo.partner_user_id
-                  ]?.toLocaleString() ?? "-"}
+                  ]?.toLocaleString() ?? "0"}
                 </td>
               </tr>
             )}
