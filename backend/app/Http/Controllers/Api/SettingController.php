@@ -18,11 +18,29 @@ class SettingController extends Controller
 {
     public function entry(Request $request): JsonResponse
     {
+        Log::warning('[DEBUG] entry method 開始しました', [
+            'request_data' => $request->all(),
+        ]);
+
         $user = $request->attributes->get('auth_user');
+
+        if (! $user) {
+            Log::error('ユーザーが見つかりません');
+
+            return response()->json([
+                'status' => false,
+                'message' => '認証エラー',
+            ], 401);
+        }
 
         // リクエストボディからデータを取得
         $userName = $request->input('name');
         $partnerId = $request->input('partner_id');
+
+        Log::warning('[DEBUG] パラメータを取得しました', [
+            'userName' => $userName,
+            'partnerId' => $partnerId,
+        ]);
 
         // ユーザー名を更新
         if ($userName !== null) {
@@ -51,7 +69,14 @@ class SettingController extends Controller
 
         // パートナーを設定
         if ($partnerId) {
+            Log::warning('[DEBUG] パートナー設定を開始しました', [
+                'partner_id' => $partnerId,
+                'user_couple_id' => $user->couple_id,
+            ]);
+
             if ($user->couple_id) {
+                Log::warning('[DEBUG] ユーザーはすでにパートナーが設定されています');
+
                 return response()->json([
                     'status' => false,
                     'message' => 'すでにパートナーが設定されています',
@@ -59,18 +84,33 @@ class SettingController extends Controller
             }
 
             try {
+                Log::warning('[DEBUG] パートナーを検索しました');
                 $partner = User::where('user_id', $partnerId)->first();
 
                 if (! $partner || $user->id === $partner->id) {
+                    Log::warning('[DEBUG] パートナーが見つかりません', [
+                        'partner_found' => $partner ? 'yes' : 'no',
+                        'same_user' => $partner && $user->id === $partner->id,
+                    ]);
+
                     return response()->json([
                         'status' => false,
                         'message' => '入力されたIDのユーザーが見つかりません',
                     ], 404);
                 }
 
+                Log::warning('[DEBUG] setPartnerを呼び出しました', [
+                    'user_id' => $user->id,
+                    'partner_id' => $partner->id,
+                ]);
+
                 $result = User::setPartner($user, $partner);
 
+                Log::warning('[DEBUG] setPartnerの結果を取得しました', ['result' => $result]);
+
                 if (! $result) {
+                    Log::error('[DEBUG] setPartnerがfalseを返しました');
+
                     return response()->json([
                         'status' => false,
                         'message' => 'パートナー設定に失敗しました',
