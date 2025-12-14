@@ -29,7 +29,7 @@ class SettingController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => '認証エラー',
+                'message' => '認証エラーによりユーザーが取得できませんでした',
             ], 401);
         }
 
@@ -43,7 +43,7 @@ class SettingController extends Controller
         ]);
 
         // ユーザー名を更新
-        if ($userName !== null) {
+        if ($userName !== null && $userName !== '') {
             try {
                 if (mb_strlen($userName) > 10) {
                     return response()->json([
@@ -68,21 +68,7 @@ class SettingController extends Controller
         }
 
         // パートナーを設定
-        if ($partnerId) {
-            Log::warning('[DEBUG] パートナー設定を開始しました', [
-                'partner_id' => $partnerId,
-                'user_couple_id' => $user->couple_id,
-            ]);
-
-            if ($user->couple_id) {
-                Log::warning('[DEBUG] ユーザーはすでにパートナーが設定されています');
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'すでにパートナーが設定されています',
-                ], 400);
-            }
-
+        if ($user->couple_id === null && $partnerId !== null) {
             try {
                 Log::warning('[DEBUG] パートナーを検索しました');
                 $partner = User::where('user_id', $partnerId)->first();
