@@ -25,8 +25,7 @@ trait ReportDataTrait
         if (isset($couple_id) && $couple_id !== null) {
             // commonモード
             $categories = Category::with(['budget' => function ($query) use ($couple_id) {
-                $query->where('couple_id', $couple_id)
-                    ->whereNull('recorded_by_user_id');
+                $query->where('couple_id', $couple_id);
             }])->get();
 
             $paymentData = Payment::with('category', 'category.categoryGroup')
@@ -66,14 +65,21 @@ trait ReportDataTrait
             // 予算データを取得
             $budget = $category->budget->first();
 
-            // period_typeに応じて予算金額を計算
-            if ($budget) {
-                $budgetAmount = $budget->period_type === 'monthly'
-                    ? $budget->amount
-                    : ceil($budget->amount / 12);
-            } else {
-                $budgetAmount = null;
+            // 予算が設定されていない場合はスキップ（支出があるカテゴリーは後から項目を追加）
+            if (! $budget) {
+                $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [
+                    'category_name' => $category->name,
+                    'budget_amount' => null,
+                    'payments' => [],
+                ];
+
+                continue;
             }
+
+            // period_typeに応じて予算金額を計算
+            $budgetAmount = $budget->period_type === 'monthly'
+                ? $budget->amount
+                : ceil($budget->amount / 12);
 
             if (isset($sortedByCategoryData[$groupCode])) {
                 $sortedByCategoryData[$groupCode]['categories'][$categoryCode] = [
