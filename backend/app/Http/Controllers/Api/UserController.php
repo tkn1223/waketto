@@ -23,12 +23,19 @@ class UserController extends Controller
             $partnerUserId = User::getPartnerUserId($user);
         }
 
+        // パートナーのidを取得
+        $partnerId = null;
+        if ($user->couple_id) {
+            $partnerId = User::getPartnerId($user->id);
+        }
+
         return response()->json([
             'id' => $user->id,
             'user_id' => $user->user_id,
             'name' => $user->name,
             'couple_id' => $user->couple_id,
             'partner_user_id' => $partnerUserId,
+            'partner_id' => $partnerId,
         ]);
     }
 

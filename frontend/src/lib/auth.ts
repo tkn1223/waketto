@@ -319,6 +319,7 @@ export async function getCurrentUserInfo(): Promise<UserInfo | null> {
       name: user.name,
       couple_id: user.couple_id || null,
       partner_user_id: user.partner_user_id || null,
+      partner_id: user.partner_id ? String(user.partner_id) : null,
       email: email,
     };
 

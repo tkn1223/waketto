@@ -16,7 +16,7 @@ export function SpendingDetailList({
   );
 
   const userId = userInfo.id;
-  const partnerId = userInfo.partner_user_id || userInfo.couple_id;
+  const partnerId = userInfo.partner_id;
 
   // 各ユーザーの支払いデータを取得
   const myPayments = paymentRecordsByUser[userId] || [];
