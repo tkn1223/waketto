@@ -28,6 +28,7 @@ const initialUserInfo: UserInfo = {
   name: "",
   couple_id: null,
   partner_user_id: null,
+  partner_id: null,
   email: null,
 };
 

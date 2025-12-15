@@ -6,6 +6,7 @@ export interface User {
   cognito_sub: string;
   couple_id: string | null;
   partner_user_id: string | null;
+  partner_id: number | null;
   created_at: string;
 }
 
@@ -16,6 +17,7 @@ export interface UserInfo {
   name: string;
   couple_id: string | null;
   partner_user_id: string | null;
+  partner_id: string | null;
   email: string | null;
 }
 
