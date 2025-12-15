@@ -37,7 +37,10 @@ export function TransactionRow({
   }, []); // 依存関係なし
 
   // 非表示条件：budget_amountが0 かつ 実績も0の場合
-  if (category.budget_amount === 0 && totalAmount === 0) {
+  if (
+    (category.budget_amount === 0 || category.budget_amount === null) &&
+    totalAmount === 0
+  ) {
     return null;
   }
 
