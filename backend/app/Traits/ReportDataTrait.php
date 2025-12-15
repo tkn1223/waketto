@@ -25,8 +25,7 @@ trait ReportDataTrait
         if (isset($couple_id) && $couple_id !== null) {
             // commonモード
             $categories = Category::with(['budget' => function ($query) use ($couple_id) {
-                $query->where('couple_id', $couple_id)
-                    ->whereNull('recorded_by_user_id');
+                $query->where('couple_id', $couple_id);
             }])->get();
 
             $paymentData = Payment::with('category', 'category.categoryGroup')
