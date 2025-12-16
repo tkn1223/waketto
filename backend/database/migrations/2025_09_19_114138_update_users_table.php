@@ -12,6 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            // emailカラムを削除
+            $table->dropUnique(['email']);
             $table->dropColumn('email');
             $table->string('cognito_sub', 50)->nullable(false)->change();
         });
@@ -23,7 +25,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('email', 255)->nullable()->after('cognito_sub');
+            $table->string('email', 255)->unique()->nullable()->after('cognito_sub');
             $table->string('cognito_sub', 255)->nullable(true)->change();
         });
     }

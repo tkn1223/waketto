@@ -30,8 +30,8 @@
 
 1. [開発背景](#1開発背景)
 2. [機能一覧](#2機能一覧)
-3. [操作画面](#3画面操作)
-4. [技術スタック](#4技術スタック)
+3. [画面](#3画面)
+4. [使用技術](#)
 5. [アプリ開発の振り返り](#5アプリ開発の振り返り)
 6. [今後の展望](#6今後の展望)
 
@@ -235,6 +235,10 @@
 
 ### 3-4.アカウントの設定画面
 
+ユーザー名変更 / ログイン情報変更
+[gif 入れる]
+
+パートナー設定
 [gif 入れる]
 
 **機能**
@@ -260,60 +264,22 @@
 
 ## 4.技術スタック
 
-### 4-1.使用技術一覧
+### 4-1.使用技術
 
-#### フロントエンド
+本プロジェクトを構成する、主要な技術を紹介します。
 
-フロントエンドの開発言語として**TypeScript**を使用し、フレームワークとして使用したのは**Next.js**です。App Router を採用し、React Server Components (RSC) と Client Components を適切に使い分けています。
-
-- [Next.js](https://nextjs.org) (15.5.2) - React フレームワーク (App Router)
-- [React](https://reactjs.org) (19.1.0) - UI ライブラリ
-- [TypeScript](https://www.typescriptlang.org/) (5 系) - 型安全性
-- [AWS Amplify](https://docs.amplify.aws/) (6.15.6) - Cognito 認証
-- [TailwindCSS](https://tailwindcss.com/) (4 系) - CSS フレームワーク
-- [Radix UI](https://www.radix-ui.com/) - アクセシブルな UI コンポーネント
-- [SWR](https://swr.vercel.app/) (2.3.6) - データフェッチング
-- [Recharts](https://recharts.org/) (2.15.4) - チャート描画
-- [date-fns](https://date-fns.org/) (4.1.0) - 日付処理
-- [Lucide React](https://lucide.dev/) - アイコンライブラリ
-- [Sonner](https://sonner.emilkowal.ski/) (2.0.7) - トースト通知
-- [next-themes](https://github.com/pacocoursey/next-themes) (0.4.6) - ダークモード
-- [ESLint](https://eslint.org/) (9.34.0) - リンター
-- [Prettier](https://prettier.io/) (3.6.2) - フォーマッター
-
-**フロントエンドの責任**
-
-- AWS Cognito による認証（ログイン・ログアウト・サインアップ）
-- Amplify によるトークン管理
-- 認証フォームの UI
-- JWT トークン付き API 呼び出し
-- データの表示とユーザーインタラクション
-
-#### バックエンド
-
-バックエンドの開発言語には**PHP**、Web アプリケーションフレームワークには**Laravel**を利用しました。開発環境の構築には、**Docker**と**Docker Compose**を用いており、これを実行することで開発用のサーバーが起動し、データベースや API サーバーを含む環境が整います。
-
-- [PHP](https://www.php.net/) (8.2+) - プログラミング言語
-- [Laravel](https://laravel.com/) (12.0) - Web アプリケーションフレームワーク
-- [MySQL](https://www.mysql.com/) (8.4) - リレーショナルデータベース
-- [Composer](https://getcomposer.org/) - 依存関係管理
-- [AWS SDK for PHP](https://aws.amazon.com/sdk-for-php/) (3.356) - AWS 連携
-- [Firebase JWT](https://github.com/firebase/php-jwt) (6.11) - JWT 検証
-- [PHPUnit](https://phpunit.de/) (11.5.3) - テストフレームワーク
-- [Laravel Pint](https://laravel.com/docs/12.x/pint) (1.13) - コードスタイル整形
-- [Laravel Sail](https://laravel.com/docs/12.x/sail) (1.41) - Docker 開発環境
-
-**バックエンドの責任**
-
-- JWT トークン検証（Cognito 発行トークン）
-- データベース操作（CRUD）
-- ビジネスロジック（予算計算、集計など）
-- API エンドポイント提供
-- データバリデーション
-
-**認証**
-
-認証には**AWS Amplify v6**を用い、Cognito 認証を実装しています。
+| カテゴリ           | 技術                                                                                                    |
+| ------------------ | ------------------------------------------------------------------------------------------------------- |
+| フロントエンド     | Next.js 15.5.2 / React 19.1.0 / TypeScript 5.9.2                                                        |
+| バックエンド       | PHP 8.4 / Laravel 12.0                                                                                  |
+| データベース       | MySQL 8.4                                                                                               |
+| 認証               | AWS Cognito / AWS Amplify 6.15.6                                                                        |
+| データフェッチング | SWR / Fetch API                                                                                         |
+| 環境構築           | Docker / Docker Compose                                                                                 |
+| CI/CD              | Github Actions                                                                                          |
+| インフラ           | S3 / CloudFront / ECR / ECS Fargate / VPC / RDS /<br>ALB / Route53 / ACM / CloudWatch / Systems Manager |
+| UI/スタイリング    | Shadcn/ui / Tailwind CSS                                                                                |
+| コード品質         | ESLint / Prettier / PHPUnit / Laravel Pint                                                              |
 
 ### 4-2.データベース設計（ER 図）
 

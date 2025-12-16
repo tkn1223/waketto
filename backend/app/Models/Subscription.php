@@ -20,4 +20,9 @@ class Subscription extends Model
         'start_date' => 'date',
         'finish_date' => 'date',
     ];
+
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
 }

@@ -144,4 +144,9 @@ class User extends Authenticatable
             return null;
         }
     }
+
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
 }

@@ -46,6 +46,7 @@ return new class extends Migration
             $table->rememberToken();
 
             // Cognito用カラムを削除
+            $table->dropUnique(['cognito_sub']);
             $table->dropColumn('cognito_sub');
         });
     }
