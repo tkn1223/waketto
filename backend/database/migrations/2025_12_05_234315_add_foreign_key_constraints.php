@@ -34,17 +34,17 @@ return new class extends Migration
                 ->references('id')
                 ->on('categories')
                 ->onDelete('restrict');
-            
+
             $table->foreign('paid_by_user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('restrict');
-            
+
             $table->foreign('recorded_by_user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('restrict');
-            
+
             $table->foreign('couple_id')
                 ->references('id')
                 ->on('couples')
@@ -57,12 +57,12 @@ return new class extends Migration
                 ->references('id')
                 ->on('couples')
                 ->onDelete('cascade');
-            
+
             $table->foreign('recorded_by_user_id')
                 ->references('id')
                 ->on('users')
                 ->onDelete('restrict');
-            
+
             $table->foreign('category_id')
                 ->references('id')
                 ->on('categories')
@@ -75,7 +75,7 @@ return new class extends Migration
                 ->references('id')
                 ->on('couples')
                 ->onDelete('cascade');
-            
+
             $table->foreign('recorded_by_user_id')
                 ->references('id')
                 ->on('users')
@@ -143,15 +143,15 @@ return new class extends Migration
             foreach ($columns as $column) {
                 $constraintName = "{$table}_{$column}_foreign";
                 $exists = DB::select(
-                    "SELECT CONSTRAINT_NAME 
+                    'SELECT CONSTRAINT_NAME 
                      FROM information_schema.KEY_COLUMN_USAGE 
                      WHERE TABLE_SCHEMA = DATABASE() 
                      AND TABLE_NAME = ? 
-                     AND CONSTRAINT_NAME = ?",
+                     AND CONSTRAINT_NAME = ?',
                     [$table, $constraintName]
                 );
 
-                if (!empty($exists)) {
+                if (! empty($exists)) {
                     Schema::table($table, function (Blueprint $table) use ($column) {
                         $table->dropForeign([$column]);
                     });
@@ -160,4 +160,3 @@ return new class extends Migration
         }
     }
 };
-
