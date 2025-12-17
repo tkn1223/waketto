@@ -23,6 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            // user_idカラムを削除
+            $table->dropUnique(['user_id']);
             $table->dropColumn('user_id');
             $table->string('name', 255)->change();
         });

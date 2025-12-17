@@ -29,4 +29,9 @@ class Category extends Model
     {
         return $this->hasMany(Budget::class, 'category_id', 'id');
     }
+
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
 }

@@ -23,6 +23,11 @@ class Payment extends Model
         return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
+
     public static function newPaymentRecord($data, $user_id, $couple_id)
     {
         try {
