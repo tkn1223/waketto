@@ -9,7 +9,7 @@ use Database\Seeders\PaymentsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ExpenseReportControllerTest extends TestCase
+class HouseholdReportControllerTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -45,12 +45,12 @@ class ExpenseReportControllerTest extends TestCase
     }
 
     /**
-     * 支出管理表APIが正常に動作し、正しい構造を返すことを確認
+     * 家計簿APIが正常に動作し、正しい構造を返すことを確認
      */
     public function test_index_returns_expected_response()
     {
         // PaymentsSeederで2025年1月のデータを作成しているので、その年月を指定
-        $response = $this->getJson('/api/expense-report/alone?year=2025&month=1');
+        $response = $this->getJson('/api/household-report/alone?year=2025&month=1');
         $data = $response->json('data');
 
         // HTTPステータスと基本構造を確認
@@ -104,3 +104,4 @@ class ExpenseReportControllerTest extends TestCase
         $this->assertCount(2, $data['monthly_variable_cost']['categories']['food_cost']['payments'], '食費の支払いが2件あること');
     }
 }
+
