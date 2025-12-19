@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Category;
 use App\Models\CategoryGroup;
-use Database\Seeders\CategoryGroupsTableSeeder;
 use Database\Seeders\CategoriesSeeder;
+use Database\Seeders\CategoryGroupsTableSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
@@ -16,7 +16,7 @@ class CategoryTest extends TestCase
     /*
      * テストデータの作成
      */
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 

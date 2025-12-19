@@ -54,4 +54,3 @@ class BudgetsSeeder extends Seeder
         ]);
     }
 }
-

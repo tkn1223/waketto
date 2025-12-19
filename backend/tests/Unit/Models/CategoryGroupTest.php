@@ -2,12 +2,12 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase;
 use App\Models\CategoryGroup;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Database\Seeders\CategoryGroupsTableSeeder;
 use Database\Seeders\CategoriesSeeder;
+use Database\Seeders\CategoryGroupsTableSeeder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 class CategoryGroupTest extends TestCase
 {

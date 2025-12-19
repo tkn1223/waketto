@@ -54,10 +54,10 @@ class CategoryControllerTest extends TestCase
                     '*' => [
                         'group_name',
                         'categories' => [
-                            '*' => ['id', 'name', 'code']
-                        ]
-                    ]
-                ]
+                            '*' => ['id', 'name', 'code'],
+                        ],
+                    ],
+                ],
             ]);
 
         // 6つのグループが存在することを確認（Seederの内容）

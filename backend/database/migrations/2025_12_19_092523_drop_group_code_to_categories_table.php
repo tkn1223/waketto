@@ -31,8 +31,8 @@ return new class extends Migration
                 'occasional_fixed_cost',
                 'occasional_variable_cost',
                 'luxury_consumption_cost',
-                'savings_investment_cost'
-                ])->after('name');
+                'savings_investment_cost',
+            ])->after('name');
         });
 
         // group_idからcodeに値を戻す

@@ -30,7 +30,7 @@ class ExpenseReportControllerTest extends TestCase
         ]);
 
         // 支払いデータを作成（ユーザーIDを渡す）
-        $paymentsSeeder = new PaymentsSeeder();
+        $paymentsSeeder = new PaymentsSeeder;
         $paymentsSeeder->run($user->id);
 
         // CognitoJwtAuthミドルウェアをモックして認証をバイパス
@@ -89,7 +89,7 @@ class ExpenseReportControllerTest extends TestCase
         // 毎月固定費に住居費カテゴリーが含まれることを確認
         $this->assertArrayHasKey('housing_cost', $data['monthly_fixed_cost']['categories']);
         $this->assertEquals('住居費', $data['monthly_fixed_cost']['categories']['housing_cost']['category_name']);
-        
+
         // PaymentsSeederで住居費（housing_cost）の支払いデータを作成しているので、それが取得されることを確認
         $this->assertNotEmpty($data['monthly_fixed_cost']['categories']['housing_cost']['payments'], '住居費の支払いデータが存在すること');
         $housingPayment = $data['monthly_fixed_cost']['categories']['housing_cost']['payments'][0];
@@ -98,7 +98,7 @@ class ExpenseReportControllerTest extends TestCase
         // 毎月変動費に食費カテゴリーが含まれることを確認
         $this->assertArrayHasKey('food_cost', $data['monthly_variable_cost']['categories']);
         $this->assertEquals('食費', $data['monthly_variable_cost']['categories']['food_cost']['category_name']);
-        
+
         // PaymentsSeederで食費（food_cost）の支払いデータを作成しているので、それが取得されることを確認
         $this->assertNotEmpty($data['monthly_variable_cost']['categories']['food_cost']['payments'], '食費の支払いデータが存在すること');
         $this->assertCount(2, $data['monthly_variable_cost']['categories']['food_cost']['payments'], '食費の支払いが2件あること');

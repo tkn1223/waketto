@@ -36,7 +36,7 @@ class PaymentsSeeder extends Seeder
                 'couple_id' => null,
                 'amount' => 80000,
                 'store_name' => null,
-                'note' => '家賃'
+                'note' => '家賃',
             ],
             // 水道光熱費の支払い
             [
@@ -47,7 +47,7 @@ class PaymentsSeeder extends Seeder
                 'couple_id' => null,
                 'amount' => 8000,
                 'store_name' => null,
-                'note' => '電気代'
+                'note' => '電気代',
             ],
             // 食費の支払い
             [
@@ -58,7 +58,7 @@ class PaymentsSeeder extends Seeder
                 'couple_id' => null,
                 'amount' => 15000,
                 'store_name' => 'スーパー',
-                'note' => '食材'
+                'note' => '食材',
             ],
             [
                 'payment_date' => '2025-01-25',
@@ -68,7 +68,7 @@ class PaymentsSeeder extends Seeder
                 'couple_id' => null,
                 'amount' => 20000,
                 'store_name' => 'スーパー',
-                'note' => '食材'
+                'note' => '食材',
             ],
         ]);
     }

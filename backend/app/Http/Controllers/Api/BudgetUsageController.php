@@ -264,8 +264,8 @@ class BudgetUsageController extends Controller
     {
         $query = Budget::with([
             'category:id,name,group_id,code',
-            'category.categoryGroup:id,code,name'
-            ])
+            'category.categoryGroup:id,code,name',
+        ])
             ->select('id', 'period', 'period_type', 'amount', 'category_id');
 
         return $couple_id
