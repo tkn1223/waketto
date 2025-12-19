@@ -15,10 +15,16 @@ class PaymentsSeeder extends Seeder
         // ユーザーIDが指定されていない場合はデフォルト値を使用
         $userId = $userId ?? 1;
 
-        // カテゴリーIDをコードから取得
-        $housingCostId = DB::table('categories')->where('code', 'housing_cost')->value('id');
-        $utilitiesCostId = DB::table('categories')->where('code', 'utilities_cost')->value('id');
-        $foodCostId = DB::table('categories')->where('code', 'food_cost')->value('id');
+        // カテゴリーIDを名前とgroup_idから取得
+        $housingCostId = DB::table('categories')
+            ->where('name', '住居費')
+            ->value('id');
+        $utilitiesCostId = DB::table('categories')
+            ->where('name', '水道光熱費')
+            ->value('id');
+        $foodCostId = DB::table('categories')
+            ->where('name', '食費')
+            ->value('id');
 
         DB::table('payments')->insert([
             // 住居費の支払い

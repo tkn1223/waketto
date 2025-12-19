@@ -59,7 +59,7 @@ trait ReportDataTrait
         }
 
         foreach ($categories as $category) {
-            $groupCode = $category->group_code;
+            $groupCode = $category->categoryGroup->code;
             $categoryCode = $category->code;
 
             // 予算データを取得
@@ -91,7 +91,7 @@ trait ReportDataTrait
         }
 
         foreach ($paymentData as $payment) {
-            $groupCode = $payment->category->group_code;
+            $groupCode = $payment->category->categoryGroup->code;
             $categoryCode = $payment->category->code;
 
             if (! isset($sortedByCategoryData[$groupCode]['categories'][$categoryCode])) {

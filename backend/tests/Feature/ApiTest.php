@@ -35,7 +35,7 @@ class ApiTest extends TestCase
         });
 
         $categoriesResponse = $this->get('/api/categories');
-        $expenseReportResponse = $this->get('/api/expense-report');
+        $expenseReportResponse = $this->get('/api/expense-report/alone');
         $categoriesResponse->assertStatus(200);
         $expenseReportResponse->assertStatus(200);
     }

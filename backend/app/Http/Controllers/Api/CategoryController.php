@@ -14,15 +14,15 @@ class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $categories = Category::select('id', 'name', 'code', 'group_code')
-            ->with('categoryGroup:code,name')
+        $categories = Category::select('id', 'name', 'group_id', 'code')
+            ->with('categoryGroup:id,code,name')
             ->get();
 
         // データをグループ化して整形
         $groupedData = [];
 
         foreach ($categories as $category) {
-            $groupCode = $category->group_code;
+            $groupCode = $category->categoryGroup->code;
             $groupName = $category->categoryGroup->name ?? $groupCode;
 
             if (! isset($groupedData[$groupCode])) {

@@ -8,8 +8,8 @@ class Category extends Model
 {
     protected $fillable = [
         'name',
+        'group_id',
         'code',
-        'group_code',
         'type',
         'recorded_by_user_id',
         'couple_id',
@@ -17,7 +17,7 @@ class Category extends Model
 
     public function categoryGroup()
     {
-        return $this->belongsTo(CategoryGroup::class, 'group_code', 'code');
+        return $this->belongsTo(CategoryGroup::class, 'group_id', 'id');
     }
 
     public function payment()

@@ -13,6 +13,6 @@ class CategoryGroup extends Model
 
     public function category()
     {
-        return $this->hasMany(Category::class, 'group_code', 'code');
+        return $this->hasMany(Category::class, 'group_id', 'id');
     }
 }

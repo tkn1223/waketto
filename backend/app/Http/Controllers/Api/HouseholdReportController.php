@@ -63,12 +63,7 @@ class HouseholdReportController extends Controller
                     $startYear = $startDate->year;
                     $startMonth = $startDate->month;
                     $startDay = $startDate->day;
-
-                    Log::info('subscription: '.$subscription->service_name);
-                    Log::info('startYear: '.$startYear);
-                    Log::info('startMonth: '.$startMonth);
-                    Log::info('startDay: '.$startDay);
-
+                    
                     // 開始月と異なる月はスキップ
                     if ($month !== $startMonth) {
                         continue;

@@ -32,9 +32,8 @@ class CategoryGroupTest extends TestCase
         $this->assertEquals(7, $categories->count(), 'カテゴリーグループが7つのカテゴリを持つことを確認');
 
         // リレーションが取得できることを確認
-        $housingCost = $categories->where('code', 'housing_cost')->first();
+        $housingCost = $categories->where('name', '住居費')->first();
         $this->assertNotNull($housingCost);
-        $this->assertEquals('housing_cost', $housingCost->code);
         $this->assertEquals('住居費', $housingCost->name);
     }
 }

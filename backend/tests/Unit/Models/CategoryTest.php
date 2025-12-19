@@ -40,19 +40,19 @@ class CategoryTest extends TestCase
     }
 
     /**
-     * カテゴリーのgroup_code属性とリレーション経由のcodeが一致することを確認
+     * カテゴリーのgroup_idとリレーション経由のidが一致することを確認
      */
-    public function test_category_group_code_matches_relation_code()
+    public function test_category_group_id_matches_relation_id()
     {
         // カテゴリーを取得
         $category = Category::where('code', 'housing_cost')->first();
 
-        // group_code属性とリレーション経由のcodeが一致することを確認
-        $this->assertNotNull($category->group_code, 'カテゴリーにgroup_code属性が存在すること');
+        // group_id属性とリレーション経由のidが一致することを確認
+        $this->assertNotNull($category->group_id, 'カテゴリーにgroup_id属性が存在すること');
         $this->assertEquals(
-            $category->group_code,
-            $category->categoryGroup->code,
-            'group_code属性とリレーション経由のcodeが一致すること'
+            $category->group_id,
+            $category->categoryGroup->id,
+            'group_id属性とリレーション経由のidが一致すること'
         );
     }
 }
