@@ -80,7 +80,7 @@ class BudgetUsageController extends Controller
                     return [
                         'name' => $budget->category->name,
                         'code' => $budget->category->code,
-                        'groupCode' => $budget->category->group_code,
+                        'groupCode' => $budget->category->categoryGroup->code,
                         'period' => $budget->period,
                         'periodType' => $budget->period_type,
                         'amount' => $budget->amount,
@@ -262,7 +262,10 @@ class BudgetUsageController extends Controller
 
     private function getBudgetSettingData($couple_id, $userId)
     {
-        $query = Budget::with(['category:id,name,code,group_code'])
+        $query = Budget::with([
+            'category:id,name,group_id,code',
+            'category.categoryGroup:id,code,name',
+        ])
             ->select('id', 'period', 'period_type', 'amount', 'category_id');
 
         return $couple_id

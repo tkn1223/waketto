@@ -9,7 +9,6 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class HouseholdReportController extends Controller
 {
@@ -63,11 +62,6 @@ class HouseholdReportController extends Controller
                     $startYear = $startDate->year;
                     $startMonth = $startDate->month;
                     $startDay = $startDate->day;
-
-                    Log::info('subscription: '.$subscription->service_name);
-                    Log::info('startYear: '.$startYear);
-                    Log::info('startMonth: '.$startMonth);
-                    Log::info('startDay: '.$startDay);
 
                     // 開始月と異なる月はスキップ
                     if ($month !== $startMonth) {
