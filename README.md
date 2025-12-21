@@ -405,36 +405,287 @@ main ブランチへのマージをトリガーに、AWS（ECR / ECS / S3）へ�
 
 [インフラ構成図を追加]
 
-## 5.アプリ開発の振り返り
+## 5.こだわった実装
 
-### 5-1.こだわった実装（4 ～ 5 こ）
+Web アプリを実装するにあたり、以下の実装にこだわって作成しました。
 
-- UI/UX
+- JWT トークンによるセキュアな認証
+- SWR によるリアルタイムデータ更新
+- 支出管理と家計簿の融合
+- 個人モードと共有モードの切り替え
+- サブスクリプションの明細反映
 
-  - SWR を利用することで入力した内容がその場で更新されるようにした
-    - 2 回目のアクセス時にキャッシュからデータを返すのでレスポンス速度が向上する。ユーザーにロードのストレスを感じさせない操作感を提供できた
-    - 先にデータの更新を行い、後からバックエンドとデータの整合性を取る仕組みになっている。ほぼリアルタイムでのデータ更新が実現できた。
-  - shadcnui と tailwindcss を活用することで、モダンなデザインのサイトを開発コストを抑えて構築することが出来た
-    - コンポーネント単位での使用ができるため、学習初期に React のコンポーネントの概念を理解するのに役立った
+### JWT トークンによるセキュアな認証
 
-- 認証機能（JWT トークンの活用、リアルタイムバリデーションなど）
+AWS Cognito と JWT トークンを使用したステートレスな認証を実装しました。<br>
+バックエンドでは、カスタムミドルウェア CognitoJwtAuth を作成し、リクエストヘッダーの JWT トークンを検証しています。
 
-- 共有モード・couple 機能の実装方法（個人、共有のデータ取得）
+**1. リクエストヘッダーから JWT トークンを取得**<br>
+API リクエストの `Authorization` ヘッダーから `Bearer` トークンを抽出します。
 
-- 支出管理の表示
+```
+// リクエストからBearerトークンを取得
+private function getTokenFromRequest(Request $request): ?string
+{
+  $header = $request->header('Authorization');
 
-  - 支出管理の ROW 表示（予算とカテゴリーのまとめと、詳細の明細をどう表示させているのか）
-  - ６つの象限に分かれたカテゴリーを用意し、表示させている。通常の家計簿アプリとは違った区切りで作成した。リベラルアーツ大学という Youtube コンテンツを学習しており、リベ大が提唱している支出管理の考え方を参考にした。
-  - 予算の表示。予算が登録してある/ない。予算が 0 円である/1 円以上である。などで細かく条件分岐することで、予算が登録されている時は表示される仕組みを実装している
-    また、実績がなくとも予算を作成していたら、収支に表示されるようにした。支出管理＝家計簿ではない（年間の予算を 12 で割って月の予算を決めるなど）が、この仕組みを導入することでただの支出入力がうまく支出管理とまじりあうようにした。
+  if ($header && str_starts_with($header, 'Bearer ')) {
+    return substr($header, 7);
+  }
 
-- 家計簿のグラフ表示（どのようなデータ整形を行っているのか）
+  return null;
+}
+```
 
-- サブスクリプション機能
+**2. JWT トークンの改ざん検証**<br>
+Cognito の公開鍵（JWKS）を使用して、JWT トークンが改ざんされていないかを検証します。<br>
+この仕組みにより、第三者が偽造したトークンでは API にアクセスできないようになっています。
 
-  - サブスクとして登録した内容が支出管理にも表示される
+```
+// Cognitoの公開鍵を取得
+$publicKey = $this->getCognitoPublicKey($kid);
 
-### 5-2.苦労した点
+// JWTの改ざん検証を行い、ペイロードを取得
+$payload = JWT::decode($token, $publicKey);
+```
+
+**3. トークンの有効期限チェック**<br>
+トークンの有効期限（`exp`）をチェックし、期限切れの場合は認証を拒否します。<br>
+有効なトークンの場合のみ、ペイロードからユーザー情報を取得し、API の処理を続行します。
+
+```
+if (isset($payload->exp) && $payload->exp < time()) {
+  Log::error('JWTトークンの有効期限が切れています');
+  return null;
+}
+
+// ユーザーを取得または作成
+return $this->getUserFromPayload($payload);
+```
+
+この実装により、不正なリクエストを防ぐ API アクセスを実現することができました。<br>
+フロントエンドでは、AWS Amplify を使用してトークンの自動更新を実装することで、ユーザーは再ログインすることなく、シームレスにアプリを利用できます。
+
+### SWR によるリアルタイムデータ更新
+
+本アプリでは、明細を登録・編集・削除した際に、<br>
+支出管理表・家計簿・予算消化状況など複数のコンポーネントを即座に更新する必要がありました。
+
+そこで、SWR のカスタムフックを使用してデータを取得し、`mutate` 関数で画面を更新する仕組みを実装しました。
+
+**1. SWR でデータを取得**
+各画面で必要なデータを SWR のカスタムフック（`useExpenseReport`、`useBudgetUsage`）で取得します。<br>
+この時、`mutate` 関数も同時に取得しておくことで、後からデータを再取得できるようにしています。
+
+```
+const {
+  data: expenseReport,
+  error: expenseReportError,
+  isLoading: isExpenseReportLoading,
+  mutate: expenseMutate,
+} = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
+
+const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
+  user,
+  yearlyDateSelector,
+  isAuth
+);
+```
+
+**2. データ更新時に複数の画面を一括更新**
+明細の登録・編集・削除が成功すると、`handleUpdate` 関数が呼ばれます。<br>
+この関数内で、支出管理表（`expenseMutate`）と予算消化状況（`budgetUsageMutate`）の `mutate` を実行することで、<br>
+関連する全ての画面のデータが自動的に再取得されます。
+
+```
+const handleUpdte = () => {
+  void expenseMutate();
+  void budgetUsageMutate();
+};
+```
+
+**3. 明細更新後に画面を再取得**
+明細の更新が成功したら、`onSuccess` コールバックを実行します。<br>
+この `onSuccess` には `handleUpdate` 関数が渡されており、自動的に関連画面のデータが再取得されます。
+
+```
+const response = await putTransaction(requestData, transactionPatch?.id);
+
+if (response.status) {
+  toast.success("取引明細を更新しました");
+  resetForm();
+  onSuccess(); // ← ここで handleUpdate が呼ぶ
+}
+```
+
+**4. キャッシュ機能で高速表示**
+SWR のキャッシュ機能により、2 秒以内の重複リクエストは自動的にキャッシュから返されます。<br>
+これにより、2 回目以降のアクセスでは高速にデータを表示でき、ユーザーにストレスのない快適な操作感を提供できました。
+
+```
+export const swrConfig = {
+  // キャッシュ設定
+  dedupingInterval: 2000, // 2 秒間は重複リクエストを防ぐ
+
+  // エラー時の再試行
+  errorRetryCount: 3, // 最大 3 回再試行
+  errorRetryInterval: 5000, // 5 秒間隔で再試行
+};
+```
+
+### 支出管理と家計簿の融合
+
+本アプリの最大の特徴は、1 度の入力で支出管理と家計簿の両方を管理できることです。<br>
+この特徴を生かすために、登録された支出や予算の情報を綺麗に表示させるよう、以下の工夫を凝らしました。
+
+**1. 予算または実績があるカテゴリーのみ表示**<br>
+支出管理表では予算が 0 円かつ実績も 0 円のカテゴリーは表示しません。<br>
+これにより、ユーザーに関係のないカテゴリーは自動的に非表示になり、見やすさを向上させています。
+
+```
+// 予算0 かつ 支出登録なしは非表示
+if (category.budget_amount === 0 && totalAmount === 0) {
+  return null;
+}
+
+・・・
+
+// 支出登録はないが予算が0以上は表示
+{totalAmount === 0 &&
+category.budget_amount !== null &&
+category.budget_amount > 0 ? (
+  <div className="col-span-7 flex items-end justify-end gap-2">
+    <span className="text-gray-500 text-xs">予算</span>
+    <span className="">
+      {category.budget_amount.toLocaleString()} 円
+    </span>
+  </div>
+) : (
+  // 支出登録のあるカテゴリーは表示
+  <>
+    <span className="col-span-4 text-right text-gray-500 text-xs">
+      {category.budget_amount !== null
+        ? `予算 ${category.budget_amount?.toLocaleString()} 円`
+        : ``}
+    </span>
+    <span className="col-span-3 text-right">
+      {totalAmount.toLocaleString()} 円
+    </span>
+  </>
+)}
+```
+
+**2. 年間予算を月額換算して表示**<br>
+予算設定では月次・年次を選択できますが、支出管理表では全て月額換算で表示します。<br>
+例えば、「年間 12 万円の予算」を設定すると、支出管理表では「月 1 万円の予算」として表示されます。
+
+これにより、月ごとの支出と予算を比較しやすくなり、予算管理がしやすくなりました。
+
+```
+// period_typeに応じて予算金額を計算
+if ($budget) {
+    $budgetAmount = $budget->period_type === 'monthly'
+        ? $budget->amount
+        : ceil($budget->amount / 12);
+} else {
+    $budgetAmount = null;
+}
+```
+
+これらの仕組みにより、支出管理と家計簿を自然に融合させることができました。
+
+### 個人モードと共有モードの切り替え
+
+ユーザーモード（個人/共有）を切り替えることで、それぞれで別の支出を管理できるようにしました。
+
+フロントエンドでは `ViewModeContext` でユーザーモードを管理し、<br>
+モード切替時に SWR の `mutate` を使用して関連データを自動再取得します。
+
+ユーザーモードが切り替わると、/expense-report で始まる全てのキャッシュキーに対して mutate が実行され、<br>
+個人データまたは共有データが自動的に再取得されます。
+
+```
+const [user, setUser] = useState<UserMode>(() => {
+    if (typeof window !== "undefined") {
+        const currentUser = localStorage.getItem("userMode");
+
+        if (currentUser === "alone" || currentUser === "common") {
+            return currentUser;
+        }
+    }
+
+    return "alone";
+});
+
+・・・
+
+const handleUserChange = (mode: UserMode) => {
+    setUser(mode);
+    // モード切替時にデータを再取得
+    void mutate(
+        (key) => typeof key === "string" && key.startsWith("/expense-report")
+    );
+};
+
+・・・
+
+useEffect(() => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem("userMode", user);
+    }
+}, [user]);
+```
+
+バックエンドでは、API リクエストに含まれる userMode パラメータに応じて、取得するデータの条件を切り替えています。<br>
+同じ API エンドポイントで、両方のモードに対応できる設計としました。
+
+取得の条件配下の通りです。
+
+- 共有モード
+  - payment.couple_id と user.couple_id が一致する
+- 個人モード
+- payment.recorded_by_user_id と user.id が一致する
+- payment.couple_id が Null
+
+```
+if (isset($couple_id) && $couple_id !== null) {
+    // commonモード
+    $categories = Category::with(['budget' => function ($query) use ($couple_id) {
+        $query->where('couple_id', $couple_id);
+    }])->get();
+
+    $paymentData = Payment::with('category', 'category.categoryGroup')
+        ->where('couple_id', $couple_id)
+        ->whereBetween('payment_date', [$startDate, $endDate])
+        ->orderBy('payment_date', 'asc')
+        ->get();
+} else {
+    // aloneモード
+    $categories = Category::with(['budget' => function ($query) use ($userId) {
+        $query->where('recorded_by_user_id', $userId)
+            ->whereNull('couple_id');
+    }])->get();
+
+    $paymentData = Payment::with('category', 'category.categoryGroup')
+        ->where('recorded_by_user_id', $userId)
+        ->whereNull('couple_id')
+        ->whereBetween('payment_date', [$startDate, $endDate])
+        ->orderBy('payment_date', 'asc')
+        ->get();
+}
+```
+
+### サブスクリプションの明細反映
+
+サブスクリプションとして登録した内容が、支出管理表と家計簿に自動的に明細として反映される機能を実装しました。
+バックエンドでは、サブスクリプションデータを取得し、月額・年額に応じて適切な金額を計算しています。
+
+```
+
+```
+
+契約開始日・終了日を考慮し、該当月のみサブスクリプションデータを取得します。年額の場合は 12 で割った金額を月次明細として表示することで、月ごとの支出を正確に把握できるようにしました。
+これにより、毎月手動で入力する手間を省き、固定費の管理を効率化できました。
 
 ## 6.今後の展望
 
@@ -458,3 +709,7 @@ main ブランチへのマージをトリガーに、AWS（ECR / ECS / S3）へ�
 - ユーザー増やす
 
   - SNS での発信。リベシティ内での紹介
+
+```
+
+```
