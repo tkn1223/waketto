@@ -129,7 +129,7 @@
 
 #### アカウント作成
 
-[gif 入れる]
+![アカウント作成](.github/images/アカウント作成.gif)
 
 **機能**
 
@@ -145,7 +145,7 @@
 
 #### ログイン方法
 
-[gif 入れる]
+![ログイン方法](.github/images/ログイン方法.gif)
 
 **機能**
 
@@ -158,7 +158,7 @@
 
 #### 支出管理
 
-[gif 入れる]
+![支出管理](.github/images/支出管理.gif)
 
 **機能**
 
@@ -181,7 +181,7 @@
 
 #### 家計簿
 
-[gif 入れる]
+![家計簿](.github/images/家計簿.gif)
 
 **機能**
 
@@ -204,7 +204,7 @@
 
 #### 予算
 
-[gif 入れる]
+![予算](.github/images/予算.gif)
 
 **機能**
 
@@ -220,7 +220,7 @@
 
 #### サブスクリプション
 
-[gif 入れる]
+![サブスクリプション](.github/images/サブスク.gif)
 
 **機能**
 
@@ -236,10 +236,10 @@
 ### 3-4.アカウントの設定画面
 
 ユーザー名変更 / ログイン情報変更
-[gif 入れる]
+![アカウント設定](.github/images/アカウント設定.gif)
 
 パートナー設定
-[gif 入れる]
+![アカウント設定２](.github/images/アカウント設定２.gif)
 
 **機能**
 
@@ -294,7 +294,7 @@ SPA を実現するために、以下の理由から React と Next.js を採用
   - コンポーネントベースで UI を構築できるため、支出入力フォーム / 支出管理表示 / 予算設定など繰り返し使用する UI パーツを効率的に開発・管理できます。<br>
     また、状態管理が容易で入力したデータを画面に即座に反映することができます。
 - Next.js
-  - SPA のリアルタイム性を維持しながら、SSR により初回ロード時間を短縮することができました。<br>
+  - SPA のリアルタイム性を維持しながら、静的サイト生成（SSG）により初回ロード時間を短縮することができました。<br>
     また、App Router を採用することで、複数のページへのルーティングを直感的に管理することができました。
 
 家計簿アプリでは、金額 / 日付 / カテゴリー / 明細 / 予算 / モードなど、多様で複雑なデータを扱います。<br>
@@ -399,7 +399,7 @@ main ブランチへのマージをトリガーに、AWS（ECR / ECS / S3）へ�
 
 ### 4-2.データベース設計（ER 図）
 
-[ER 図を追加]
+![わけっとER図](.github/images/わけっと_ER図.png)
 
 ### 4-3.インフラ構成図
 
@@ -540,7 +540,7 @@ export const swrConfig = {
 
 **1. 予算または実績があるカテゴリーのみ表示**<br>
 支出管理表では予算が 0 円かつ実績も 0 円のカテゴリーは表示しません。<br>
-これにより、ユーザーに関係のないカテゴリーは自動的に非表示になり、見やすさを向上させています。
+これにより、ユーザーに関係のないカテゴリーは自動的に非表示になり、UX を向上させています。
 
 ```
 // 予算0 かつ 支出登録なしは非表示
@@ -598,7 +598,8 @@ if ($budget) {
 
 ユーザーモード（個人/共有）を切り替えることで、それぞれで別の支出を管理できるようにしました。
 
-フロントエンドでは `ViewModeContext` でユーザーモードを管理し、<br>
+**フロントエンド**<br>
+`ViewModeContext` でユーザーモードを管理し、<br>
 モード切替時に SWR の `mutate` を使用して関連データを自動再取得します。
 
 ユーザーモードが切り替わると、/expense-report で始まる全てのキャッシュキーに対して mutate が実行され、<br>
@@ -636,7 +637,8 @@ useEffect(() => {
 }, [user]);
 ```
 
-バックエンドでは、API リクエストに含まれる userMode パラメータに応じて、取得するデータの条件を切り替えています。<br>
+**バックエンド**<br>
+API リクエストに含まれる userMode パラメータに応じて、取得するデータの条件を切り替えています。<br>
 同じ API エンドポイントで、両方のモードに対応できる設計としました。
 
 取得の条件配下の通りです。
@@ -644,8 +646,8 @@ useEffect(() => {
 - 共有モード
   - payment.couple_id と user.couple_id が一致する
 - 個人モード
-- payment.recorded_by_user_id と user.id が一致する
-- payment.couple_id が Null
+  - payment.recorded_by_user_id と user.id が一致する
+  - payment.couple_id が Null
 
 ```
 if (isset($couple_id) && $couple_id !== null) {
@@ -677,39 +679,93 @@ if (isset($couple_id) && $couple_id !== null) {
 
 ### サブスクリプションの明細反映
 
-サブスクリプションとして登録した内容が、支出管理表と家計簿に自動的に明細として反映される機能を実装しました。
-バックエンドでは、サブスクリプションデータを取得し、月額・年額に応じて適切な金額を計算しています。
+サブスクリプションは「支出明細」や「予算」のような単発の日付ではなく、開始日〜終了日の期間で登録されます。<br>
+そのため、各月の画面では「その月の期間にサブスクが 1 日でも存在するか（期間が重なるか）」を判定して表示対象を決めます。
+
+**表示対象の判定（期間の重なり）**
+
+表示する月の期間を startDate（月初）〜 endDate（月末）として取得し、次の条件を満たすサブスクのみ取得します。
+
+- start_date <= endDate
+- finish_date >= startDate
+
+つまり、月の期間とサブスク期間が重なっているデータだけ表示します。
+
+![サブスク表示の考え方](/.github/images/サブスク表示の考え方.PNG)
+
+```
+// 支出管理および家計簿に表示するサブスクリプションのデータのみ取得
+public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
+{
+    if (isset($couple_id) && $couple_id !== null) {
+        // commonモード
+        $subscriptionData = Subscription::where('couple_id', $couple_id)
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('finish_date', '>=', $startDate)
+            ->get();
+    } else {
+        // aloneモード（自分が記録したデータのみ + couple_idがnull)
+        $subscriptionData = Subscription::where('recorded_by_user_id', $userId)
+            ->whereNull('couple_id')
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('finish_date', '>=', $startDate)
+            ->get();
+    }
+
+    return $subscriptionData;
+}
+
+・・・
+
+// サブスク費を一律で１カ月払いで表示させる
+if ($subscriptionCategory instanceof Category && $subscriptionData instanceof Collection && ! $subscriptionData->isEmpty()) {
+    foreach ($subscriptionData as $subscription) {
+        // 日付を作成
+        $day = date('d', strtotime($subscription->start_date));
+
+        // 有効な日付かチェック（例：2月30日は存在しない）
+        if (! checkdate($month, $day, $year)) {
+            $paymentDate = date('Y-m-t', strtotime("{$year}-{$month}-01"));
+        } else {
+            $paymentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+        }
+
+        $paymentAmount = $subscription->billing_interval === 'monthly' ? $subscription->amount : ceil($subscription->amount / 12);
+
+        $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost']['payments'][] = [
+            'id' => $subscription->id,
+            'user' => $subscription->recorded_by_user_id,
+            'amount' => $paymentAmount,
+            'date' => $paymentDate,
+            'category' => $subscriptionCategory->id,
+            'shop_name' => $subscription->service_name,
+            'memo' => null,
+            'category_group_code' => 'monthly_fixed_cost',
+            'is_subscription' => true, // サブスクリプションかどうか
+        ];
+    }
+}
+
+・・・
 
 ```
 
-```
-
-契約開始日・終了日を考慮し、該当月のみサブスクリプションデータを取得します。年額の場合は 12 で割った金額を月次明細として表示することで、月ごとの支出を正確に把握できるようにしました。
-これにより、毎月手動で入力する手間を省き、固定費の管理を効率化できました。
+取得したサブスクは payment テーブルに保存せず、月表示用の payments[] に組み立てて表示します。<br>
+これにより、サブスクリプション登録だけで支出管理・家計簿に表示でき、payment の実データは増やさずに済む構成にしています。
 
 ## 6.今後の展望
 
-- Google 認証機能
+以下の機能の実装を予定しています。
 
-- スマホアプリ対応
-
-  - 支出の入力はやはりスマホの方が手軽でよい
-
+- Google アカウントを使った認証機能
+- 明細の自動取得
+  - カードと連携し明細を自動取得
+  - 取得した明細はカテゴリーのみ入力していない状態で、振り分け前の項目に設置する
+- スマホに特化した UI 開発
+  - 支出登録画面を右下に常時表示させる
+  - 画面下部にナビゲーションを用意する
 - カテゴリーのカスタマイズ機能
-
-  - 教育費、車検費、税金など。人の特性に応じて不要なカテゴリーがある
-  - 浪費、投資の項目だけは好きに増やせてもよいかも（それ以外は不要。このアプリの特徴だし）
-
-- 明細の自動取得（カード会社のと API 連携）
-
+  - カテゴリーの色分けをユーザーごとに設定できる
+  - 浪費・投資の項目のみカテゴリの追加可能
 - 支出のカレンダー表記機能
-
-  - 一部ユーザーからカレンダー形式での表示機能を実装を求められた。多くの工数がかかる見込みなので、時間と満足度の兼ね合いを慎重に見極めて必要次応じて実装する・
-
-- ユーザー増やす
-
-  - SNS での発信。リベシティ内での紹介
-
-```
-
-```
+  - 家計簿モードの円グラフの下のスペースを使って実装予定
