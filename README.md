@@ -31,8 +31,8 @@
 1. [開発背景](#1開発背景)
 2. [機能一覧](#2機能一覧)
 3. [画面](#3画面)
-4. [使用技術](#)
-5. [アプリ開発の振り返り](#5アプリ開発の振り返り)
+4. [技術スタック](#4技術スタック)
+5. [こだわった実装](#5こだわった実装)
 6. [今後の展望](#6今後の展望)
 
 ## 1.開発背景
@@ -52,7 +52,7 @@
 が分からず、「お金が貯まっている実感」を得ることができませんでした。
 
 この原因は**事前に予算を設定していない**ことだと考えています。<br>
-予算がないため、「何にいくら使っていいか」の基準がなく、支出の適切性を判断できなかったのです。
+予算を決めていないため、「何にいくら使っていいか」の基準がなく、支出の適切性を判断できませんでした。
 
 ### 課題 2：パートナーとの煩雑な精算処理
 
@@ -129,7 +129,7 @@
 
 #### アカウント作成
 
-[gif 入れる]
+![アカウント作成](.github/images/アカウント作成.gif)
 
 **機能**
 
@@ -145,7 +145,7 @@
 
 #### ログイン方法
 
-[gif 入れる]
+![ログイン方法](.github/images/ログイン方法.gif)
 
 **機能**
 
@@ -158,7 +158,7 @@
 
 #### 支出管理
 
-[gif 入れる]
+![支出管理](.github/images/支出管理.gif)
 
 **機能**
 
@@ -181,7 +181,7 @@
 
 #### 家計簿
 
-[gif 入れる]
+![家計簿](.github/images/家計簿.gif)
 
 **機能**
 
@@ -204,7 +204,7 @@
 
 #### 予算
 
-[gif 入れる]
+![予算](.github/images/予算.gif)
 
 **機能**
 
@@ -220,7 +220,7 @@
 
 #### サブスクリプション
 
-[gif 入れる]
+![サブスクリプション](.github/images/サブスク.gif)
 
 **機能**
 
@@ -236,10 +236,10 @@
 ### 3-4.アカウントの設定画面
 
 ユーザー名変更 / ログイン情報変更
-[gif 入れる]
+![アカウント設定](.github/images/アカウント設定.gif)
 
 パートナー設定
-[gif 入れる]
+![アカウント設定２](.github/images/アカウント設定２.gif)
 
 **機能**
 
@@ -267,6 +267,7 @@
 ### 4-1.使用技術
 
 本プロジェクトを構成する、主要な技術を紹介します。
+実務で広く使用されている技術を採用し、実践的なスキル習得を目指しました。
 
 | カテゴリ           | 技術                                                                                                    |
 | ------------------ | ------------------------------------------------------------------------------------------------------- |
@@ -276,28 +277,495 @@
 | 認証               | AWS Cognito / AWS Amplify 6.15.6                                                                        |
 | データフェッチング | SWR / Fetch API                                                                                         |
 | 環境構築           | Docker / Docker Compose                                                                                 |
-| CI/CD              | Github Actions                                                                                          |
 | インフラ           | S3 / CloudFront / ECR / ECS Fargate / VPC / RDS /<br>ALB / Route53 / ACM / CloudWatch / Systems Manager |
 | UI/スタイリング    | Shadcn/ui / Tailwind CSS                                                                                |
+| CI/CD              | Github Actions                                                                                          |
 | コード品質         | ESLint / Prettier / PHPUnit / Laravel Pint                                                              |
+
+#### 技術選定理由
+
+**【フロントエンド】**<br>
+本アプリは支出の登録 / 編集 / 削除を頻繁に行い、その結果を即座に複数の画面（支出管理・家計簿・推移）に反映させる必要があります。<br>
+このようなリアルタイム性の高い UX を提供するためには、SPA が最適だと判断しました。<br>
+
+SPA を実現するために、以下の理由から React と Next.js を採用しました。
+
+- React
+  - コンポーネントベースで UI を構築できるため、支出入力フォーム / 支出管理表示 / 予算設定など繰り返し使用する UI パーツを効率的に開発・管理できます。<br>
+    また、状態管理が容易で入力したデータを画面に即座に反映することができます。
+- Next.js
+  - SPA のリアルタイム性を維持しながら、静的サイト生成（SSG）により初回ロード時間を短縮することができました。<br>
+    また、App Router を採用することで、複数のページへのルーティングを直感的に管理することができました。
+
+家計簿アプリでは、金額 / 日付 / カテゴリー / 明細 / 予算 / モードなど、多様で複雑なデータを扱います。<br>
+これらのデータが正しい方で受け渡しされないと、計算ミスや表示エラーに繋がります。<br>
+
+TypeScript を採用することで、開発段階でデータの型を厳密にチェックでき、予期せぬバグを未然に防ぐことができました。<br>
+導入時は型の厳密さに苦しめられることもありましたが、支出管理と家計簿、予算と実績などの似た構造のデータを管理する際に<br>
+安全にデータの受け渡しが行えるようになったことは大きなメリットでした。
+
+**【バックエンド】**<br>
+Web アプリケーションの開発に必要な機能（ルーティング・バリデーション・ORM（Eloquent））が標準で揃っており、<br>
+効率的に開発を進めることができる Laravel を採用しました。
+
+特に、本プロジェクトでは複数のテーブル（明細・予算・サブスクリプション）をリレーションしてデータを扱います。
+Eloquent を使用することで、これらのリレーションを直感的に定義 / 操作できたことは、開発効率の向上に大幅に役立ちました。
+
+またバリデーション機能を活用することで、送信されるデータの整合性をバックエンドでもチェックすることができ、データの信頼性を確保できました。
+
+**【データベース】**<br>
+本番環境で AWS RDS を使用することを想定し、MySQL を採用しました。<br>
+Laravel の Eloquent ORM との相性も良く、開発環境から本番環境まで一貫したデータベース環境を構築できました。
+
+**【認証】**<br>
+本アプリでは、ユーザーのパスワードなどの機密情報を運営者側で管理せず、<br>
+セキュアな認証基盤を構築するため、AWS Cognito を採用しました。
+
+Cognito を使用することで、以下３点を実現できました。
+
+- JWT トークンによるステートレスな認証
+- トークンの自動更新によるシームレスなセッション維持
+- トークン期限切れ時の再ログイン促進
+
+AWS Amplify ライブラリと組み合わせることで、
+複雑な認証フローを少ないコードで実装できました。
+
+**【データフェッチング】**<br>
+本アプリでは、明細の登録・編集・削除を行った際に、<br>
+支出管理表・家計簿・グラフなど複数の画面を即座に更新する必要があります。
+
+SWR を採用することで、以下２点を実現できました。
+
+- データ更新後の自動再検証により、画面をリアルタイムで更新
+- キャッシュ機能により、2 回目以降のアクセスで高速表示
+
+結果として、ユーザーにストレスのない快適な操作感を提供できました。
+
+**【環境構築】**<br>
+開発環境の統一と、実務で広く使われている技術の習得を目的に、<br>
+Docker / Docker Compose を採用しました。
+
+コンテナ化により、以下を実現できました。
+
+- ローカル環境を汚さず、プロジェクトごとに独立した環境を構築
+- 開発環境と本番環境（ECS）の差異を最小化
+- チーム開発時の環境差異によるトラブルを防止
+
+また、本番環境で ECS Fargate を使用することを想定し、<br>
+早期から Docker に慣れておくことも目的の一つでした。
+
+**【インフラ】**<br>
+実務で広く使用されているクラウドインフラの構築を学ぶため、AWS を採用しました。
+
+本プロジェクトでは、フロントエンド（S3 + CloudFront）とバックエンド（ECS Fargate）を分離した構成を採用しています。
+
+当初、フロントエンドも ECS で動かすことを検討しましたが、<br>
+以下の理由から S3 + CloudFront の構成を選択しました。
+
+- CloudFront のオリジン設定で、パスベースのルーティングを簡単に実現
+  - `/api/*` → ALB（バックエンド）
+  - その他 → S3（フロントエンド）
+- Nginx の設定が不要になり、構成がシンプルに
+- CDN による高速配信とコスト削減も実現
+
+また、RDS（MySQL）/ VPC / ALB / Route53 / ACM など、
+実務で使用される標準的なサービスを組み合わせ、スケーラブルなインフラを構築しました。
+
+**【UI/スタイリング】**<br>
+モダンで保守性の高い UI を効率的に構築するため、Tailwind CSS と Shadcn/ui を採用しました。
+
+Tailwind CSS は、クラス名を組み合わせるだけで柔軟なスタイリングが可能で、<br>
+Next.js との相性も良く、React コミュニティでも広く使用されています。
+
+Shadcn/ui は、再利用可能な UI コンポーネントを提供しており、<br>
+ボタン・フォーム・ダイアログなどを素早く実装できました。<br>
+デザインがモダンでカスタマイズも容易なため、開発効率を大幅に向上させることができました。
+
+**【CI/CD】**<br>
+デプロイの自動化により開発効率を向上させるため、GitHub Actions を採用しました。
+
+main ブランチへのマージをトリガーに、AWS（ECR / ECS / S3）への自動デプロイが実行されます。<br>
+これにより、手動デプロイのミスを防ぎ、本番環境への反映を迅速に行うことができました。
+
+**【コード品質】**<br>
+技術負債を防ぎ、保守性の高いコードを維持するため、<br>
+プロジェクト立ち上げ時から厳格なコード品質管理を導入しました。
+
+フロントエンドには ESLint / Prettier、バックエンドには Laravel Pint を採用し、<br>
+コーディング規約を統一しました。
+
+また、GitHub Actions により、Pull Request 時に自動的にコードチェックを実行し、<br>
+品質基準を満たさないコードはマージできない仕組みを構築しました。
 
 ### 4-2.データベース設計（ER 図）
 
-ER 図を後から追加
+![わけっとER図](.github/images/わけっと_ER図.png)
 
 ### 4-3.インフラ構成図
 
-**開発環境**
+![インフラ構成図](.github/images/わけっと_インフラ構成図.png)
 
-- [Docker](https://www.docker.com/) - コンテナ管理
-- [Docker Compose](https://docs.docker.com/compose/) - マルチコンテナ管理
-- [AWS Cognito](https://aws.amazon.com/cognito/) - 認証・認可サービス
-- [Nginx](https://nginx.org/) - Web サーバー
+## 5.こだわった実装
 
-**本番環境**
+Web アプリを実装するにあたり、以下の実装にこだわって作成しました。
 
-AWS のインフラ構成図を後から追加
+- JWT トークンによるセキュアな認証
+- SWR によるリアルタイムデータ更新
+- 支出管理と家計簿の融合
+- 個人モードと共有モードの切り替え
+- サブスクリプションの明細反映
 
-## 5.アプリ開発の振り返り
+### JWT トークンによるセキュアな認証
+
+AWS Cognito と JWT トークンを使用したステートレスな認証を実装しました。<br>
+バックエンドでは、カスタムミドルウェア CognitoJwtAuth を作成し、リクエストヘッダーの JWT トークンを検証しています。
+
+**1. リクエストヘッダーから JWT トークンを取得**<br>
+API リクエストの `Authorization` ヘッダーから `Bearer` トークンを抽出します。
+
+```
+// リクエストからBearerトークンを取得
+private function getTokenFromRequest(Request $request): ?string
+{
+  $header = $request->header('Authorization');
+
+  if ($header && str_starts_with($header, 'Bearer ')) {
+    return substr($header, 7);
+  }
+
+  return null;
+}
+```
+
+**2. JWT トークンの改ざん検証**<br>
+Cognito の公開鍵（JWKS）を使用して、JWT トークンが改ざんされていないかを検証します。<br>
+この仕組みにより、第三者が偽造したトークンでは API にアクセスできないようになっています。
+
+```
+// Cognitoの公開鍵を取得
+$publicKey = $this->getCognitoPublicKey($kid);
+
+// JWTの改ざん検証を行い、ペイロードを取得
+$payload = JWT::decode($token, $publicKey);
+```
+
+**3. トークンの有効期限チェック**<br>
+トークンの有効期限（`exp`）をチェックし、期限切れの場合は認証を拒否します。<br>
+有効なトークンの場合のみ、ペイロードからユーザー情報を取得し、API の処理を続行します。
+
+```
+if (isset($payload->exp) && $payload->exp < time()) {
+  Log::error('JWTトークンの有効期限が切れています');
+  return null;
+}
+
+// ユーザーを取得または作成
+return $this->getUserFromPayload($payload);
+```
+
+この実装により、不正なリクエストを防ぐ API アクセスを実現することができました。<br>
+フロントエンドでは、AWS Amplify を使用してトークンの自動更新を実装することで、ユーザーは再ログインすることなく、シームレスにアプリを利用できます。
+
+### SWR によるリアルタイムデータ更新
+
+本アプリでは、明細を登録・編集・削除した際に、<br>
+支出管理表・家計簿・予算消化状況など複数のコンポーネントを即座に更新する必要がありました。
+
+そこで、SWR のカスタムフックを使用してデータを取得し、`mutate` 関数で画面を更新する仕組みを実装しました。
+
+**1. SWR でデータを取得**
+各画面で必要なデータを SWR のカスタムフック（`useExpenseReport`、`useBudgetUsage`）で取得します。<br>
+この時、`mutate` 関数も同時に取得しておくことで、後からデータを再取得できるようにしています。
+
+```
+const {
+  data: expenseReport,
+  error: expenseReportError,
+  isLoading: isExpenseReportLoading,
+  mutate: expenseMutate,
+} = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
+
+const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
+  user,
+  yearlyDateSelector,
+  isAuth
+);
+```
+
+**2. データ更新時に複数の画面を一括更新**
+明細の登録・編集・削除が成功すると、`handleUpdate` 関数が呼ばれます。<br>
+この関数内で、支出管理表（`expenseMutate`）と予算消化状況（`budgetUsageMutate`）の `mutate` を実行することで、<br>
+関連する全ての画面のデータが自動的に再取得されます。
+
+```
+const handleUpdte = () => {
+  void expenseMutate();
+  void budgetUsageMutate();
+};
+```
+
+**3. 明細更新後に画面を再取得**
+明細の更新が成功したら、`onSuccess` コールバックを実行します。<br>
+この `onSuccess` には `handleUpdate` 関数が渡されており、自動的に関連画面のデータが再取得されます。
+
+```
+const response = await putTransaction(requestData, transactionPatch?.id);
+
+if (response.status) {
+  toast.success("取引明細を更新しました");
+  resetForm();
+  onSuccess(); // ← ここで handleUpdate が呼ぶ
+}
+```
+
+**4. キャッシュ機能で高速表示**
+SWR のキャッシュ機能により、2 秒以内の重複リクエストは自動的にキャッシュから返されます。<br>
+これにより、2 回目以降のアクセスでは高速にデータを表示でき、ユーザーにストレスのない快適な操作感を提供できました。
+
+```
+export const swrConfig = {
+  // キャッシュ設定
+  dedupingInterval: 2000, // 2 秒間は重複リクエストを防ぐ
+
+  // エラー時の再試行
+  errorRetryCount: 3, // 最大 3 回再試行
+  errorRetryInterval: 5000, // 5 秒間隔で再試行
+};
+```
+
+### 支出管理と家計簿の融合
+
+本アプリの最大の特徴は、1 度の入力で支出管理と家計簿の両方を管理できることです。<br>
+この特徴を生かすために、登録された支出や予算の情報を綺麗に表示させるよう、以下の工夫を凝らしました。
+
+**1. 予算または実績があるカテゴリーのみ表示**<br>
+支出管理表では予算が 0 円かつ実績も 0 円のカテゴリーは表示しません。<br>
+これにより、ユーザーに関係のないカテゴリーは自動的に非表示になり、UX を向上させています。
+
+```
+// 予算0 かつ 支出登録なしは非表示
+if (category.budget_amount === 0 && totalAmount === 0) {
+  return null;
+}
+
+・・・
+
+// 支出登録はないが予算が0以上は表示
+{totalAmount === 0 &&
+category.budget_amount !== null &&
+category.budget_amount > 0 ? (
+  <div className="col-span-7 flex items-end justify-end gap-2">
+    <span className="text-gray-500 text-xs">予算</span>
+    <span className="">
+      {category.budget_amount.toLocaleString()} 円
+    </span>
+  </div>
+) : (
+  // 支出登録のあるカテゴリーは表示
+  <>
+    <span className="col-span-4 text-right text-gray-500 text-xs">
+      {category.budget_amount !== null
+        ? `予算 ${category.budget_amount?.toLocaleString()} 円`
+        : ``}
+    </span>
+    <span className="col-span-3 text-right">
+      {totalAmount.toLocaleString()} 円
+    </span>
+  </>
+)}
+```
+
+**2. 年間予算を月額換算して表示**<br>
+予算設定では月次・年次を選択できますが、支出管理表では全て月額換算で表示します。<br>
+例えば、「年間 12 万円の予算」を設定すると、支出管理表では「月 1 万円の予算」として表示されます。
+
+これにより、月ごとの支出と予算を比較しやすくなり、予算管理がしやすくなりました。
+
+```
+// period_typeに応じて予算金額を計算
+if ($budget) {
+    $budgetAmount = $budget->period_type === 'monthly'
+        ? $budget->amount
+        : ceil($budget->amount / 12);
+} else {
+    $budgetAmount = null;
+}
+```
+
+これらの仕組みにより、支出管理と家計簿を自然に融合させることができました。
+
+### 個人モードと共有モードの切り替え
+
+ユーザーモード（個人/共有）を切り替えることで、それぞれで別の支出を管理できるようにしました。
+
+**フロントエンド**<br>
+`ViewModeContext` でユーザーモードを管理し、<br>
+モード切替時に SWR の `mutate` を使用して関連データを自動再取得します。
+
+ユーザーモードが切り替わると、/expense-report で始まる全てのキャッシュキーに対して mutate が実行され、<br>
+個人データまたは共有データが自動的に再取得されます。
+
+```
+const [user, setUser] = useState<UserMode>(() => {
+    if (typeof window !== "undefined") {
+        const currentUser = localStorage.getItem("userMode");
+
+        if (currentUser === "alone" || currentUser === "common") {
+            return currentUser;
+        }
+    }
+
+    return "alone";
+});
+
+・・・
+
+const handleUserChange = (mode: UserMode) => {
+    setUser(mode);
+    // モード切替時にデータを再取得
+    void mutate(
+        (key) => typeof key === "string" && key.startsWith("/expense-report")
+    );
+};
+
+・・・
+
+useEffect(() => {
+    if (typeof window !== "undefined") {
+        localStorage.setItem("userMode", user);
+    }
+}, [user]);
+```
+
+**バックエンド**<br>
+API リクエストに含まれる userMode パラメータに応じて、取得するデータの条件を切り替えています。<br>
+同じ API エンドポイントで、両方のモードに対応できる設計としました。
+
+取得の条件配下の通りです。
+
+- 共有モード
+  - payment.couple_id と user.couple_id が一致する
+- 個人モード
+  - payment.recorded_by_user_id と user.id が一致する
+  - payment.couple_id が Null
+
+```
+if (isset($couple_id) && $couple_id !== null) {
+    // commonモード
+    $categories = Category::with(['budget' => function ($query) use ($couple_id) {
+        $query->where('couple_id', $couple_id);
+    }])->get();
+
+    $paymentData = Payment::with('category', 'category.categoryGroup')
+        ->where('couple_id', $couple_id)
+        ->whereBetween('payment_date', [$startDate, $endDate])
+        ->orderBy('payment_date', 'asc')
+        ->get();
+} else {
+    // aloneモード
+    $categories = Category::with(['budget' => function ($query) use ($userId) {
+        $query->where('recorded_by_user_id', $userId)
+            ->whereNull('couple_id');
+    }])->get();
+
+    $paymentData = Payment::with('category', 'category.categoryGroup')
+        ->where('recorded_by_user_id', $userId)
+        ->whereNull('couple_id')
+        ->whereBetween('payment_date', [$startDate, $endDate])
+        ->orderBy('payment_date', 'asc')
+        ->get();
+}
+```
+
+### サブスクリプションの明細反映
+
+サブスクリプションは「支出明細」や「予算」のような単発の日付ではなく、開始日〜終了日の期間で登録されます。<br>
+そのため、各月の画面では「その月の期間にサブスクが 1 日でも存在するか（期間が重なるか）」を判定して表示対象を決めます。
+
+**表示対象の判定（期間の重なり）**
+
+表示する月の期間を startDate（月初）〜 endDate（月末）として取得し、次の条件を満たすサブスクのみ取得します。
+
+- start_date <= endDate
+- finish_date >= startDate
+
+つまり、月の期間とサブスク期間が重なっているデータだけ表示します。
+
+![サブスク表示の考え方](/.github/images/サブスク表示の考え方.PNG)
+
+```
+// 支出管理および家計簿に表示するサブスクリプションのデータのみ取得
+public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
+{
+    if (isset($couple_id) && $couple_id !== null) {
+        // commonモード
+        $subscriptionData = Subscription::where('couple_id', $couple_id)
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('finish_date', '>=', $startDate)
+            ->get();
+    } else {
+        // aloneモード（自分が記録したデータのみ + couple_idがnull)
+        $subscriptionData = Subscription::where('recorded_by_user_id', $userId)
+            ->whereNull('couple_id')
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('finish_date', '>=', $startDate)
+            ->get();
+    }
+
+    return $subscriptionData;
+}
+
+・・・
+
+// サブスク費を一律で１カ月払いで表示させる
+if ($subscriptionCategory instanceof Category && $subscriptionData instanceof Collection && ! $subscriptionData->isEmpty()) {
+    foreach ($subscriptionData as $subscription) {
+        // 日付を作成
+        $day = date('d', strtotime($subscription->start_date));
+
+        // 有効な日付かチェック（例：2月30日は存在しない）
+        if (! checkdate($month, $day, $year)) {
+            $paymentDate = date('Y-m-t', strtotime("{$year}-{$month}-01"));
+        } else {
+            $paymentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
+        }
+
+        $paymentAmount = $subscription->billing_interval === 'monthly' ? $subscription->amount : ceil($subscription->amount / 12);
+
+        $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost']['payments'][] = [
+            'id' => $subscription->id,
+            'user' => $subscription->recorded_by_user_id,
+            'amount' => $paymentAmount,
+            'date' => $paymentDate,
+            'category' => $subscriptionCategory->id,
+            'shop_name' => $subscription->service_name,
+            'memo' => null,
+            'category_group_code' => 'monthly_fixed_cost',
+            'is_subscription' => true, // サブスクリプションかどうか
+        ];
+    }
+}
+
+・・・
+
+```
+
+取得したサブスクは payment テーブルに保存せず、月表示用の payments[] に組み立てて表示します。<br>
+これにより、サブスクリプション登録だけで支出管理・家計簿に表示でき、payment の実データは増やさずに済む構成にしています。
 
 ## 6.今後の展望
+
+以下の機能の実装を予定しています。
+
+- Google アカウントを使った認証機能
+- 明細の自動取得
+  - カードと連携し明細を自動取得
+  - 取得した明細はカテゴリーのみ入力していない状態で、振り分け前の項目に設置する
+- スマホに特化した UI 開発
+  - 支出登録画面を右下に常時表示させる
+  - 画面下部にナビゲーションを用意する
+- カテゴリーのカスタマイズ機能
+  - カテゴリーの色分けをユーザーごとに設定できる
+  - 浪費・投資の項目のみカテゴリの追加可能
+- 支出のカレンダー表記機能
+  - 家計簿モードの円グラフの下のスペースを使って実装予定
