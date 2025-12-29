@@ -88,6 +88,7 @@ class TransactionController extends Controller
     {
         $user = $request->attributes->get('auth_user');
         $user_id = $user->id;
+        $couple_id = $user->couple_id;
 
         // payerが存在するか確認
         $payerExists = User::where('id', $request->payer)
@@ -135,12 +136,12 @@ class TransactionController extends Controller
             ], 422);
         }
 
-        $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id);
+        $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id, $couple_id);
         if (! $updatePayment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Transaction update failed',
-            ], 500);
+                'message' => '対象の明細が見つかりませんでした',
+            ], 404);
         }
 
         return response()->json([
@@ -149,14 +150,30 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function delete($id): JsonResponse
+    public function delete(Request $request, $id): JsonResponse
     {
-        $payment = Payment::find($id);
+        $user = $request->attributes->get('auth_user');
+        $user_id = $user->id;
+        $couple_id = $user->couple_id;
+
+        $query = Payment::where('id', $id);
+
+        if ($couple_id) {
+            // 共有モード
+            $query->where('couple_id', $couple_id);
+        } else {
+            // 個人モード
+            $query->where('recorded_by_user_id', $user_id)
+                ->whereNull('couple_id');
+        }
+
+        $payment = $query->first();
+
         if (! $payment) {
             return response()->json([
                 'status' => false,
-                'message' => 'Transaction not found',
-            ], 500);
+                'message' => '対象の明細が見つかりませんでした',
+            ], 404);
         }
 
         $payment->delete();

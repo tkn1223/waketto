@@ -64,15 +64,24 @@ class Payment extends Model
         }
     }
 
-    public static function updatePaymentRecord($validator, $id, $user_id)
+    public static function updatePaymentRecord($validator, $id, $user_id, $couple_id = null)
     {
         try {
-            $paymentData = Payment::find($id);
+            $query = Payment::where('id', $id);
+
+            if ($couple_id) {
+                // 共有モード
+                $query->where('couple_id', $couple_id);
+            } else {
+                // 個人モード
+                $query->where('recorded_by_user_id', $user_id)
+                    ->whereNull('couple_id');
+            }
+
+            $paymentData = $query->first();
+
             if (! $paymentData) {
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Transaction not found',
-                ], 500);
+                return false;
             }
 
             $current_payer = (string) $paymentData->paid_by_user_id;
