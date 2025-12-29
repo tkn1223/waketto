@@ -426,48 +426,19 @@ AWS Cognito と JWT トークンを使用したステートレスな認証を実
 **1. リクエストヘッダーから JWT トークンを取得**<br>
 API リクエストの `Authorization` ヘッダーから `Bearer` トークンを抽出します。
 
-```
-// リクエストからBearerトークンを取得
-private function getTokenFromRequest(Request $request): ?string
-{
-  $header = $request->header('Authorization');
-
-  if ($header && str_starts_with($header, 'Bearer ')) {
-    return substr($header, 7);
-  }
-
-  return null;
-}
-```
-
 **2. JWT トークンの改ざん検証**<br>
 Cognito の公開鍵（JWKS）を使用して、JWT トークンが改ざんされていないかを検証します。<br>
 この仕組みにより、第三者が偽造したトークンでは API にアクセスできないようになっています。
-
-```
-// Cognitoの公開鍵を取得
-$publicKey = $this->getCognitoPublicKey($kid);
-
-// JWTの改ざん検証を行い、ペイロードを取得
-$payload = JWT::decode($token, $publicKey);
-```
 
 **3. トークンの有効期限チェック**<br>
 トークンの有効期限（`exp`）をチェックし、期限切れの場合は認証を拒否します。<br>
 有効なトークンの場合のみ、ペイロードからユーザー情報を取得し、API の処理を続行します。
 
-```
-if (isset($payload->exp) && $payload->exp < time()) {
-  Log::error('JWTトークンの有効期限が切れています');
-  return null;
-}
-
-// ユーザーを取得または作成
-return $this->getUserFromPayload($payload);
-```
-
 この実装により、不正なリクエストを防ぐ API アクセスを実現することができました。<br>
 フロントエンドでは、AWS Amplify を使用してトークンの自動更新を実装することで、ユーザーは再ログインすることなく、シームレスにアプリを利用できます。
+
+■ 参考ファイル
+/backend/app/Http/Middleware/CognitoJwtAuth.php
 
 ### SWR によるリアルタイムデータ更新
 
@@ -476,65 +447,29 @@ return $this->getUserFromPayload($payload);
 
 そこで、SWR のカスタムフックを使用してデータを取得し、`mutate` 関数で画面を更新する仕組みを実装しました。
 
-**1. SWR でデータを取得**
+**1. SWR でデータを取得**<br>
 各画面で必要なデータを SWR のカスタムフック（`useExpenseReport`、`useBudgetUsage`）で取得します。<br>
 この時、`mutate` 関数も同時に取得しておくことで、後からデータを再取得できるようにしています。
 
-```
-const {
-  data: expenseReport,
-  error: expenseReportError,
-  isLoading: isExpenseReportLoading,
-  mutate: expenseMutate,
-} = useExpenseReport(user, monthlyAndYearlyDateSelector, isAuth);
-
-const { data: budgetUsage, mutate: budgetUsageMutate } = useBudgetUsage(
-  user,
-  yearlyDateSelector,
-  isAuth
-);
-```
-
-**2. データ更新時に複数の画面を一括更新**
+**2. データ更新時に複数の画面を一括更新**<br>
 明細の登録・編集・削除が成功すると、`handleUpdate` 関数が呼ばれます。<br>
 この関数内で、支出管理表（`expenseMutate`）と予算消化状況（`budgetUsageMutate`）の `mutate` を実行することで、<br>
 関連する全ての画面のデータが自動的に再取得されます。
 
-```
-const handleUpdte = () => {
-  void expenseMutate();
-  void budgetUsageMutate();
-};
-```
-
-**3. 明細更新後に画面を再取得**
+**3. 明細更新後に画面を再取得**<br>
 明細の更新が成功したら、`onSuccess` コールバックを実行します。<br>
 この `onSuccess` には `handleUpdate` 関数が渡されており、自動的に関連画面のデータが再取得されます。
 
-```
-const response = await putTransaction(requestData, transactionPatch?.id);
-
-if (response.status) {
-  toast.success("取引明細を更新しました");
-  resetForm();
-  onSuccess(); // ← ここで handleUpdate が呼ぶ
-}
-```
-
-**4. キャッシュ機能で高速表示**
+**4. キャッシュ機能で高速表示**<br>
 SWR のキャッシュ機能により、2 秒以内の重複リクエストは自動的にキャッシュから返されます。<br>
 これにより、2 回目以降のアクセスでは高速にデータを表示でき、ユーザーにストレスのない快適な操作感を提供できました。
 
-```
-export const swrConfig = {
-  // キャッシュ設定
-  dedupingInterval: 2000, // 2 秒間は重複リクエストを防ぐ
-
-  // エラー時の再試行
-  errorRetryCount: 3, // 最大 3 回再試行
-  errorRetryInterval: 5000, // 5 秒間隔で再試行
-};
-```
+■ 参考ファイル
+/frontend/src/lib/swr.ts
+/frontend/src/components/dashboard/SpendingManagementPage.tsx
+/frontend/src/components/dashboard/HouseholdManagementPage.tsx
+/frontend/src/components/dashboard/Transaction/TransactionDetail.tsx
+/frontend/src/hooks/useTransactionForm.tsx
 
 ### 支出管理と家計簿の融合
 
@@ -545,57 +480,16 @@ export const swrConfig = {
 支出管理表では予算が 0 円かつ実績も 0 円のカテゴリーは表示しません。<br>
 これにより、ユーザーに関係のないカテゴリーは自動的に非表示になり、UX を向上させています。
 
-```
-// 予算0 かつ 支出登録なしは非表示
-if (category.budget_amount === 0 && totalAmount === 0) {
-  return null;
-}
-
-・・・
-
-// 支出登録はないが予算が0以上は表示
-{totalAmount === 0 &&
-category.budget_amount !== null &&
-category.budget_amount > 0 ? (
-  <div className="col-span-7 flex items-end justify-end gap-2">
-    <span className="text-gray-500 text-xs">予算</span>
-    <span className="">
-      {category.budget_amount.toLocaleString()} 円
-    </span>
-  </div>
-) : (
-  // 支出登録のあるカテゴリーは表示
-  <>
-    <span className="col-span-4 text-right text-gray-500 text-xs">
-      {category.budget_amount !== null
-        ? `予算 ${category.budget_amount?.toLocaleString()} 円`
-        : ``}
-    </span>
-    <span className="col-span-3 text-right">
-      {totalAmount.toLocaleString()} 円
-    </span>
-  </>
-)}
-```
-
 **2. 年間予算を月額換算して表示**<br>
 予算設定では月次・年次を選択できますが、支出管理表では全て月額換算で表示します。<br>
-例えば、「年間 12 万円の予算」を設定すると、支出管理表では「月 1 万円の予算」として表示されます。
-
+例えば、「年間 12 万円の予算」を設定すると、支出管理表では「月 1 万円の予算」として表示されます。<br>
 これにより、月ごとの支出と予算を比較しやすくなり、予算管理がしやすくなりました。
 
-```
-// period_typeに応じて予算金額を計算
-if ($budget) {
-    $budgetAmount = $budget->period_type === 'monthly'
-        ? $budget->amount
-        : ceil($budget->amount / 12);
-} else {
-    $budgetAmount = null;
-}
-```
-
 これらの仕組みにより、支出管理と家計簿を自然に融合させることができました。
+
+■ 参考ファイル
+/frontend/src/components/dashboard/ExpenseReport/TransactionRow.tsx
+/backend/app/Traits/ReportDataTrait.php
 
 ### 個人モードと共有モードの切り替え
 
@@ -607,38 +501,6 @@ if ($budget) {
 
 ユーザーモードが切り替わると、/expense-report で始まる全てのキャッシュキーに対して mutate が実行され、<br>
 個人データまたは共有データが自動的に再取得されます。
-
-```
-const [user, setUser] = useState<UserMode>(() => {
-    if (typeof window !== "undefined") {
-        const currentUser = localStorage.getItem("userMode");
-
-        if (currentUser === "alone" || currentUser === "common") {
-            return currentUser;
-        }
-    }
-
-    return "alone";
-});
-
-・・・
-
-const handleUserChange = (mode: UserMode) => {
-    setUser(mode);
-    // モード切替時にデータを再取得
-    void mutate(
-        (key) => typeof key === "string" && key.startsWith("/expense-report")
-    );
-};
-
-・・・
-
-useEffect(() => {
-    if (typeof window !== "undefined") {
-        localStorage.setItem("userMode", user);
-    }
-}, [user]);
-```
 
 **バックエンド**<br>
 API リクエストに含まれる userMode パラメータに応じて、取得するデータの条件を切り替えています。<br>
@@ -652,33 +514,10 @@ API リクエストに含まれる userMode パラメータに応じて、取得
   - payment.recorded_by_user_id と user.id が一致する
   - payment.couple_id が Null
 
-```
-if (isset($couple_id) && $couple_id !== null) {
-    // commonモード
-    $categories = Category::with(['budget' => function ($query) use ($couple_id) {
-        $query->where('couple_id', $couple_id);
-    }])->get();
-
-    $paymentData = Payment::with('category', 'category.categoryGroup')
-        ->where('couple_id', $couple_id)
-        ->whereBetween('payment_date', [$startDate, $endDate])
-        ->orderBy('payment_date', 'asc')
-        ->get();
-} else {
-    // aloneモード
-    $categories = Category::with(['budget' => function ($query) use ($userId) {
-        $query->where('recorded_by_user_id', $userId)
-            ->whereNull('couple_id');
-    }])->get();
-
-    $paymentData = Payment::with('category', 'category.categoryGroup')
-        ->where('recorded_by_user_id', $userId)
-        ->whereNull('couple_id')
-        ->whereBetween('payment_date', [$startDate, $endDate])
-        ->orderBy('payment_date', 'asc')
-        ->get();
-}
-```
+■ 参考ファイル
+/frontend/src/contexts/ViewModeContext.tsx
+/backend/app/Traits/ReportDataTrait.php
+/backend/app/Http/Controllers/Api/ExpenseReportController.php
 
 ### サブスクリプションの明細反映
 
@@ -696,65 +535,13 @@ if (isset($couple_id) && $couple_id !== null) {
 
 ![サブスク表示の考え方](/.github/images/サブスク表示の考え方.PNG)
 
-```
-// 支出管理および家計簿に表示するサブスクリプションのデータのみ取得
-public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
-{
-    if (isset($couple_id) && $couple_id !== null) {
-        // commonモード
-        $subscriptionData = Subscription::where('couple_id', $couple_id)
-            ->whereDate('start_date', '<=', $endDate)
-            ->whereDate('finish_date', '>=', $startDate)
-            ->get();
-    } else {
-        // aloneモード（自分が記録したデータのみ + couple_idがnull)
-        $subscriptionData = Subscription::where('recorded_by_user_id', $userId)
-            ->whereNull('couple_id')
-            ->whereDate('start_date', '<=', $endDate)
-            ->whereDate('finish_date', '>=', $startDate)
-            ->get();
-    }
-
-    return $subscriptionData;
-}
-
-・・・
-
-// サブスク費を一律で１カ月払いで表示させる
-if ($subscriptionCategory instanceof Category && $subscriptionData instanceof Collection && ! $subscriptionData->isEmpty()) {
-    foreach ($subscriptionData as $subscription) {
-        // 日付を作成
-        $day = date('d', strtotime($subscription->start_date));
-
-        // 有効な日付かチェック（例：2月30日は存在しない）
-        if (! checkdate($month, $day, $year)) {
-            $paymentDate = date('Y-m-t', strtotime("{$year}-{$month}-01"));
-        } else {
-            $paymentDate = sprintf('%04d-%02d-%02d', $year, $month, $day);
-        }
-
-        $paymentAmount = $subscription->billing_interval === 'monthly' ? $subscription->amount : ceil($subscription->amount / 12);
-
-        $sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost']['payments'][] = [
-            'id' => $subscription->id,
-            'user' => $subscription->recorded_by_user_id,
-            'amount' => $paymentAmount,
-            'date' => $paymentDate,
-            'category' => $subscriptionCategory->id,
-            'shop_name' => $subscription->service_name,
-            'memo' => null,
-            'category_group_code' => 'monthly_fixed_cost',
-            'is_subscription' => true, // サブスクリプションかどうか
-        ];
-    }
-}
-
-・・・
-
-```
-
 取得したサブスクは payment テーブルに保存せず、月表示用の payments[] に組み立てて表示します。<br>
 これにより、サブスクリプション登録だけで支出管理・家計簿に表示でき、payment の実データは増やさずに済む構成にしています。
+
+■ 参考ファイル
+/backend/app/Traits/ReportDataTrait.php
+/backend/app/Http/Controllers/Api/ExpenseReportController.php
+/backend/app/Http/Controllers/Api/HouseholdReportController.php
 
 ## 6.今後の展望
 
