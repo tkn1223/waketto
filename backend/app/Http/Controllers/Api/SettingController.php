@@ -150,12 +150,6 @@ class SettingController extends Controller
 
             Couple::where('id', $coupleId)->delete();
 
-            Budget::where('couple_id', $coupleId)->delete();
-
-            Payment::where('couple_id', $coupleId)->delete();
-
-            Subscription::where('couple_id', $coupleId)->delete();
-
             DB::commit();
 
             return response()->json([
