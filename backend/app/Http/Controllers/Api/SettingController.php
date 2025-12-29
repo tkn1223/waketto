@@ -3,10 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Budget;
 use App\Models\Couple;
-use App\Models\Payment;
-use App\Models\Subscription;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
