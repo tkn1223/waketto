@@ -47,10 +47,6 @@ export function ViewModeProvider({ children }: { children: ReactNode }) {
 
   const handleUserChange = (mode: UserMode) => {
     setUser(mode);
-    // モード切替時にデータを再取得
-    void mutate(
-      (key) => typeof key === "string" && key.startsWith("/expense-report")
-    );
   };
 
   // localStorageに保存（ファイナンスモード）
