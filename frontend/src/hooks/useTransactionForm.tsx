@@ -137,7 +137,7 @@ export const useTransactionForm = ({
         category: transactionData.category?.value || "",
       };
 
-      const response = await putTransaction(requestData, transactionPatch?.id);
+      const response = await putTransaction(requestData, user, transactionPatch?.id);
 
       if (response.status) {
         toast.success("取引明細を更新しました");
@@ -165,7 +165,7 @@ export const useTransactionForm = ({
     }
 
     try {
-      const response = await deleteTransaction(transactionPatch?.id);
+      const response = await deleteTransaction(user, transactionPatch?.id);
 
       if (response.status) {
         toast.success("取引明細を削除しました");

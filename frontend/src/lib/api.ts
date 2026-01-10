@@ -88,17 +88,21 @@ export async function postTransaction(
 // 取引明細を更新
 export async function putTransaction(
   requestData: TransactionRequestData,
+  userMode: UserMode,
   id: string
 ): Promise<Response> {
-  return await fetchApi<Response>(`/transaction/${id}`, {
+  return await fetchApi<Response>(`/transaction/${userMode}/${id}`, {
     method: "PUT",
     body: JSON.stringify(requestData),
   });
 }
 
 // 取引明細を削除
-export async function deleteTransaction(id: string): Promise<Response> {
-  return await fetchApi(`/transaction/${id}`, {
+export async function deleteTransaction(
+  userMode: UserMode,
+  id: string
+): Promise<Response> {
+  return await fetchApi(`/transaction/${userMode}/${id}`, {
     method: "DELETE",
   });
 }
