@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class ProductionPaymentsSeeder extends Seeder
 {
@@ -21,8 +21,9 @@ class ProductionPaymentsSeeder extends Seeder
 
         // カテゴリーIDを取得
         $categoryIds = $this->getCategoryIds();
-        if (!$categoryIds) {
+        if (! $categoryIds) {
             $this->command->error('カテゴリーが見つかりません。先にCategoriesSeederを実行してください。');
+
             return;
         }
 
@@ -342,10 +343,10 @@ class ProductionPaymentsSeeder extends Seeder
         foreach ($travelDatesConfig as $config) {
             $year = $config['year'];
             $month = $config['month'];
-            
+
             // その月の週末（金・土・日）を取得
             $weekendDates = $this->getWeekendDates($year, $month);
-            if (!empty($weekendDates)) {
+            if (! empty($weekendDates)) {
                 // 連続する週末を選ぶ（旅行用）
                 $travelStart = $weekendDates[array_rand($weekendDates)];
                 $travelDates[] = $travelStart;
@@ -362,26 +363,27 @@ class ProductionPaymentsSeeder extends Seeder
             // 月2-3回のデート
             $dateCount = rand(2, 3);
             $selectedWeekends = [];
-            
+
             // 旅行日を除外して週末を選択
-            $availableWeekends = array_filter($weekendDates, function($date) use ($travelDates) {
+            $availableWeekends = array_filter($weekendDates, function ($date) use ($travelDates) {
                 foreach ($travelDates as $travelDate) {
                     if ($date->format('Y-m-d') === $travelDate->format('Y-m-d')) {
                         return false;
                     }
                 }
+
                 return true;
             });
 
             if (count($availableWeekends) > 0) {
                 $selectedWeekends = array_rand(array_values($availableWeekends), min($dateCount, count($availableWeekends)));
-                if (!is_array($selectedWeekends)) {
+                if (! is_array($selectedWeekends)) {
                     $selectedWeekends = [$selectedWeekends];
                 }
 
                 foreach ($selectedWeekends as $index) {
                     $weekendDate = array_values($availableWeekends)[$index];
-                    
+
                     // 交際費（2,000-10,000円）
                     $paidBy = rand(1, 2) === 1 ? $userId : $partnerId;
                     $recordedBy = rand(1, 2) === 1 ? $userId : $partnerId;
@@ -421,7 +423,7 @@ class ProductionPaymentsSeeder extends Seeder
                 if ($travelDate->year === $year && $travelDate->month === $month) {
                     // 旅行日は複数レコードで合計金額を分散
                     $totalTravelAmount = rand(20000, 150000);
-                    
+
                     // ホテル代（30,000-80,000円）
                     $hotelAmount = min(rand(30000, 80000), $totalTravelAmount * 0.6);
                     $paidBy = rand(1, 2) === 1 ? $userId : $partnerId;
