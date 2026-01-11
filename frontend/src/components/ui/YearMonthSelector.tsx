@@ -28,6 +28,19 @@ export function YearMonthSelector({
 
   return (
     <div className="flex items-center gap-2">
+      <Select defaultValue={year} onValueChange={onYearChange}>
+        <SelectTrigger>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {years.map((year) => (
+            <SelectItem key={year} value={year}>
+              {year}年
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       {showMonth && (
         <Select defaultValue={month} onValueChange={onMonthChange}>
           <SelectTrigger>
@@ -42,19 +55,6 @@ export function YearMonthSelector({
           </SelectContent>
         </Select>
       )}
-
-      <Select defaultValue={year} onValueChange={onYearChange}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {years.map((year) => (
-            <SelectItem key={year} value={year}>
-              {year}年
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
   );
 }
