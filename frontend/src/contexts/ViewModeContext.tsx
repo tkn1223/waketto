@@ -2,7 +2,6 @@
 
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import { useSWRConfig } from "swr";
 import type {
   FinanceMode,
   UserMode,
@@ -15,8 +14,6 @@ export const ViewModeContext = createContext<ViewModeContextType | undefined>(
 );
 
 export function ViewModeProvider({ children }: { children: ReactNode }) {
-  const { mutate } = useSWRConfig();
-
   const [finance, setFinance] = useState<FinanceMode>(() => {
     if (typeof window !== "undefined") {
       const currentFinance = localStorage.getItem("financeMode");

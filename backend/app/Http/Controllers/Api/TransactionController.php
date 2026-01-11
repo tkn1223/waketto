@@ -84,11 +84,16 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(Request $request, $userMode, $id): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
         $user_id = $user->id;
-        $couple_id = $user->couple_id;
+
+        if ($userMode === 'common') {
+            $couple_id = $user->couple_id;
+        } else {
+            $couple_id = null;
+        }
 
         // payerが存在するか確認
         $payerExists = User::where('id', $request->payer)
@@ -136,7 +141,7 @@ class TransactionController extends Controller
             ], 422);
         }
 
-        $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id, $couple_id);
+        $updatePayment = Payment::updatePaymentRecord($validator, $id, $user_id, $userMode);
         if (! $updatePayment) {
             return response()->json([
                 'status' => false,
@@ -150,15 +155,20 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function delete(Request $request, $id): JsonResponse
+    public function delete(Request $request, $userMode, $id): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
         $user_id = $user->id;
-        $couple_id = $user->couple_id;
+
+        if ($userMode === 'common') {
+            $couple_id = $user->couple_id;
+        } else {
+            $couple_id = null;
+        }
 
         $query = Payment::where('id', $id);
 
-        if ($couple_id) {
+        if ($userMode === 'common') {
             // 共有モード
             $query->where('couple_id', $couple_id);
         } else {

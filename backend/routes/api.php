@@ -40,8 +40,8 @@ Route::middleware('cognito')->group(function () {
     // 取引明細関連のルート
     Route::prefix('transaction')->group(function () {
         Route::post('/{userMode}', [TransactionController::class, 'store']);
-        Route::put('/{id}', [TransactionController::class, 'update']);
-        Route::delete('/{id}', [TransactionController::class, 'delete']);
+        Route::put('/{userMode}/{id}', [TransactionController::class, 'update']);
+        Route::delete('/{userMode}/{id}', [TransactionController::class, 'delete']);
     });
 
     // 支出管理表関連のルート

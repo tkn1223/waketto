@@ -64,13 +64,14 @@ class Payment extends Model
         }
     }
 
-    public static function updatePaymentRecord($validator, $id, $user_id, $couple_id = null)
+    public static function updatePaymentRecord($validator, $id, $user_id, $userMode)
     {
         try {
             $query = Payment::where('id', $id);
 
-            if ($couple_id) {
+            if ($userMode === 'common') {
                 // 共有モード
+                $couple_id = User::where('id', $user_id)->value('couple_id');
                 $query->where('couple_id', $couple_id);
             } else {
                 // 個人モード
