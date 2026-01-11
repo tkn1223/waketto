@@ -27,23 +27,6 @@ class ProductionPaymentsSeeder extends Seeder
             return;
         }
 
-        // テスト用：1件だけレコードを追加
-        DB::table('payments')->insert([
-            [
-                'payment_date' => '2026-01-01',
-                'category_id' => $categoryIds['住居費'],
-                'paid_by_user_id' => $userId,
-                'recorded_by_user_id' => $userId,
-                'couple_id' => null,
-                'amount' => 10000,
-                'store_name' => '自動入力テスト',
-                'note' => null,
-            ],
-        ]);
-        $this->command->info('Paymentテストデータを作成しました: 1件');
-
-        // 以下は一旦コメントアウト（テスト後にコメント解除）
-        /*
         $payments = [];
 
         // 個人モードのデータ作成（2025年1月1日〜2026年3月31日）
@@ -53,15 +36,14 @@ class ProductionPaymentsSeeder extends Seeder
         $payments = array_merge($payments, $this->generateCommonModePayments($categoryIds, $userId, $partnerId, $coupleId));
 
         // 一括挿入
-        if (!empty($payments)) {
+        if (! empty($payments)) {
             // チャンクに分けて挿入（大量データ対策）
             $chunks = array_chunk($payments, 500);
             foreach ($chunks as $chunk) {
                 DB::table('payments')->insert($chunk);
             }
-            $this->command->info('Paymentテストデータを作成しました: ' . count($payments) . '件');
+            $this->command->info('Paymentテストデータを作成しました: '.count($payments).'件');
         }
-        */
     }
 
     /**
@@ -113,7 +95,7 @@ class ProductionPaymentsSeeder extends Seeder
                 'paid_by_user_id' => $userId,
                 'recorded_by_user_id' => $userId,
                 'couple_id' => null,
-                'amount' => 130000,
+                'amount' => 95000,
                 'store_name' => '家賃',
                 'note' => null,
             ];
