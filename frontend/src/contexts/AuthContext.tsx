@@ -75,6 +75,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // ゲストログイン処理
+  const signInAsGuest = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // ゲストアカウントの情報（環境変数から取得、なければ固定値）
+      const guestEmail = "waketto@sample.com";
+      const guestPassword = "GuestAccount?1234";
+
+      const result = await signInWithCognito({
+        email: guestEmail,
+        password: guestPassword,
+      });
+
+      if (result.success) {
+        // ログイン後にユーザー情報を取得するため待機
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const userInfo = await getCurrentUserInfo();
+
+        if (userInfo) {
+          setUserInfo(userInfo);
+          setIsAuth(true);
+        } else {
+          throw new Error("ユーザー情報の取得に失敗しました");
+        }
+      } else {
+        throw new Error(result.error || "ゲストログインに失敗しました");
+      }
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "ゲストログインに失敗しました"
+      );
+      setIsAuth(false);
+      setUserInfo(initialUserInfo);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // ログアウト処理
   const signOut = async () => {
     setIsLoading(true);
@@ -196,6 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         error,
         signIn,
+        signInAsGuest,
         signOut,
         refreshUserInfo,
         checkAuthState,

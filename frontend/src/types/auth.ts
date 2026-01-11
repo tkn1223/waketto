@@ -28,6 +28,7 @@ export interface AuthContextType {
   isLoading: boolean;
   error: string | null;
   signIn: (infomation: InfomationForLogin) => Promise<void>;
+  signInAsGuest: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshUserInfo: () => Promise<void>;
   checkAuthState: () => Promise<void>;
