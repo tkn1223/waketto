@@ -47,8 +47,8 @@ export function RegisteredDate({
           mode="single"
           selected={date}
           captionLayout="dropdown"
-          startMonth={new Date(new Date().getFullYear(), -1)}
-          endMonth={new Date(new Date().getFullYear() + 10, 11)}
+          startMonth={new Date(new Date().getFullYear() - 1, 0)}
+          endMonth={new Date(new Date().getFullYear() + 3, 11)}
           onSelect={(selectedDate) => {
             if (selectedDate) {
               onDateChange(selectedDate);
