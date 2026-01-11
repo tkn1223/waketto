@@ -128,7 +128,7 @@ export default function SigninForm() {
           <button
             type="button"
             disabled={isGuestLoading}
-            onClick={handleGuestLogin}
+            onClick={() => void handleGuestLogin()}
             className="w-64 mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-gray-700 bg-white border border-gray-400 hover:bg-gray-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGuestLoading ? "ゲストログイン中..." : "ゲストとしてログイン"}
