@@ -23,9 +23,7 @@
 
 サービス URL：https://waketto.com/
 
-【 ゲストユーザーアカウント 】<br>
-メールアドレス：waketto@sample.com<br>
-パスワード：GuestAccount?1234
+※ ゲストログインをご用意しております
 
 # 目次
 
