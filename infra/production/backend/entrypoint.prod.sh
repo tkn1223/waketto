@@ -110,14 +110,6 @@ if [ "$MIGRATIONS_TABLE_EXISTS" = "false" ]; then
     echo "First deployment setup completed."
 fi
 
-# ProductionPaymentsSeeder実行（手動実行用：1度実行したら削除してください）
-echo "Running: php artisan db:seed --class=ProductionPaymentsSeeder --force"
-if ! php artisan db:seed --class=ProductionPaymentsSeeder --force; then
-    echo "ProductionPaymentsSeeder failed."
-    exit 1
-fi
-echo "ProductionPaymentsSeeder completed."
-
 # キャッシュクリア
 echo "php artisan cache:clear"
 php artisan cache:clear
