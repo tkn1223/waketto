@@ -9,23 +9,41 @@ export default function SigninForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSignupLoading, setIsSignupLoading] = useState(false);
-  const { isLoading, error, signIn } = useAuth();
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const [isLoginLoading, setIsLoginLoading] = useState(false);
+  const { error, signIn, signInAsGuest } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoginLoading(true);
     try {
       await signIn({ email, password });
       // signIn後にdashboardにリダイレクト
       router.replace("/dashboard");
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("ログインに失敗しました:", error);
+    } finally {
+      setIsLoginLoading(false);
     }
   };
 
   const ChangeSignupPage = () => {
     setIsSignupLoading(true);
     router.push("/signup");
+  };
+
+  const handleGuestLogin = async () => {
+    setIsGuestLoading(true);
+    try {
+      await signInAsGuest();
+      // signInAsGuest後にdashboardにリダイレクト
+      router.replace("/dashboard");
+    } catch (error) {
+      console.error("ゲストログインに失敗しました:", error);
+    } finally {
+      setIsGuestLoading(false);
+    }
   };
 
   return (
@@ -51,7 +69,7 @@ export default function SigninForm() {
           </p>
         </div>
         <form
-          className="px-10 py-8 rounded-sm shadow-sm bg-sky-50 mb-15"
+          className="px-10 py-8 rounded-sm shadow-sm bg-sky-50 mb-10"
           onSubmit={(e) => void handleSubmit(e)}
         >
           <div>
@@ -98,24 +116,35 @@ export default function SigninForm() {
           <div>
             <button
               type="submit"
-              disabled={isLoading}
-              className="group relative mx-auto flex justify-center py-2 px-15 text-lg font-bold rounded-sm text-white bg-amber-600 hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoginLoading}
+              className="group relative w-64 mx-auto flex justify-center py-2 px-15 text-lg font-bold rounded-sm text-white bg-amber-600 hover:bg-amber-500 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "ログイン中..." : "ログイン"}
+              {isLoginLoading ? "ログイン中..." : "ログイン"}
             </button>
           </div>
         </form>
+
+        <div className="mb-10">
+          <button
+            type="button"
+            disabled={isGuestLoading}
+            onClick={handleGuestLogin}
+            className="w-64 mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-gray-700 bg-white border border-gray-400 hover:bg-gray-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isGuestLoading ? "ゲストログイン中..." : "ゲストとしてログイン"}
+          </button>
+        </div>
 
         <div>
           <button
             type="button"
             disabled={isSignupLoading}
             onClick={ChangeSignupPage}
-            className="mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-64 mx-auto flex justify-center py-2 px-15 text-base rounded-sm text-blue-700 bg-white border border-blue-700 hover:bg-blue-700 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSignupLoading
               ? "サインアップページへ移動中..."
-              : "アカウントを新規作成"}
+              : "アカウントの作成"}
           </button>
 
           <div className="mt-6 relative">
