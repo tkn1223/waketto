@@ -117,11 +117,11 @@ trait ReportDataTrait
     /**
      * サブスクリプションデータを取得
      *
-     * @param  int|null  $couple_id
-     * @param  int  $userId
-     * @param  string  $startDate
-     * @param  string  $endDate
-     * @return array $subscriptionData
+     * @param  int|null  $couple_id カップルID（null=個人）
+     * @param  int  $userId ユーザーID
+     * @param  string  $startDate 開始日
+     * @param  string  $endDate 終了日
+     * @return Collection サブスクリプションデータ
      */
     public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
     {
@@ -144,13 +144,15 @@ trait ReportDataTrait
     }
 
     /**
-     * サブスクリプションカテゴリーを初期化
+     * サブスクリプションカテゴリーを追加する
+     * 
+     * 後からサブスクリプションのデータを追加するために、subscription_costカテゴリーが存在しない場合に、その構造を追加する。
      *
-     * @param  array  $sortedByCategoryData
-     * @param  Collection  $subscriptionData
-     * @return array $subscriptionCategory, $sortedByCategoryData
+     * @param  array  $sortedByCategoryData カテゴリーごとにグループ化された支出データ
+     * @param  Collection  $subscriptionData サブスクリプションデータ
+     * @return array {subscriptionCategory: サブスクリプションカテゴリー, sortedByCategoryData: カテゴリーごとにグループ化された支出データ}
      */
-    public function initializeSubscriptionCategory($sortedByCategoryData, $subscriptionData)
+    public function addSubscriptionCategory($sortedByCategoryData, $subscriptionData)
     {
         $subscriptionCategory = Category::where('code', 'subscription_cost')->first();
         if ($subscriptionCategory && ! $subscriptionData->isEmpty() && ! isset($sortedByCategoryData['monthly_fixed_cost']['categories']['subscription_cost'])) {
@@ -168,13 +170,16 @@ trait ReportDataTrait
     }
 
     /**
-     * 合計金額を算出
+     * 総計を算出
+     * 
+     * 全カテゴリーの予算合計・支払い合計・差分を計算して配列に追加する。
      *
-     * @param  array  $sortedByCategoryData
-     * @return array $sortedByCategoryData with totals
+     * @param  array  $sortedByCategoryData カテゴリーごとにグループ化された支出データ
+     * @return array {totalBudget: 予算合計, totalPayment: 支払い合計, defference: 差分}
      */
     public function getTotalExpenseData($sortedByCategoryData)
     {
+        // sumを使用するために一時的にCollectionに変換
         $data = collect($sortedByCategoryData);
 
         $totalBudget = $data->sum(function ($group) {

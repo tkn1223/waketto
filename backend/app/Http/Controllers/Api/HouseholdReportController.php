@@ -37,10 +37,10 @@ class HouseholdReportController extends Controller
 
         $subscriptionData = $this->getSubscriptionData($couple_id, $userId, $startDate, $endDate);
 
-        // subscription_costカテゴリーを初期化（subscriptionDataが存在する場合のみ）
-        $initializeSubscriptionCategory = $this->initializeSubscriptionCategory($sortedByCategoryData, $subscriptionData);
-        $sortedByCategoryData = $initializeSubscriptionCategory['sortedByCategoryData'];
-        $subscriptionCategory = $initializeSubscriptionCategory['subscriptionCategory'];
+        // subscription_costカテゴリーを追加（subscriptionDataが存在する場合のみ）
+        $addSubscriptionCategory = $this->addSubscriptionCategory($sortedByCategoryData, $subscriptionData);
+        $sortedByCategoryData = $addSubscriptionCategory['sortedByCategoryData'];
+        $subscriptionCategory = $addSubscriptionCategory['subscriptionCategory'];
 
         // サブスク費を支払った日付で表示させる（家計簿）
         if ($subscriptionCategory instanceof Category && $subscriptionData instanceof Collection && ! $subscriptionData->isEmpty()) {

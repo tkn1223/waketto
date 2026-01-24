@@ -13,6 +13,15 @@ class ExpenseReportController extends Controller
 {
     use ReportDataTrait;
 
+    /**
+     * 支出管理表に表示するデータを取得する
+     * 
+     * 指定年月のPaymentおよびSubscriptionデータを取得し、カテゴリーごとにグループ化して返す。
+     * 
+     * @param Request $request リクエストオブジェクト（queryパラメータ: year=年度, month=月）
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse {status: true, data: カテゴリーごとにグループ化された支出データ（合計含む）}
+     */
     public function index(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
@@ -36,10 +45,10 @@ class ExpenseReportController extends Controller
 
         $subscriptionData = $this->getSubscriptionData($couple_id, $userId, $startDate, $endDate);
 
-        // subscription_costカテゴリーを初期化（subscriptionDataが存在する場合のみ）
-        $initializeSubscriptionCategory = $this->initializeSubscriptionCategory($sortedByCategoryData, $subscriptionData);
-        $sortedByCategoryData = $initializeSubscriptionCategory['sortedByCategoryData'];
-        $subscriptionCategory = $initializeSubscriptionCategory['subscriptionCategory'];
+        // subscription_costカテゴリーを追加
+        $addSubscriptionCategory = $this->addSubscriptionCategory($sortedByCategoryData, $subscriptionData);
+        $sortedByCategoryData = $addSubscriptionCategory['sortedByCategoryData'];
+        $subscriptionCategory = $addSubscriptionCategory['subscriptionCategory'];
 
         // サブスク費を一律で１カ月払いで表示させる（支出管理表）
         if ($subscriptionCategory instanceof Category && $subscriptionData instanceof Collection && ! $subscriptionData->isEmpty()) {
