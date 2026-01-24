@@ -20,7 +20,7 @@ class CognitoJwtAuth
      * リクエストヘッダーのJWTを検証し
      * 認証されたユーザー情報をリクエストに追加する
      *
-     * @param  Request  $request  受信したHTTPリクエスト
+     * @param Request $request リクエストオブジェクト
      * @param Closure #next 次のミドルウェアまたはコントローラー
      * @return Response 成功時には次の処理へ、失敗時は401エラー
      */
@@ -30,7 +30,12 @@ class CognitoJwtAuth
         $token = $this->getTokenFromRequest($request);
 
         if (! $token) {
-            return $this->unauthorizedResponse('認証トークンが見つかりません');
+            Log::error('認証失敗', ['message' => '認証トークンが見つかりません']);
+
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => '認証トークンが見つかりません',
+            ], 401);
         }
 
         try {
@@ -38,7 +43,13 @@ class CognitoJwtAuth
             $user = $this->validateTokenAndGetUser($token);
 
             if (! $user) {
-                return $this->unauthorizedResponse('無効な認証トークンです');
+                Log::error('認証失敗', ['message' => '無効な認証トークンです']);
+
+                return response()->json([
+                    'error' => 'Unauthorized',
+                    'message' => '無効な認証トークンです',
+                ], 401);
+                
             }
 
             // リクエストにユーザー情報を追加
@@ -52,12 +63,18 @@ class CognitoJwtAuth
                 'error_type' => get_class($e),
             ]);
 
-            return $this->unauthorizedResponse('認証に失敗しました');
+            return response()->json([
+                'error' => 'Unauthorized',
+                'message' => '認証に失敗しました',
+            ], 401);
         }
     }
 
     /**
      * リクエストからBearerトークンを取得
+     *
+     * @param Request $request リクエストオブジェクト
+     * @return string|null
      */
     private function getTokenFromRequest(Request $request): ?string
     {
@@ -72,6 +89,9 @@ class CognitoJwtAuth
 
     /**
      * JWTを検証してユーザーを取得
+     *
+     * @param string $token JWTトークン
+     * @return User|null
      */
     private function validateTokenAndGetUser(string $token): ?User
     {
@@ -124,6 +144,9 @@ class CognitoJwtAuth
 
     /**
      * Cognitoの公開鍵を取得
+     *
+     * @param string $kid kid
+     * @return Key|null
      */
     private function getCognitoPublicKey(string $kid): Key
     {
@@ -153,6 +176,9 @@ class CognitoJwtAuth
 
     /**
      * JWTペイロードからユーザーを取得
+     *
+     * @param object $payload JWTペイロード
+     * @return User|null
      */
     private function getUserFromPayload(object $payload): ?User
     {
@@ -168,18 +194,5 @@ class CognitoJwtAuth
 
             return null;
         }
-    }
-
-    /**
-     * 認証失敗レスポンスを返す
-     */
-    private function unauthorizedResponse(string $message): JsonResponse
-    {
-        Log::error('認証失敗', ['message' => $message]);
-
-        return response()->json([
-            'error' => 'Unauthorized',
-            'message' => $message,
-        ], 401);
     }
 }
