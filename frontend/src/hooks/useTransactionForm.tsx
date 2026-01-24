@@ -49,7 +49,7 @@ export const useTransactionForm = ({
       } else {
         return {
           user: userInfo.user_id,
-          amount: 0,
+          amount: null,
           date: new Date(),
           category: null,
           payer: userInfo.id,
@@ -97,9 +97,10 @@ export const useTransactionForm = ({
     try {
       const requestData = {
         ...transactionData,
-        payer: String(transactionData.payer),
-        date: format(transactionData.date, "yyyy-MM-dd"),
+        amount: transactionData.amount ?? 0,
         category: transactionData.category?.value || "",
+        date: format(transactionData.date, "yyyy-MM-dd"),
+        payer: String(transactionData.payer),
       };
 
       const response = await postTransaction(requestData, user);
@@ -132,6 +133,7 @@ export const useTransactionForm = ({
     try {
       const requestData = {
         ...transactionData,
+        amount: transactionData.amount ?? 0,
         payer: String(transactionData.payer),
         date: format(transactionData.date, "yyyy-MM-dd"),
         category: transactionData.category?.value || "",
@@ -186,7 +188,7 @@ export const useTransactionForm = ({
   const resetForm = () => {
     setTransactionData({
       user: userInfo.user_id,
-      amount: 0,
+      amount: null,
       date: new Date(),
       category: null,
       payer: userInfo.id,
@@ -197,7 +199,7 @@ export const useTransactionForm = ({
 
   // 保存/更新ボタンの無効化
   const isSaveDisabled =
-    transactionData.amount <= 0 || transactionData.category === null;
+    !transactionData.amount || transactionData.amount <= 0 || transactionData.category === null;
 
   return {
     categories,

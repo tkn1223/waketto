@@ -3,7 +3,7 @@ import type { AmountProps } from "@/types/transaction.ts";
 
 // [表示用] 数値をカンマ区切りの文字列に変換
 const formatNumber = (num: number): string => {
-  return num.toLocaleString("ja-JP");
+  return num ? num.toLocaleString("ja-JP") : "";
 };
 
 // [保存用] カンマ区切りの文字列を数値に変換

@@ -3,7 +3,7 @@ import type { UserInfo } from "@/types/auth.ts";
 // フロントエンドで扱う際の取引明細の型
 export interface TransactionData {
   user: string;
-  amount: number;
+  amount: number | null;
   date: Date;
   category: CategorySelection | null;
   payer: string;
