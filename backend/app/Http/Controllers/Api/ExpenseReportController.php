@@ -17,6 +17,7 @@ class ExpenseReportController extends Controller
      * 支出管理表に表示するデータを取得する
      * 
      * 指定年月のPaymentおよびSubscriptionデータを取得し、カテゴリーごとにグループ化して返す。
+     * また、月次管理のため、サブスクリプションは月額換算して表示させている。
      * 
      * @param Request $request リクエストオブジェクト（queryパラメータ: year=年度, month=月）
      * @param string $userMode ユーザーモード（個人/共有）

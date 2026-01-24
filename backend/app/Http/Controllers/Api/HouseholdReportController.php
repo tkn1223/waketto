@@ -14,6 +14,16 @@ class HouseholdReportController extends Controller
 {
     use ReportDataTrait;
 
+    /**
+     * 家計簿に表示するデータを取得する
+     * 
+     * 指定年月のPaymentおよびSubscriptionデータを取得し、カテゴリーごとにグループ化して返す。
+     * また、支払い記録を表示させるため、サブスクリプションは実際に支払った日付で表示させている。
+     * 
+     * @param Request $request リクエストオブジェクト（queryパラメータ: year=年度, month=月）
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse {status: true, data: カテゴリーごとにグループ化された支出データ（合計含む）}
+     */
     public function index(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
