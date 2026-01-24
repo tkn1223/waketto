@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
+    /**
+     * 明細記録を保存する
+     * 
+     * Paymentテーブルに明細記録を保存する。
+     * 
+     * @param Request $request リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse
+     */
     public function store(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
@@ -25,6 +34,7 @@ class TransactionController extends Controller
 
         // payerが存在するか確認
         $payerExists = User::where('id', $request->payer)
+            // 共有モードの場合 payerにcouple_idが入るため、orWhereで確認する
             ->orWhere('couple_id', $request->payer)
             ->exists();
 
@@ -69,7 +79,7 @@ class TransactionController extends Controller
             ], 422);
         }
 
-        $payment = Payment::newPaymentRecord($validator->validated(), $user_id, $couple_id);
+        $payment = Payment::savePaymentRecord($validator->validated(), $user_id, $couple_id);
 
         if (! $payment) {
             return response()->json([
@@ -84,6 +94,14 @@ class TransactionController extends Controller
         ]);
     }
 
+    /**
+     * 明細記録を更新する
+     * 
+     * @param Request $request リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @param int $id 明細記録ID
+     * @return JsonResponse
+     */
     public function update(Request $request, $userMode, $id): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
@@ -130,7 +148,7 @@ class TransactionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validation failed', [
+            Log::error('バリデーションエラー', [
                 'errors' => $validator->errors(),
                 'request_data' => $request->all(),
             ]);
@@ -155,6 +173,14 @@ class TransactionController extends Controller
         ]);
     }
 
+    /**
+     * 明細記録を削除する
+     * 
+     * @param Request $request リクエストオブジェクト
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @param int $id 明細記録ID
+     * @return JsonResponse
+     */
     public function delete(Request $request, $userMode, $id): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
