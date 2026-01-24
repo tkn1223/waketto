@@ -128,6 +128,9 @@ class User extends Authenticatable
 
     /**
      * パートナーのuser_idを取得
+     *
+     * @param  User  $user  ユーザー
+     * @return string|null
      */
     public static function getPartnerUserId($user)
     {
