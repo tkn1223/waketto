@@ -7,7 +7,6 @@ use Closure;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +19,7 @@ class CognitoJwtAuth
      * リクエストヘッダーのJWTを検証し
      * 認証されたユーザー情報をリクエストに追加する
      *
-     * @param Request $request リクエストオブジェクト
+     * @param  Request  $request  リクエストオブジェクト
      * @param Closure #next 次のミドルウェアまたはコントローラー
      * @return Response 成功時には次の処理へ、失敗時は401エラー
      */
@@ -49,7 +48,7 @@ class CognitoJwtAuth
                     'error' => 'Unauthorized',
                     'message' => '無効な認証トークンです',
                 ], 401);
-                
+
             }
 
             // リクエストにユーザー情報を追加
@@ -73,8 +72,7 @@ class CognitoJwtAuth
     /**
      * リクエストからBearerトークンを取得
      *
-     * @param Request $request リクエストオブジェクト
-     * @return string|null
+     * @param  Request  $request  リクエストオブジェクト
      */
     private function getTokenFromRequest(Request $request): ?string
     {
@@ -90,8 +88,7 @@ class CognitoJwtAuth
     /**
      * JWTを検証してユーザーを取得
      *
-     * @param string $token JWTトークン
-     * @return User|null
+     * @param  string  $token  JWTトークン
      */
     private function validateTokenAndGetUser(string $token): ?User
     {
@@ -145,7 +142,7 @@ class CognitoJwtAuth
     /**
      * Cognitoの公開鍵を取得
      *
-     * @param string $kid kid
+     * @param  string  $kid  kid
      * @return Key|null
      */
     private function getCognitoPublicKey(string $kid): Key
@@ -177,8 +174,7 @@ class CognitoJwtAuth
     /**
      * JWTペイロードからユーザーを取得
      *
-     * @param object $payload JWTペイロード
-     * @return User|null
+     * @param  object  $payload  JWTペイロード
      */
     private function getUserFromPayload(object $payload): ?User
     {
