@@ -14,12 +14,11 @@ class TransactionController extends Controller
 {
     /**
      * 明細記録を保存する
-     * 
+     *
      * Paymentテーブルに明細記録を保存する。
-     * 
-     * @param Request $request リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
-     * @param string $userMode ユーザーモード（個人/共有）
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
+     * @param  string  $userMode  ユーザーモード（個人/共有）
      */
     public function store(Request $request, $userMode): JsonResponse
     {
@@ -96,11 +95,10 @@ class TransactionController extends Controller
 
     /**
      * 明細記録を更新する
-     * 
-     * @param Request $request リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
-     * @param string $userMode ユーザーモード（個人/共有）
-     * @param int $id 明細記録ID
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト（bodyパラメータ: amount=金額, category=カテゴリー, date=日付, payer=支払者, shop_name=お店の名前, note=メモ）
+     * @param  string  $userMode  ユーザーモード（個人/共有）
+     * @param  int  $id  明細記録ID
      */
     public function update(Request $request, $userMode, $id): JsonResponse
     {
@@ -175,11 +173,10 @@ class TransactionController extends Controller
 
     /**
      * 明細記録を削除する
-     * 
-     * @param Request $request リクエストオブジェクト
-     * @param string $userMode ユーザーモード（個人/共有）
-     * @param int $id 明細記録ID
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト
+     * @param  string  $userMode  ユーザーモード（個人/共有）
+     * @param  int  $id  明細記録ID
      */
     public function delete(Request $request, $userMode, $id): JsonResponse
     {

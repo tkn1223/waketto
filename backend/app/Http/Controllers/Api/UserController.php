@@ -12,11 +12,10 @@ class UserController extends Controller
 {
     /**
      * ユーザー情報を取得
-     * 
+     *
      * Userテーブルからユーザー情報を取得する。
-     * 
-     * @param Request $request リクエストオブジェクト
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト
      */
     public function getUserInfo(Request $request): JsonResponse
     {
@@ -46,11 +45,10 @@ class UserController extends Controller
 
     /**
      * 認証済みユーザーのプロファイルを取得
-     * 
+     *
      * Userテーブルから認証済みユーザーのプロファイルを取得する。
-     * 
-     * @param Request $request リクエストオブジェクト
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト
      */
     public function profile(Request $request): JsonResponse
     {
@@ -67,11 +65,10 @@ class UserController extends Controller
 
     /**
      * ユーザープロファイルの更新
-     * 
+     *
      * Userテーブルから認証済みユーザーのプロファイルを更新する。
-     * 
-     * @param Request $request リクエストオブジェクト
-     * @return JsonResponse
+     *
+     * @param  Request  $request  リクエストオブジェクト
      */
     public function updateProfile(Request $request): JsonResponse
     {

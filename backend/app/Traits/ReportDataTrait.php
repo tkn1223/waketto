@@ -117,10 +117,10 @@ trait ReportDataTrait
     /**
      * サブスクリプションデータを取得
      *
-     * @param  int|null  $couple_id カップルID（null=個人）
-     * @param  int  $userId ユーザーID
-     * @param  string  $startDate 開始日
-     * @param  string  $endDate 終了日
+     * @param  int|null  $couple_id  カップルID（null=個人）
+     * @param  int  $userId  ユーザーID
+     * @param  string  $startDate  開始日
+     * @param  string  $endDate  終了日
      * @return Collection サブスクリプションデータ
      */
     public function getSubscriptionData($couple_id, $userId, $startDate, $endDate)
@@ -145,11 +145,11 @@ trait ReportDataTrait
 
     /**
      * サブスクリプションカテゴリーを追加する
-     * 
+     *
      * 後からサブスクリプションのデータを追加するために、subscription_costカテゴリーが存在しない場合に、その構造を追加する。
      *
-     * @param  array  $sortedByCategoryData カテゴリーごとにグループ化された支出データ
-     * @param  Collection  $subscriptionData サブスクリプションデータ
+     * @param  array  $sortedByCategoryData  カテゴリーごとにグループ化された支出データ
+     * @param  Collection  $subscriptionData  サブスクリプションデータ
      * @return array {subscriptionCategory: サブスクリプションカテゴリー, sortedByCategoryData: カテゴリーごとにグループ化された支出データ}
      */
     public function addSubscriptionCategory($sortedByCategoryData, $subscriptionData)
@@ -171,10 +171,10 @@ trait ReportDataTrait
 
     /**
      * 総計を算出
-     * 
+     *
      * 全カテゴリーの予算合計・支払い合計・差分を計算して配列に追加する。
      *
-     * @param  array  $sortedByCategoryData カテゴリーごとにグループ化された支出データ
+     * @param  array  $sortedByCategoryData  カテゴリーごとにグループ化された支出データ
      * @return array {totalBudget: 予算合計, totalPayment: 支払い合計, defference: 差分}
      */
     public function getTotalExpenseData($sortedByCategoryData)

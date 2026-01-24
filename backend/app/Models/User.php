@@ -60,12 +60,11 @@ class User extends Authenticatable
 
     /**
      * パートナーを登録する
-     * 
+     *
      * Coupleテーブルを作成し、user.couple_idとpartner.couple_idを設定する。
-     * 
-     * @param User $user ユーザー
-     * @param User $partner パートナー
-     * @return bool
+     *
+     * @param  User  $user  ユーザー
+     * @param  User  $partner  パートナー
      */
     public static function setPartner(User $user, User $partner): bool
     {
@@ -102,8 +101,8 @@ class User extends Authenticatable
 
     /**
      * パートナーのidを取得
-     * 
-     * @param int $user_id ユーザーID
+     *
+     * @param  int  $user_id  ユーザーID
      * @return int|null
      */
     public static function getPartnerId($user_id)

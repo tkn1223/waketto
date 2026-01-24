@@ -15,11 +15,10 @@ class BudgetUsageController extends Controller
 {
     /**
      * 予算使用状況を取得する
-     * 
+     *
      * 指定年度の予算設定を支払い実績を取得し、カテゴリーごとの目次データとして返す。
-     * 
-     * @param Request $request
-     * @param string $userMode ユーザーモード（個人/共有）
+     *
+     * @param  string  $userMode  ユーザーモード（個人/共有）
      * @return JsonResponse 成功時: {status: true, data: 予算使用状況配列}, 失敗時: {status: false, message: エラーメッセージ}
      */
     public function index(Request $request, $userMode): JsonResponse
@@ -66,9 +65,8 @@ class BudgetUsageController extends Controller
 
     /**
      * 予算設定を取得する
-     * 
-     * @param Request $request
-     * @param string $userMode ユーザーモード（個人/共有）
+     *
+     * @param  string  $userMode  ユーザーモード（個人/共有）
      * @return JsonResponse 成功時: {status: true, data: 予算設定配列}, 失敗時: {status: false, message: エラーメッセージ}
      */
     public function budgetSetting(Request $request, $userMode): JsonResponse
@@ -122,12 +120,11 @@ class BudgetUsageController extends Controller
 
     /**
      * 予算設定を更新する
-     * 
+     *
      * リクエストで受け取ったカテゴリごとの予算設定をバリデーションし、
      * ログインユーザーおよびユーザーモードを考慮して予算データを更新する。
-     * 
-     * @param Request $request
-     * @param string $userMode ユーザーモード（個人/共有）
+     *
+     * @param  string  $userMode  ユーザーモード（個人/共有）
      * @return JsonResponse 成功時: {status: true, message: 予算の設定に成功しました}, 失敗時: {status: false, message: 予算の設定に失敗しました}
      */
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
@@ -224,9 +221,9 @@ class BudgetUsageController extends Controller
 
     /**
      * 予算データを取得する
-     * 
-     * @param int|null $couple_id カップルID（null=個人）
-     * @param int $userId ユーザーID
+     *
+     * @param  int|null  $couple_id  カップルID（null=個人）
+     * @param  int  $userId  ユーザーID
      * @return Collection 予算データ
      */
     private function getBudgetData($couple_id, $userId)
@@ -243,14 +240,14 @@ class BudgetUsageController extends Controller
 
     /**
      * 支払い実績を取得する
-     * 
+     *
      * 予算が設定されているカテゴリの支払い実績を取得し、さらにカテゴリごとの月次データとして返す。
-     * 
-     * @param int|null $couple_id カップルID（null=個人）
-     * @param int $userId ユーザーID
-     * @param Collection $budget 予算データ
-     * @param string $startDate 開始日
-     * @param string $endDate 終了日
+     *
+     * @param  int|null  $couple_id  カップルID（null=個人）
+     * @param  int  $userId  ユーザーID
+     * @param  Collection  $budget  予算データ
+     * @param  string  $startDate  開始日
+     * @param  string  $endDate  終了日
      * @return Collection 支払い実績データ
      */
     private function getPaymentRecords($couple_id, $userId, $budget, $startDate, $endDate)
@@ -274,11 +271,11 @@ class BudgetUsageController extends Controller
 
     /**
      * 予算データと支払い実績データを結合する
-     * 
+     *
      * 予算データと支払い実績データを結合し、カテゴリごとの月次実績データと残りの予算を返す。
-     * 
-     * @param Collection $budget 予算データ
-     * @param Collection $paymentRecords 支払い実績データ
+     *
+     * @param  Collection  $budget  予算データ
+     * @param  Collection  $paymentRecords  支払い実績データ
      * @return Collection 結合後のデータ（予算情報 + 12ヶ月分の月次実績 + 残り予算）
      */
     private function connectBudgetAndPaymentRecords($budget, $paymentRecords)
@@ -314,9 +311,9 @@ class BudgetUsageController extends Controller
 
     /**
      * 予算データを取得する
-     * 
-     * @param int|null $couple_id カップルID（null=個人）
-     * @param int $userId ユーザーID
+     *
+     * @param  int|null  $couple_id  カップルID（null=個人）
+     * @param  int  $userId  ユーザーID
      * @return Collection 予算データ
      */
     private function getBudgetSettingData($couple_id, $userId)
