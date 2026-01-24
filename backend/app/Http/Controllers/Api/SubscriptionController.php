@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Validator;
 
 class SubscriptionController extends Controller
 {
+    /**
+     * サブスクリプションデータを取得する
+     *
+     * @param  Request  $request  リクエストオブジェクト（queryパラメータ: なし）
+     * @param  string  $userMode  ユーザーモード（個人/共有）
+     */
     public function getSubscriptions(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
@@ -64,6 +70,14 @@ class SubscriptionController extends Controller
         }
     }
 
+    /**
+     * サブスクリプションデータを更新する
+     *
+     * 既存のサブスクリプションを削除し、新しいサブスクリプションを作成する。
+     *
+     * @param  Request  $request  リクエストオブジェクト（bodyパラメータ: subscriptions=サブスクリプションデータ）
+     * @param  string  $userMode  ユーザーモード（個人/共有）
+     */
     public function updateSubscriptions(Request $request, $userMode): JsonResponse
     {
         // バリデーションチェック

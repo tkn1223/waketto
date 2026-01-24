@@ -21,8 +21,17 @@ class User extends Authenticatable
         'couple_id',
     ];
 
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
+
     /**
-     * Cognito SubでユーザーをIDで検索、存在しない場合は作成
+     * Cognitoと同じ情報を持つUserを取得
+     *
+     * Cognito SubをキーにUserを取得、存在しない場合は新規作成する。
+     *
+     * @param  string  $cognitoSub  Cognito Sub
      */
     public static function findOrCreateByCognitoSub(string $cognitoSub): User
     {
@@ -41,7 +50,9 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーIDを生成
+     * ユーザーIDの生成
+     *
+     * 一意な10文字のランダムな英数字を生成する。
      */
     private static function generateUserId(): string
     {
@@ -59,40 +70,23 @@ class User extends Authenticatable
     }
 
     /**
-     * パートナー設定
+     * パートナーを登録する
+     *
+     * Coupleテーブルを作成し、user.couple_idとpartner.couple_idを設定する。
+     *
+     * @param  User  $user  ユーザー
+     * @param  User  $partner  パートナー
      */
     public static function setPartner(User $user, User $partner): bool
     {
         DB::beginTransaction();
 
         try {
-            Log::error('[DEBUG] Couple作成開始', [
-                'user_user_id' => $user->user_id,
-                'partner_user_id' => $partner->user_id,
-            ]);
-
             $couple = Couple::create([
                 'name' => $user->user_id.' & '.$partner->user_id,
             ]);
 
-            Log::error('[DEBUG] Couple作成成功', [
-                'couple_id' => $couple->id,
-                'couple_name' => $couple->name,
-            ]);
-
-            Log::error('[DEBUG] User更新開始', [
-                'user_id' => $user->id,
-                'couple_id' => $couple->id,
-            ]);
-
             $user->update([
-                'couple_id' => $couple->id,
-            ]);
-
-            Log::error('[DEBUG] User更新成功');
-
-            Log::error('[DEBUG] Partner更新開始', [
-                'partner_id' => $partner->id,
                 'couple_id' => $couple->id,
             ]);
 
@@ -100,11 +94,7 @@ class User extends Authenticatable
                 'couple_id' => $couple->id,
             ]);
 
-            Log::error('[DEBUG] Partner更新成功');
-
-            Log::error('[DEBUG] トランザクションコミット開始');
             DB::commit();
-            Log::error('[DEBUG] トランザクションコミット成功');
 
             return true;
         } catch (\Exception $e) {
@@ -121,7 +111,10 @@ class User extends Authenticatable
     }
 
     /**
-     * partnerのidを取得
+     * パートナーのidを取得
+     *
+     * @param  int  $user_id  ユーザーID
+     * @return int|null
      */
     public static function getPartnerId($user_id)
     {
@@ -146,6 +139,9 @@ class User extends Authenticatable
 
     /**
      * パートナーのuser_idを取得
+     *
+     * @param  User  $user  ユーザー
+     * @return string|null
      */
     public static function getPartnerUserId($user)
     {
@@ -166,10 +162,5 @@ class User extends Authenticatable
 
             return null;
         }
-    }
-
-    public function couple()
-    {
-        return $this->belongsTo(Couple::class, 'couple_id', 'id');
     }
 }

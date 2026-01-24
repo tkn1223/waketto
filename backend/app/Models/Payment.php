@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
@@ -28,7 +29,15 @@ class Payment extends Model
         return $this->belongsTo(Couple::class, 'couple_id', 'id');
     }
 
-    public static function newPaymentRecord($data, $user_id, $couple_id)
+    /**
+     * 明細記録を保存する
+     *
+     * @param  array  $data  明細記録データ
+     * @param  int  $user_id  ユーザーID
+     * @param  int  $couple_id  パートナーID
+     * @return bool
+     */
+    public static function savePaymentRecord($data, $user_id, $couple_id)
     {
         try {
             // 最初は自分に設定しておいて、パートナーの場合はパートナーに設定
@@ -64,6 +73,15 @@ class Payment extends Model
         }
     }
 
+    /**
+     * 明細記録を更新する
+     *
+     * @param  Validator  $validator  バリデーション結果
+     * @param  int  $id  明細記録ID
+     * @param  int  $user_id  ユーザーID
+     * @param  string  $userMode  ユーザーモード（個人/共有）
+     * @return bool
+     */
     public static function updatePaymentRecord($validator, $id, $user_id, $userMode)
     {
         try {

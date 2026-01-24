@@ -11,6 +11,10 @@ class CategoryController extends Controller
 {
     /**
      * カテゴリーの一覧を取得
+     *
+     * カテゴリーの一覧を取得し、categoryGroupでグループ化して返す。
+     *
+     * @return JsonResponse {status: true, data: {グループコード: {group_name: グループ名, categories: [カテゴリー配列]}}}
      */
     public function index(Request $request): JsonResponse
     {

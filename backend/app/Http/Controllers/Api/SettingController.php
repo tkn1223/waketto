@@ -13,12 +13,14 @@ use Illuminate\Support\Facades\Log;
 
 class SettingController extends Controller
 {
+    /*
+     * ユーザーネームおよびパートナー設定を保存する
+     *
+     * @param Request $request リクエストオブジェクト（bodyパラメータ: name=ユーザー名（10文字以内、オプション）, partner_id=パートナーID（オプション））
+     * @return JsonResponse
+     */
     public function entry(Request $request): JsonResponse
     {
-        Log::error('[DEBUG] entry method 開始しました', [
-            'request_data' => $request->all(),
-        ]);
-
         $user = $request->attributes->get('auth_user');
 
         if (! $user) {
@@ -33,11 +35,6 @@ class SettingController extends Controller
         // リクエストボディからデータを取得
         $userName = $request->input('name');
         $partnerId = $request->input('partner_id');
-
-        Log::error('[DEBUG] パラメータを取得しました', [
-            'userName' => $userName,
-            'partnerId' => $partnerId,
-        ]);
 
         // ユーザー名を更新
         if ($userName !== null && $userName !== '') {
@@ -67,11 +64,10 @@ class SettingController extends Controller
         // パートナーを設定
         if ($user->couple_id === null && $partnerId !== null) {
             try {
-                Log::error('[DEBUG] パートナーを検索しました');
                 $partner = User::where('user_id', $partnerId)->first();
 
                 if (! $partner || $user->id === $partner->id) {
-                    Log::error('[DEBUG] パートナーが見つかりません', [
+                    Log::error('パートナーが見つかりません', [
                         'partner_found' => $partner ? 'yes' : 'no',
                         'same_user' => $partner && $user->id === $partner->id,
                     ]);
@@ -82,18 +78,9 @@ class SettingController extends Controller
                     ], 404);
                 }
 
-                Log::error('[DEBUG] setPartnerを呼び出しました', [
-                    'user_id' => $user->id,
-                    'partner_id' => $partner->id,
-                ]);
-
                 $result = User::setPartner($user, $partner);
 
-                Log::error('[DEBUG] setPartnerの結果を取得しました', ['result' => $result]);
-
                 if (! $result) {
-                    Log::error('[DEBUG] setPartnerがfalseを返しました');
-
                     return response()->json([
                         'status' => false,
                         'message' => 'パートナー設定に失敗しました',
@@ -119,6 +106,14 @@ class SettingController extends Controller
         ]);
     }
 
+    /**
+     * パートナーを解除する
+     *
+     * パートナー設定を解除することで、User.couple_idをnullにする。
+     * また、Coupleテーブルを削除することで、外部キー制約に基づいて、関連するPayment,Subscription,Budgetも自動的に削除される。
+     *
+     * @param  Request  $request  リクエストオブジェクト（bodyパラメータ: なし）
+     */
     public function reset(Request $request): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
