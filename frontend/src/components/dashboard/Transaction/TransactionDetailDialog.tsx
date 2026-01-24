@@ -7,15 +7,8 @@ import {
 } from "@/components/ui/dialog.tsx";
 import { useAuth } from "@/contexts/AuthContext.tsx";
 import { useTransactionForm } from "@/hooks/useTransactionForm.tsx";
-import type { SavedTransactionData } from "@/types/transaction.ts";
+import type { TransactionDetailDialogProps } from "@/types/transaction.ts";
 import { TransactionForm } from "./TransactionForm.tsx";
-
-interface TransactionDetailDialogProps {
-  payment: SavedTransactionData;
-  isOpen: boolean;
-  onClose: () => void;
-  onUpdate: () => void;
-}
 
 export const TransactionDetailDialog = memo(function TransactionDetailDialog({
   payment,

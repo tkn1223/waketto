@@ -45,6 +45,7 @@ export function UserInfoEdit() {
     setIsDialogOpen(false);
   };
 
+  // パートナー情報を解除する
   const handlePartnerReset = async () => {
     try {
       const response = await postPartnerReset();

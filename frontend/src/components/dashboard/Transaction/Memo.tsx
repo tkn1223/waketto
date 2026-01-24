@@ -12,6 +12,7 @@ interface MemoProps {
 export function Memo({ memo, onMemoChange }: MemoProps) {
   const [error, setError] = useState<string | null>(null);
 
+  // メモを更新する
   const handleMemoChange = (value: string) => {
     if (value.length > 255) {
       setError("文字数の上限を超えています");
@@ -22,6 +23,7 @@ export function Memo({ memo, onMemoChange }: MemoProps) {
     onMemoChange(value);
   };
 
+  // エンターキーを押したときにフォーカスを外す
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.currentTarget.blur();

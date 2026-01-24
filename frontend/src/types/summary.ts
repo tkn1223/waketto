@@ -1,6 +1,9 @@
 import type { UserInfo } from "@/types/auth.ts";
 import type { DateSelector } from "@/types/expense.ts";
-import type { ExpenseReportData } from "@/types/transaction.ts";
+import type {
+  ExpenseReportData,
+  PaymentWithCategory,
+} from "@/types/transaction.ts";
 import type { UserMode } from "@/types/viewmode.ts";
 
 // 支出管理ページのprops型定義
@@ -65,5 +68,11 @@ export interface SpendingDetailListProps {
   householdReport: ExpenseReportData;
   user: UserMode;
   userInfo: UserInfo;
+  onTransactionUpdate: () => void;
+}
+
+// 支出の内訳詳細行のprops型定義
+export interface SpendingDetailRowProps {
+  paymentRecords: PaymentWithCategory[];
   onTransactionUpdate: () => void;
 }

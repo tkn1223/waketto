@@ -29,7 +29,7 @@ export default function SignupPage() {
   const validationTimer = useRef<NodeJS.Timeout | null>(null);
   const { checkAuthState } = useAuth();
 
-  // アカウント作成ボタンのハンドリング
+  // 入力されたメールアドレスとパスワードをCognitoに送信し、アカウント作成を行う
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSignupLoading(true);
@@ -52,7 +52,7 @@ export default function SignupPage() {
     }
   };
 
-  // 確認コード入力画面のハンドリング
+  // cognitoに確認コードを送信し、アカウント作成を完了する
   const handleConfirmSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsConfirmLoading(true);
@@ -88,7 +88,7 @@ export default function SignupPage() {
     }
   };
 
-  // パスワードのバリデーション（デバウンス付き）
+  // 入力されたパスワードと確認用パスワードをバリデーションし、エラーを配列にまとめる
   const handlePasswordValidation = (
     password: string,
     passwordConfirm: string

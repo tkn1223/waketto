@@ -11,12 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover.tsx";
 import { cn } from "@/lib/utils.ts";
-
-interface RegisteredDateProps {
-  date: Date;
-  onDateChange: (date: Date) => void;
-  className?: string;
-}
+import type { RegisteredDateProps } from "@/types/transaction.ts";
 
 export function RegisteredDate({
   date,

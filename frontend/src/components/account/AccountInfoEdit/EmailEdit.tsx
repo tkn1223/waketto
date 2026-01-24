@@ -22,6 +22,7 @@ export function EmailEdit() {
   const [confirmationCode, setConfirmationCode] = useState("");
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
 
+  // メールアドレスを更新する
   const handleEmailSave = async () => {
     setError("");
 
@@ -54,6 +55,7 @@ export function EmailEdit() {
     }
   };
 
+  // cognitoに確認コードを送信し、メールアドレスを変更する
   const handleConfirmCode = async () => {
     setIsConfirmLoading(true);
     setError("");
