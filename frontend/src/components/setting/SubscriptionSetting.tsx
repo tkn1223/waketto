@@ -16,6 +16,8 @@ export function SubscriptionSetting({
   allSubscriptions,
   handleSubscriptionUpdate,
 }: SubscriptionSettingProps) {
+
+  // サブスクリプションを追加する
   const handleAddRow = () => {
     const newSubscription: Subscription = {
       id: `temp-${Date.now()}`,
@@ -28,10 +30,12 @@ export function SubscriptionSetting({
     handleSubscriptionUpdate([...allSubscriptions, newSubscription]);
   };
 
+  // サブスクリプションを削除する
   const handleDeleteRow = (id: string) => {
     handleSubscriptionUpdate(allSubscriptions.filter((s) => s.id !== id));
   };
 
+  // サブスクリプションを更新する
   const handleFieldUpdate = (
     id: string | undefined,
     field: keyof Subscription,

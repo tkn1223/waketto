@@ -39,7 +39,7 @@ export default function BudgetSettingPage() {
     string | null
   >(null);
 
-  // 予算設定表の状態管理
+  // 予算設定表のカテゴリーを更新する
   const handleCategoryUpdate = (
     code: string,
     field: keyof BudgetCategory,
@@ -50,10 +50,12 @@ export default function BudgetSettingPage() {
     );
   };
 
+  // サブスクリプションを更新する
   const handleSubscriptionUpdate = (subscriptions: Subscription[]) => {
     setAllSubscriptions(subscriptions);
   };
 
+  // 予算設定表を保存する
   const handleBudgetSave = async () => {
     setSaveError(null);
     try {
@@ -86,6 +88,7 @@ export default function BudgetSettingPage() {
     }
   };
 
+  // サブスク管理表を保存する
   const handleSubscriptionSave = async () => {
     setSubscriptionSaveError(null);
     try {

@@ -33,6 +33,7 @@ export default function SigninForm() {
     router.push("/signup");
   };
 
+  // ゲストログインを行う
   const handleGuestLogin = async () => {
     setIsGuestLoading(true);
     try {

@@ -10,6 +10,7 @@ interface ShopInfoProps {
 export function ShopInfo({ shop_name, onShopNameChange }: ShopInfoProps) {
   const [error, setError] = useState<string | null>(null);
 
+  // お店の名前を更新する
   const handleShopNameChange = (value: string) => {
     if (value.length > 255) {
       setError("文字数の上限を超えています");
@@ -20,6 +21,7 @@ export function ShopInfo({ shop_name, onShopNameChange }: ShopInfoProps) {
     onShopNameChange(value);
   };
 
+  // エンターキーを押したときにフォーカスを外す
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.currentTarget.blur();

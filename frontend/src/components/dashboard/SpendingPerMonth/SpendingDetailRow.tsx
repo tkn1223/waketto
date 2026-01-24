@@ -1,16 +1,9 @@
 import { useCallback, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area.tsx";
 import { formatDate } from "@/types/displayFormat.ts";
-import type {
-  PaymentWithCategory,
-  SavedTransactionData,
-} from "@/types/transaction.ts";
+import type { SpendingDetailRowProps } from "@/types/summary.ts";
+import type { SavedTransactionData } from "@/types/transaction.ts";
 import { TransactionDetailDialog } from "../Transaction/TransactionDetailDialog.tsx";
-
-interface SpendingDetailRowProps {
-  paymentRecords: PaymentWithCategory[];
-  onTransactionUpdate: () => void;
-}
 
 export function SpendingDetailRow({
   paymentRecords,

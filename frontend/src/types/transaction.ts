@@ -102,6 +102,13 @@ export interface AmountProps {
   onAmountChange: (amount: number) => void;
 }
 
+// 登録日（取引明細）
+export interface RegisteredDateProps {
+  date: Date;
+  onDateChange: (date: Date) => void;
+  className?: string;
+}
+
 export type CategoryData = Record<string, CategoryGroup>;
 
 export interface CategorySelection {
@@ -150,4 +157,12 @@ export interface TransactionFormProps {
   onSave?: () => void;
   onUpdate?: () => void;
   onDelete?: () => void;
+}
+
+// 取引明細詳細ダイアログ用
+export interface TransactionDetailDialogProps {
+  payment: SavedTransactionData;
+  isOpen: boolean;
+  onClose: () => void;
+  onUpdate: () => void;
 }

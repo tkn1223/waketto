@@ -22,7 +22,22 @@ export function PasswordEdit() {
 
   const validationTimer = useRef<NodeJS.Timeout | null>(null);
 
-  // パスワードのバリデーション（デバウンス付き）
+  // パスワードと確認用パスワードをバリデーションし、エラー配列を返す
+  const validatePasswords = (
+    password: string,
+    passwordConfirm: string
+  ): string[] => {
+    const errors = validatePassword(password);
+    const matchError = validatePasswordMatch(password, passwordConfirm);
+
+    if (matchError) {
+      errors.push(matchError);
+    }
+
+    return errors;
+  };
+
+  // 入力されたパスワードと確認用パスワードをバリデーション（デバウンス付き）
   const handlePasswordValidation = (
     password: string,
     passwordConfirm: string
@@ -31,31 +46,19 @@ export function PasswordEdit() {
       clearTimeout(validationTimer.current);
     }
     validationTimer.current = setTimeout(() => {
-      const errors = validatePassword(password);
-      const matchError = validatePasswordMatch(password, passwordConfirm);
-
-      // すべてのエラーを配列にまとめる
-      const allErrors = [...errors];
-
-      if (matchError) {
-        allErrors.push(matchError);
-      }
-
+      const allErrors = validatePasswords(password, passwordConfirm);
       setPasswordErrors(allErrors);
     }, 500);
   };
 
+  // パスワードを更新する
   const handlePasswordSave = async () => {
-    // バリデーションチェック
-    const passwordValidationErrors = validatePassword(newPassword);
-    const matchError = validatePasswordMatch(newPassword, newPasswordConfirm);
-
-    // すべてのエラーを配列にまとめる
-    const allErrors = [...passwordValidationErrors];
-
-    if (matchError) {
-      allErrors.push(matchError);
+    // デバウンスタイマーをクリアして、即座に最新の値をバリデーション
+    if (validationTimer.current) {
+      clearTimeout(validationTimer.current);
     }
+
+    const allErrors = validatePasswords(newPassword, newPasswordConfirm);
 
     if (allErrors.length > 0) {
       setPasswordErrors(allErrors);

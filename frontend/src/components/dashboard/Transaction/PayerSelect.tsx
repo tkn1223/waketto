@@ -8,6 +8,7 @@ export function PayerSelect({
   onPayerChange,
 }: PayerSelectProps) {
   const { user } = useViewMode();
+  
   // 選択された支払者を取得
   const getSelectedPayer = () => {
     if (payer === userInfo.id) {
