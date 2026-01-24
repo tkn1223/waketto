@@ -21,8 +21,18 @@ class User extends Authenticatable
         'couple_id',
     ];
 
+    public function couple()
+    {
+        return $this->belongsTo(Couple::class, 'couple_id', 'id');
+    }
+
     /**
-     * Cognito SubでユーザーをIDで検索、存在しない場合は作成
+     * Cognitoと同じ情報を持つUserを取得
+     * 
+     * Cognito SubをキーにUserを取得、存在しない場合は新規作成する。
+     *
+     * @param string $cognitoSub Cognito Sub
+     * @return User
      */
     public static function findOrCreateByCognitoSub(string $cognitoSub): User
     {
@@ -41,7 +51,11 @@ class User extends Authenticatable
     }
 
     /**
-     * ユーザーIDを生成
+     * ユーザーIDの生成
+     *
+     * 一意な10文字のランダムな英数字を生成する。
+     *
+     * @return string
      */
     private static function generateUserId(): string
     {
@@ -151,10 +165,5 @@ class User extends Authenticatable
 
             return null;
         }
-    }
-
-    public function couple()
-    {
-        return $this->belongsTo(Couple::class, 'couple_id', 'id');
     }
 }
