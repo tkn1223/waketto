@@ -14,7 +14,10 @@ use Illuminate\Support\Facades\Log;
 class SettingController extends Controller
 {
     /*
-     *
+     * ユーザーネームおよびパートナー設定を保存する
+     * 
+     * @param Request $request リクエストオブジェクト（bodyパラメータ: name=ユーザー名（10文字以内、オプション）, partner_id=パートナーID（オプション））
+     * @return JsonResponse
      */
     public function entry(Request $request): JsonResponse
     {
@@ -103,6 +106,15 @@ class SettingController extends Controller
         ]);
     }
 
+    /**
+     * パートナーを解除する
+     * 
+     * パートナー設定を解除することで、User.couple_idをnullにする。
+     * また、Coupleテーブルを削除することで、外部キー制約に基づいて、関連するPayment,Subscription,Budgetも自動的に削除される。
+     * 
+     * @param Request $request リクエストオブジェクト（bodyパラメータ: なし）
+     * @return JsonResponse
+     */
     public function reset(Request $request): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
