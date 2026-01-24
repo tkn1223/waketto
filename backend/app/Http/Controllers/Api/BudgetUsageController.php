@@ -13,18 +13,27 @@ use Illuminate\Support\Facades\Validator;
 
 class BudgetUsageController extends Controller
 {
+    /**
+     * 予算使用状況を取得する
+     * 
+     * 指定年度の予算設定を支払い実績を取得し、カテゴリーごとの目次データとして返す。
+     * 
+     * @param Request $request
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse 成功時: {status: true, data: 予算使用状況配列}, 失敗時: {status: false, message: エラーメッセージ}
+     */
     public function index(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
         $userId = $user->id;
 
-        // クエリパラメータから年を取得
         $year = $request->query('year', date('Y'));
 
         // 年度の開始日と終了日の取得
         $startDate = "{$year}-01-01";
         $endDate = "{$year}-12-31";
 
+        // couple_idの有無で個人 / 共有モードの判断をできるようにする
         if ($userMode === 'common') {
             $couple_id = $user->couple_id;
         } else {
@@ -55,6 +64,13 @@ class BudgetUsageController extends Controller
         }
     }
 
+    /**
+     * 予算設定を取得する
+     * 
+     * @param Request $request
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse 成功時: {status: true, data: 予算設定配列}, 失敗時: {status: false, message: エラーメッセージ}
+     */
     public function budgetSetting(Request $request, $userMode): JsonResponse
     {
         $user = $request->attributes->get('auth_user');
@@ -104,6 +120,16 @@ class BudgetUsageController extends Controller
         }
     }
 
+    /**
+     * 予算設定を更新する
+     * 
+     * リクエストで受け取ったカテゴリごとの予算設定をバリデーションし、
+     * ログインユーザーおよびユーザーモードを考慮して予算データを更新する。
+     * 
+     * @param Request $request
+     * @param string $userMode ユーザーモード（個人/共有）
+     * @return JsonResponse 成功時: {status: true, message: 予算の設定に成功しました}, 失敗時: {status: false, message: 予算の設定に失敗しました}
+     */
     public function updateBudgetSetting(Request $request, $userMode): JsonResponse
     {
         // バリデーションチェック
@@ -120,7 +146,6 @@ class BudgetUsageController extends Controller
             'categories.*.code.required' => '値が読み込めません。リロードしてください。',
             'categories.*.code.string' => '値が読み込めません。リロードしてください。',
             'categories.*.code.exists' => '指定されたカテゴリーコードは存在しません',
-            // 'categories.*.period.nullable' => '期間は必須です',
             'categories.*.period.integer' => '期間は整数で入力してください',
             'categories.*.period.min' => '期間は1~12の間で入力してください',
             'categories.*.period.max' => '期間は1~12の間で入力してください',
@@ -197,6 +222,13 @@ class BudgetUsageController extends Controller
         }
     }
 
+    /**
+     * 予算データを取得する
+     * 
+     * @param int|null $couple_id カップルID（null=個人）
+     * @param int $userId ユーザーID
+     * @return Collection 予算データ
+     */
     private function getBudgetData($couple_id, $userId)
     {
         $query = Budget::with(['category:id,name,code'])
@@ -209,6 +241,18 @@ class BudgetUsageController extends Controller
                 ->get();
     }
 
+    /**
+     * 支払い実績を取得する
+     * 
+     * 予算が設定されているカテゴリの支払い実績を取得し、さらにカテゴリごとの月次データとして返す。
+     * 
+     * @param int|null $couple_id カップルID（null=個人）
+     * @param int $userId ユーザーID
+     * @param Collection $budget 予算データ
+     * @param string $startDate 開始日
+     * @param string $endDate 終了日
+     * @return Collection 支払い実績データ
+     */
     private function getPaymentRecords($couple_id, $userId, $budget, $startDate, $endDate)
     {
         $query = Payment::selectRaw('
@@ -225,10 +269,18 @@ class BudgetUsageController extends Controller
             ? $query->where('couple_id', $couple_id)->get()
             : $query->where('recorded_by_user_id', $userId)
                 ->whereNull('couple_id')
-                ->whereBetween('payment_date', [$startDate, $endDate])
                 ->get();
     }
 
+    /**
+     * 予算データと支払い実績データを結合する
+     * 
+     * 予算データと支払い実績データを結合し、カテゴリごとの月次実績データと残りの予算を返す。
+     * 
+     * @param Collection $budget 予算データ
+     * @param Collection $paymentRecords 支払い実績データ
+     * @return Collection 結合後のデータ（予算情報 + 12ヶ月分の月次実績 + 残り予算）
+     */
     private function connectBudgetAndPaymentRecords($budget, $paymentRecords)
     {
         return $budget->map(function ($budgetItem) use ($paymentRecords) {
@@ -260,6 +312,13 @@ class BudgetUsageController extends Controller
         });
     }
 
+    /**
+     * 予算データを取得する
+     * 
+     * @param int|null $couple_id カップルID（null=個人）
+     * @param int $userId ユーザーID
+     * @return Collection 予算データ
+     */
     private function getBudgetSettingData($couple_id, $userId)
     {
         $query = Budget::with([
