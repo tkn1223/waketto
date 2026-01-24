@@ -34,7 +34,7 @@ export function TransactionForm({
       {/* 金額 */}
       <div className="flex justify-between items-end gap-2">
         <Amount
-          amount={transactionData.amount}
+          amount={transactionData.amount || 0}
           onAmountChange={onAmountChange}
         />
       </div>
