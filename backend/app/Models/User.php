@@ -59,40 +59,24 @@ class User extends Authenticatable
     }
 
     /**
-     * パートナー設定
+     * パートナーを登録する
+     * 
+     * Coupleテーブルを作成し、user.couple_idとpartner.couple_idを設定する。
+     * 
+     * @param User $user ユーザー
+     * @param User $partner パートナー
+     * @return bool
      */
     public static function setPartner(User $user, User $partner): bool
     {
         DB::beginTransaction();
 
         try {
-            Log::error('[DEBUG] Couple作成開始', [
-                'user_user_id' => $user->user_id,
-                'partner_user_id' => $partner->user_id,
-            ]);
-
             $couple = Couple::create([
                 'name' => $user->user_id.' & '.$partner->user_id,
             ]);
 
-            Log::error('[DEBUG] Couple作成成功', [
-                'couple_id' => $couple->id,
-                'couple_name' => $couple->name,
-            ]);
-
-            Log::error('[DEBUG] User更新開始', [
-                'user_id' => $user->id,
-                'couple_id' => $couple->id,
-            ]);
-
             $user->update([
-                'couple_id' => $couple->id,
-            ]);
-
-            Log::error('[DEBUG] User更新成功');
-
-            Log::error('[DEBUG] Partner更新開始', [
-                'partner_id' => $partner->id,
                 'couple_id' => $couple->id,
             ]);
 
@@ -100,11 +84,7 @@ class User extends Authenticatable
                 'couple_id' => $couple->id,
             ]);
 
-            Log::error('[DEBUG] Partner更新成功');
-
-            Log::error('[DEBUG] トランザクションコミット開始');
             DB::commit();
-            Log::error('[DEBUG] トランザクションコミット成功');
 
             return true;
         } catch (\Exception $e) {
