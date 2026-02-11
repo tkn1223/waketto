@@ -208,4 +208,107 @@ class TransactionControllerTest extends TestCase
 
         $this->assertDatabaseCount('payments', 0);
     }
+
+    /**
+     * 正常系：個人モードで支払い明細を更新できることを確認
+     */
+    public function test_update_transaction_in_alone_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+        $userId = $this->user->id;
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $userId,
+            'recorded_by_user_id' => $userId,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $requestBody = [
+            'amount' => 2000,
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $userId,
+            'shop_name' => 'EFGHショップ',
+            'memo' => '更新テストメモ',
+        ];
+
+        $response = $this->putJson("/api/transaction/alone/{$paymentId}", $requestBody);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction updated successfully',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $paymentId,
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $userId,
+            'recorded_by_user_id' => $userId,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 2000,
+            'store_name' => 'EFGHショップ',
+            'note' => '更新テストメモ',
+        ]);
+    }
+
+    /**
+     * 正常系：共有モードで支払い明細を更新できることを確認
+     */
+    public function test_update_transaction_in_common_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->partner->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $this->couple->id,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $requestBody = [
+            'amount' => 2000,
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $this->couple->id,
+            'shop_name' => 'EFGHショップ',
+            'memo' => '更新テストメモ',
+        ];
+
+        $response = $this->putJson("/api/transaction/common/{$paymentId}", $requestBody);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction updated successfully',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $paymentId,
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->partner->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $this->couple->id,
+            'payment_date' => $date,
+            'amount' => 2000,
+            'store_name' => 'EFGHショップ',
+            'note' => '更新テストメモ',
+        ]);
+    }
 }
