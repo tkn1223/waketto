@@ -57,6 +57,8 @@ class TransactionController extends Controller
             'amount.numeric' => '金額は数値で入力してください',
             'amount.min' => '金額は0以上で入力してください',
             'category.required' => 'カテゴリーは必須です',
+            'category.integer' => 'カテゴリーは整数で入力してください',
+            'category.exists' => 'カテゴリーは存在しません',
             'date.required' => '日付は必須です',
             'date.date' => '日付は日付形式で入力してください',
             'payer.required' => '支払者は必須です',

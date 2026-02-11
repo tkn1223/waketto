@@ -5,17 +5,25 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
+ * User モデル用のファクトリ。テストやシードでユーザーを生成する際に使用する。
+ *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
  */
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
+     * メール未確認状態で作成したい場合に使う state。
      */
-    protected static ?string $password;
+    public function unverified(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'email_verified_at' => null,
+        ]);
+    }
 
     /**
-     * Define the model's default state.
+     * モデルのデフォルト状態を定義する。
+     * ここで返したカラムが、factory()->create() 時に自動で入力される。
      *
      * @return array<string, mixed>
      */
@@ -26,15 +34,5 @@ class UserFactory extends Factory
             'name' => $this->faker->name(),
             'user_id' => 'test_u_'.$this->faker->unique()->randomNumber(2),
         ];
-    }
-
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
-        ]);
     }
 }
