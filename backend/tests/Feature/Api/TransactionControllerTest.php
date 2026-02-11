@@ -4,8 +4,9 @@ namespace Tests\Feature\Api;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Models\Category;
-use App\Models\User;
 use App\Models\Couple;
+use App\Models\Payment;
+use App\Models\User;
 use Database\Seeders\CategoryGroupsTableSeeder;
 use Database\Seeders\CategoriesSeeder;
 use Tests\Common\MocksCognitoAuth;
@@ -46,34 +47,80 @@ class TransactionControllerTest extends TestCase
         $this->mockCognitoAuth($this->user);
     }
 
+
     /**
-     * setUpで作成したユーザー・カップルが存在し、紐づいていることを確認
+     * 個人モードで支払い明細を作成できることを確認（正常系）
      */
-    public function test_setup_creates_user_partner_and_couple(): void
+    public function test_create_transaction_in_alone_mode(): void
     {
-        $this->assertNotNull($this->user->id);
-        $this->assertNotNull($this->partner->id);
-        $this->assertNotNull($this->couple->id);
-        $this->assertSame($this->couple->id, $this->user->couple_id);
-        $this->assertSame($this->couple->id, $this->partner->couple_id);
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+        $requestBody = [
+            'amount' => 1500,
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $this->user->id,
+            'shop_name' => 'ABCDショップ',
+            'memo' => 'テストメモ',
+        ];
+
+        $response = $this->postJson('/api/transaction/alone', $requestBody);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction created successfully',
+            ]);
+        
+        $this->assertDatabaseHas('payments', [
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->user->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $this->assertSame(1, Payment::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
     }
 
     /**
-     * 認証をバイパスしてAPIに到達できることを確認（store を1件作成）
+     * 共有モードで支払い明細を作成できることを確認（正常系）
      */
-    public function test_authenticated_request_reaches_api(): void
+    public function test_create_transaction_in_common_mode(): void
     {
         $categoryId = Category::first()->id;
-        $response = $this->postJson('/api/transaction/alone', [
-            'amount' => 100,
+        $date = now()->format('Y-m-d');
+        $requestBody = [
+            'amount' => 1500,
             'category' => $categoryId,
-            'date' => now()->format('Y-m-d'),
-            'payer' => (string) $this->user->id,
-            'shop_name' => 'test shop',
-            'memo' => 'setup check',
-        ]);
+            'date' => $date,
+            'payer' => (string) $this->couple->id,
+            'shop_name' => 'ABCDショップ',
+            'memo' => 'テストメモ',
+        ];
+
+        $response = $this->postJson('/api/transaction/common', $requestBody);
 
         $response->assertStatus(200)
-            ->assertJson(['status' => true]);
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction created successfully',
+            ]);
+        
+        $this->assertDatabaseHas('payments', [
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->partner->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $this->couple->id,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $this->assertSame(1, Payment::where('couple_id', $this->couple->id)->count());
     }
 }
