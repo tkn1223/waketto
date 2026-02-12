@@ -450,4 +450,152 @@ class TransactionControllerTest extends TestCase
             'amount' => 1500,
         ]);
     }
+
+    /**
+     * 正常系 - 削除：個人モードで自分の支払い明細を削除できることを確認
+     */
+    public function test_delete_transaction_in_alone_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+        $userId = $this->user->id;
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $userId,
+            'recorded_by_user_id' => $userId,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $response = $this->deleteJson("/api/transaction/alone/{$paymentId}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction deleted successfully',
+            ]);
+
+        $this->assertDatabaseMissing('payments', [
+            'id' => $paymentId,
+        ]);
+    }
+
+    /**
+     * 正常系 - 削除：共有モードでカップルの支払い明細を削除できることを確認
+     */
+    public function test_delete_transaction_in_common_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->partner->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $this->couple->id,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $response = $this->deleteJson("/api/transaction/common/{$paymentId}");
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'Transaction deleted successfully',
+            ]);
+
+        $this->assertDatabaseMissing('payments', [
+            'id' => $paymentId,
+        ]);
+    }
+
+    /**
+     * 異常系 - 削除：個人モードで他人（パートナー）の明細を削除しようとすると404を返すことを確認
+     */
+    public function test_delete_fails_when_deleting_others_transaction_in_alone_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+        $partnerId = $this->partner->id;
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $partnerId,
+            'recorded_by_user_id' => $partnerId,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => '他のユーザーの明細',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $response = $this->deleteJson("/api/transaction/alone/{$paymentId}");
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '対象の明細が見つかりませんでした',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $paymentId,
+            'amount' => 1500,
+        ]);
+    }
+
+    /**
+     * 異常系 - 削除：共有モードで別カップルの明細を削除しようとすると404を返すことを確認
+     */
+    public function test_delete_fails_when_deleting_other_couples_transaction_in_common_mode(): void
+    {
+        $otherUser = User::factory()->create();
+        $otherPartner = User::factory()->create();
+        $otherCouple = Couple::create([
+            'name' => $otherUser->user_id.' & '.$otherPartner->user_id,
+        ]);
+        $otherUser->update(['couple_id' => $otherCouple->id]);
+        $otherPartner->update(['couple_id' => $otherCouple->id]);
+
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $otherPartner->id,
+            'recorded_by_user_id' => $otherUser->id,
+            'couple_id' => $otherCouple->id,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => '別カップルショップ',
+            'note' => '別カップルの明細',
+        ]);
+
+        $paymentId = $payment->id;
+
+        $response = $this->deleteJson("/api/transaction/common/{$paymentId}");
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '対象の明細が見つかりませんでした',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $paymentId,
+            'amount' => 1500,
+        ]);
+    }
 }
