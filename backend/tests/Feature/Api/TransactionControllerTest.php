@@ -50,7 +50,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 正常系：個人モードで支払い明細を作成できることを確認
+     * 正常系 - 登録：個人モードで支払い明細を作成できることを確認
      */
     public function test_create_transaction_in_alone_mode(): void
     {
@@ -90,7 +90,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 正常系：共有モードで支払い明細を作成できることを確認
+     * 正常系 - 登録：共有モードで支払い明細を作成できることを確認
      */
     public function test_create_transaction_in_common_mode(): void
     {
@@ -128,7 +128,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /*
-     * 異常系：必須項目（amount）が欠けている場合に422とバリデーションエラーを返すことを確認
+     * 異常系 - 登録：必須項目（amount）が欠けている場合に422とバリデーションエラーを返すことを確認
      */
     public function test_store_fails_when_required_field_missing(): void
     {
@@ -155,7 +155,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /*
-     * 異常系：amountが負の数の場合に422とバリデーションエラーを返すことを確認
+     * 異常系 - 登録：amountが負の数の場合に422とバリデーションエラーを返すことを確認
      */
     public function test_store_fails_when_amount_is_negative(): void
     {
@@ -183,7 +183,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /*
-     * 異常系：categoryが存在しない場合に422とバリデーションエラーを返すことを確認
+     * 異常系 - 登録：categoryが存在しない場合に422とバリデーションエラーを返すことを確認
      */
     public function test_store_fails_when_category_does_not_exist(): void
     {
@@ -210,7 +210,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 正常系：個人モードで支払い明細を更新できることを確認
+     * 正常系 - 更新：個人モードで支払い明細を更新できることを確認
      */
     public function test_update_transaction_in_alone_mode(): void
     {
@@ -262,7 +262,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 正常系：共有モードで支払い明細を更新できることを確認
+     * 正常系 - 更新：共有モードで支払い明細を更新できることを確認
      */
     public function test_update_transaction_in_common_mode(): void
     {
@@ -313,7 +313,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 異常系：個人モードで他人（パートナー）の明細を更新しようとすると404を返すことを確認
+     * 異常系 - 更新：個人モードで他人（パートナー）の明細を更新しようとすると404を返すことを確認
      */
     public function test_update_fails_when_updating_others_transaction_in_alone_mode(): void
     {
@@ -358,7 +358,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 異常系：共有モードで別カップルの明細を更新しようとすると404を返すことを確認
+     * 異常系 - 更新：共有モードで別カップルの明細を更新しようとすると404を返すことを確認
      */
     public function test_update_fails_when_updating_other_couples_transaction_in_common_mode(): void
     {
@@ -411,7 +411,7 @@ class TransactionControllerTest extends TestCase
     }
 
     /**
-     * 異常系：必須項目（amount）が欠けている場合に422とバリデーションエラーを返すことを確認
+     * 異常系 - 更新：必須項目（amount）が欠けている場合に422とバリデーションエラーを返すことを確認
      */
     public function test_update_fails_when_required_fields_missing(): void
     {
