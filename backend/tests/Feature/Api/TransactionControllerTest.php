@@ -311,4 +311,143 @@ class TransactionControllerTest extends TestCase
             'note' => '更新テストメモ',
         ]);
     }
+
+    /**
+     * 異常系：個人モードで他人（パートナー）の明細を更新しようとすると404を返すことを確認
+     */
+    public function test_update_fails_when_updating_others_transaction_in_alone_mode(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+        $partnerId = $this->partner->id;
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $partnerId,
+            'recorded_by_user_id' => $partnerId,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => '他のユーザーの明細',
+        ]);
+
+        $requestBody = [
+            'amount' => 2000,
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $this->user->id,
+            'shop_name' => 'EFGHショップ',
+            'memo' => '他ユーザーのデータを更新してみる',
+        ];
+
+        $response = $this->putJson("/api/transaction/alone/{$payment->id}", $requestBody);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '対象の明細が見つかりませんでした',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => '他のユーザーの明細',
+        ]);
+    }
+
+    /**
+     * 異常系：共有モードで別カップルの明細を更新しようとすると404を返すことを確認
+     */
+    public function test_update_fails_when_updating_other_couples_transaction_in_common_mode(): void
+    {
+        $otherUser = User::factory()->create();
+        $otherPartner = User::factory()->create();
+        $otherCouple = Couple::create([
+            'name' => $otherUser->user_id . ' & ' . $otherPartner->user_id,
+        ]);
+        $otherUser->update(['couple_id' => $otherCouple->id]);
+        $otherPartner->update(['couple_id' => $otherCouple->id]);
+
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $otherPartner->id,
+            'recorded_by_user_id' => $otherUser->id,
+            'couple_id' => $otherCouple->id,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => '別カップルショップ',
+            'note' => '別カップルの明細',
+        ]);
+
+        $requestBody = [
+            'amount' => 2000,
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $this->couple->id,
+            'shop_name' => 'ABCDショップ',
+            'memo' => '別カップルのデータを更新してみる',
+        ];
+
+        $response = $this->putJson("/api/transaction/common/{$payment->id}", $requestBody);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '対象の明細が見つかりませんでした',
+            ]);
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'paid_by_user_id' => $otherPartner->id,
+            'amount' => 1500,
+            'store_name' => '別カップルショップ',
+            'note' => '別カップルの明細',
+        ]);
+    }
+
+    /**
+     * 異常系：必須項目（amount）が欠けている場合に422とバリデーションエラーを返すことを確認
+     */
+    public function test_update_fails_when_required_fields_missing(): void
+    {
+        $categoryId = Category::first()->id;
+        $date = now()->format('Y-m-d');
+
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->user->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'payment_date' => $date,
+            'amount' => 1500,
+            'store_name' => 'ABCDショップ',
+            'note' => 'テストメモ',
+        ]);
+
+        $requestBody = [
+            'category' => $categoryId,
+            'date' => $date,
+            'payer' => (string) $this->user->id,
+            'shop_name' => 'EFGHショップ',
+            'memo' => '更新テストメモ',
+        ];
+
+        $response = $this->putJson("/api/transaction/alone/{$payment->id}", $requestBody);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'status' => false,
+            ])
+            ->assertJsonPath('errors.amount.0', '金額は必須です');
+
+        $this->assertDatabaseHas('payments', [
+            'id' => $payment->id,
+            'amount' => 1500,
+        ]);
+    }
 }
