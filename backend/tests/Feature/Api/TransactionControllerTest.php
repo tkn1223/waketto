@@ -365,7 +365,7 @@ class TransactionControllerTest extends TestCase
         $otherUser = User::factory()->create();
         $otherPartner = User::factory()->create();
         $otherCouple = Couple::create([
-            'name' => $otherUser->user_id . ' & ' . $otherPartner->user_id,
+            'name' => $otherUser->user_id.' & '.$otherPartner->user_id,
         ]);
         $otherUser->update(['couple_id' => $otherCouple->id]);
         $otherPartner->update(['couple_id' => $otherCouple->id]);
