@@ -322,7 +322,7 @@ class SubscriptionControllerTest extends TestCase
     /**
      * 異常系 - 更新：updatePeriod が monthly/yearly 以外の場合に422エラーを返すことを確認
      */
-    public function test_update_subscriptions_fails_when_updatePeriod_invalid(): void
+    public function test_update_subscriptions_fails_when_update_period_invalid(): void
     {
         $requestBody = [
             'subscriptions' => [
@@ -347,7 +347,7 @@ class SubscriptionControllerTest extends TestCase
     /**
      * 異常系 - 更新：終了日が開始日より前の場合に422エラーを返すことを確認
      */
-    public function test_update_subscriptions_fails_when_finishDate_before_startDate(): void
+    public function test_update_subscriptions_fails_when_finish_date_before_start_date(): void
     {
         $requestBody = [
             'subscriptions' => [
