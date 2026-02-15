@@ -52,7 +52,7 @@ class SubscriptionControllerTest extends TestCase
         Subscription::create([
             'recorded_by_user_id' => $this->user->id,
             'couple_id' => null,
-            'service_name' => 'Netflix',
+            'service_name' => 'サブスク１',
             'amount' => 980,
             'billing_interval' => 'monthly',
             'start_date' => '2025-01-01',
@@ -65,7 +65,7 @@ class SubscriptionControllerTest extends TestCase
             ->assertJson([
                 'status' => true,
             ])
-            ->assertJsonPath('data.0.name', 'Netflix')
+            ->assertJsonPath('data.0.name', 'サブスク１')
             ->assertJsonPath('data.0.updatePeriod', 'monthly')
             ->assertJsonPath('data.0.amount', 980)
             ->assertJsonPath('data.0.startDate', '2025-01-01')
@@ -85,7 +85,7 @@ class SubscriptionControllerTest extends TestCase
         Subscription::create([
             'recorded_by_user_id' => $this->user->id,
             'couple_id' => $this->couple->id,
-            'service_name' => 'Spotify',
+            'service_name' => 'サブスク２',
             'amount' => 1280,
             'billing_interval' => 'yearly',
             'start_date' => '2025-04-01',
@@ -98,7 +98,7 @@ class SubscriptionControllerTest extends TestCase
             ->assertJson([
                 'status' => true,
             ])
-            ->assertJsonPath('data.0.name', 'Spotify')
+            ->assertJsonPath('data.0.name', 'サブスク２')
             ->assertJsonPath('data.0.updatePeriod', 'yearly')
             ->assertJsonPath('data.0.amount', 1280);
 
@@ -127,7 +127,7 @@ class SubscriptionControllerTest extends TestCase
         $requestBody = [
             'subscriptions' => [
                 [
-                    'name' => 'Netflix',
+                    'name' => 'サブスク１',
                     'updatePeriod' => 'monthly',
                     'amount' => 980,
                     'startDate' => '2025-01-01',
@@ -147,7 +147,7 @@ class SubscriptionControllerTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'recorded_by_user_id' => $this->user->id,
             'couple_id' => null,
-            'service_name' => 'Netflix',
+            'service_name' => 'サブスク１',
             'amount' => 980,
             'billing_interval' => 'monthly',
         ]);
@@ -161,7 +161,7 @@ class SubscriptionControllerTest extends TestCase
         $requestBody = [
             'subscriptions' => [
                 [
-                    'name' => 'Spotify',
+                    'name' => 'サブスク２',
                     'updatePeriod' => 'monthly',
                     'amount' => 1280,
                     'startDate' => '2025-01-01',
@@ -181,7 +181,7 @@ class SubscriptionControllerTest extends TestCase
         $this->assertDatabaseHas('subscriptions', [
             'recorded_by_user_id' => $this->user->id,
             'couple_id' => $this->couple->id,
-            'service_name' => 'Spotify',
+            'service_name' => 'サブスク２',
             'amount' => 1280,
         ]);
     }
@@ -237,14 +237,14 @@ class SubscriptionControllerTest extends TestCase
         $requestBody = [
             'subscriptions' => [
                 [
-                    'name' => 'Netflix',
+                    'name' => 'サブスク１',
                     'updatePeriod' => 'monthly',
                     'amount' => 980,
                     'startDate' => '2025-01-01',
                     'finishDate' => '2025-12-31',
                 ],
                 [
-                    'name' => 'Spotify',
+                    'name' => 'サブスク２',
                     'updatePeriod' => 'monthly',
                     'amount' => 1280,
                     'startDate' => '2025-01-01',
@@ -260,11 +260,151 @@ class SubscriptionControllerTest extends TestCase
         $this->assertSame(2, Subscription::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
         $this->assertDatabaseHas('subscriptions', [
             'recorded_by_user_id' => $this->user->id,
-            'service_name' => 'Netflix',
+            'service_name' => 'サブスク１',
         ]);
         $this->assertDatabaseHas('subscriptions', [
             'recorded_by_user_id' => $this->user->id,
-            'service_name' => 'Spotify',
+            'service_name' => 'サブスク２',
         ]);
+    }
+
+    /**
+     * 正常系 - 更新：2件登録済みの状態で1件だけ送ると、送らなかった1件が削除されることを確認
+     */
+    public function test_update_subscriptions_deletes_omitted_subscriptions(): void
+    {
+        Subscription::create([
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'service_name' => 'サブスク１',
+            'amount' => 980,
+            'billing_interval' => 'monthly',
+            'start_date' => '2025-01-01',
+            'finish_date' => '2025-12-31',
+        ]);
+        Subscription::create([
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'service_name' => 'サブスク２',
+            'amount' => 1280,
+            'billing_interval' => 'monthly',
+            'start_date' => '2025-01-01',
+            'finish_date' => '2025-12-31',
+        ]);
+
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'サブスク１',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(200);
+
+        $this->assertSame(1, Subscription::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'サブスク１',
+        ]);
+        $this->assertDatabaseMissing('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'サブスク２',
+        ]);
+    }
+
+    /**
+     * 異常系 - 更新：updatePeriod が monthly/yearly 以外の場合に422エラーを返すことを確認
+     */
+    public function test_update_subscriptions_fails_when_updatePeriod_invalid(): void
+    {
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'サブスク１',
+                    'updatePeriod' => 'weekly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(422);
+        $errors = $response->json('errors');
+        $this->assertArrayHasKey('subscriptions.0.updatePeriod', $errors);
+        $this->assertSame('更新間隔は「カ月」または「年」を選択してください', $errors['subscriptions.0.updatePeriod'][0]);
+    }
+
+    /**
+     * 異常系 - 更新：終了日が開始日より前の場合に422エラーを返すことを確認
+     */
+    public function test_update_subscriptions_fails_when_finishDate_before_startDate(): void
+    {
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'サブスク１',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-12-01',
+                    'finishDate' => '2025-01-01',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(422);
+        $errors = $response->json('errors');
+        $this->assertArrayHasKey('subscriptions.0.finishDate', $errors);
+        $this->assertSame('終了日は開始日以降の日付を入力してください', $errors['subscriptions.0.finishDate'][0]);
+    }
+
+    /**
+     * 異常系 - 更新：トランザクション失敗時のロールバック
+     */
+    public function test_update_subscriptions_rollback_on_failure(): void
+    {
+        $callCount = 0;
+        Event::listen('eloquent.creating: '.Subscription::class, function ($model) use (&$callCount) {
+            $callCount++;
+            if ($callCount >= 2) {
+                throw new \RuntimeException('Simulated failure for rollback test');
+            }
+        });
+
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'First',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+                [
+                    'name' => 'Second',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(500);
+
+        $this->assertSame(0, Subscription::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
     }
 }
