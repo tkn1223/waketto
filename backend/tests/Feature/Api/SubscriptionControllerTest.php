@@ -118,4 +118,153 @@ class SubscriptionControllerTest extends TestCase
                 'data' => [],
             ]);
     }
+
+    /**
+     * 正常系 - 更新：alone モードでサブスクリプションを更新できることを確認
+     */
+    public function test_update_subscriptions_in_alone_mode_succeeds(): void
+    {
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'Netflix',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'サブスクリプションの設定に成功しました',
+            ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'service_name' => 'Netflix',
+            'amount' => 980,
+            'billing_interval' => 'monthly',
+        ]);
+    }
+
+    /**
+     * 正常系 - 更新：common モードでサブスクリプションを更新できることを確認
+     */
+    public function test_update_subscriptions_in_common_mode_succeeds(): void
+    {
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'Spotify',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 1280,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/common', $requestBody);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'サブスクリプションの設定に成功しました',
+            ]);
+
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $this->couple->id,
+            'service_name' => 'Spotify',
+            'amount' => 1280,
+        ]);
+    }
+
+    /**
+     * 正常系 - 更新：既存サブスクリプションを完全置換できることを確認
+     */
+    public function test_update_subscriptions_replaces_existing_subscriptions(): void
+    {
+        Subscription::create([
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => null,
+            'service_name' => 'OldService',
+            'amount' => 100,
+            'billing_interval' => 'monthly',
+            'start_date' => '2024-01-01',
+            'finish_date' => '2024-12-31',
+        ]);
+
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'NewService',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 500,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'OldService',
+        ]);
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'NewService',
+            'amount' => 500,
+        ]);
+        $this->assertSame(1, Subscription::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
+    }
+
+    /**
+     * 正常系 - 更新：複数件のサブスクリプションを更新できることを確認
+     */
+    public function test_update_subscriptions_transaction_commits_successfully(): void
+    {
+        $requestBody = [
+            'subscriptions' => [
+                [
+                    'name' => 'Netflix',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 980,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+                [
+                    'name' => 'Spotify',
+                    'updatePeriod' => 'monthly',
+                    'amount' => 1280,
+                    'startDate' => '2025-01-01',
+                    'finishDate' => '2025-12-31',
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/subscription/setting/updateSubscriptions/alone', $requestBody);
+
+        $response->assertStatus(200);
+
+        $this->assertSame(2, Subscription::where('recorded_by_user_id', $this->user->id)->whereNull('couple_id')->count());
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'Netflix',
+        ]);
+        $this->assertDatabaseHas('subscriptions', [
+            'recorded_by_user_id' => $this->user->id,
+            'service_name' => 'Spotify',
+        ]);
+    }
 }
