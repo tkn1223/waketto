@@ -8,6 +8,7 @@ use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -153,7 +154,16 @@ class CognitoJwtAuth
         $jwksUrl = "https://cognito-idp.{$region}.amazonaws.com/{$userPoolId}/.well-known/jwks.json";
 
         try {
-            $jwks = json_decode(file_get_contents($jwksUrl), true);
+            $response = Http::get($jwksUrl);
+            if (! $response->successful()) {
+                throw new \Exception('JWKSの取得に失敗しました');
+            }
+
+            $jwks = $response->json();
+            if (! $jwks) {
+                throw new \Exception('JWKSのパースに失敗しました');
+            }
+
             // JWK形式の鍵をPHPの検証用キーリソースへ変換
             $keySet = JWK::parseKeySet($jwks);
 
