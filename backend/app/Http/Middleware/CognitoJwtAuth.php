@@ -7,8 +7,8 @@ use Closure;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -160,7 +160,7 @@ class CognitoJwtAuth
             }
 
             $jwks = $response->json();
-            if(! $jwks) {
+            if (! $jwks) {
                 throw new \Exception('JWKSのパースに失敗しました');
             }
 

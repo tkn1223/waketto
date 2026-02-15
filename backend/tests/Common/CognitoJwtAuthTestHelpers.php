@@ -3,7 +3,6 @@
 namespace Tests\Common;
 
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Http;
 
 trait CognitoJwtAuthTestHelpers
@@ -93,14 +92,6 @@ trait CognitoJwtAuthTestHelpers
             'RS256',
             self::$testKid
         );
-    }
-
-    /**
-     * 期限切れのテスト用 JWT を発行する
-     */
-    private function createExpiredTestJwt(string $sub = 'test-cognito-sub-expired'): string
-    {
-        return $this->createValidTestJwt($sub, time() - 60);
     }
 
     /**
