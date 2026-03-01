@@ -74,8 +74,7 @@ class UserController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'sometimes|required|string|max:255',
-                'email' => 'sometimes|required|email|max:255',
+                'name' => 'sometimes|required|string|max:10',
             ]);
 
             $user = $request->attributes->get('auth_user');
@@ -86,7 +85,6 @@ class UserController extends Controller
                 'data' => [
                     'id' => $user->id,
                     'name' => $user->name,
-                    'email' => $user->email,
                     'cognito_sub' => $user->cognito_sub,
                     'updated_at' => $user->updated_at,
                 ],
