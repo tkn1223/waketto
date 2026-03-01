@@ -264,4 +264,27 @@ class SettingControllerTest extends TestCase
         $this->assertDatabaseMissing('payments', ['id' => $payment->id]);
         $this->assertDatabaseMissing('budgets', ['id' => $budget->id]);
     }
+
+    /**
+     * 異常系 - reset：パートナーが存在しない（同一couple_idの他ユーザーがいない）場合に404を返す
+     */
+    public function test_reset_returns_404_when_partner_not_found(): void
+    {
+        $couple = Couple::create([
+            'name' => $this->user->user_id.' & '.$this->partner->user_id,
+        ]);
+        $this->user->update(['couple_id' => $couple->id]);
+        // partner は couple_id を設定しない（片方だけ Couple に紐づいた状態）
+
+        $response = $this->deleteJson('/api/partner-setting/reset');
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => 'パートナーが見つかりません',
+            ]);
+
+        $this->assertDatabaseHas('couples', ['id' => $couple->id]);
+        $this->assertNotNull($this->user->fresh()->couple_id);
+    }
 }
