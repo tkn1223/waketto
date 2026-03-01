@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api;
 
+use App\Http\Middleware\CognitoJwtAuth;
 use App\Models\Couple;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -107,5 +108,64 @@ class SettingControllerTest extends TestCase
         $this->partner->refresh();
         $this->assertSame($couple->id, $this->user->couple_id);
         $this->assertSame($couple->id, $this->partner->couple_id);
+    }
+
+    /**
+     * 異常系 - entry：ユーザー名が10文字を超える場合に422を返す
+     */
+    public function test_entry_returns_422_when_name_exceeds_10_characters(): void
+    {
+        $response = $this->postJson('/api/partner-setting', [
+            'name' => 'abcde123456',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'status' => false,
+                'message' => 'ユーザー名は10文字以内で入力してください',
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'name' => $this->user->name,
+        ]);
+    }
+
+    /**
+     * 異常系 - entry：存在しないpartner_idを指定した場合に404を返す
+     */
+    public function test_entry_returns_404_when_partner_id_does_not_exist(): void
+    {
+        $response = $this->postJson('/api/partner-setting', [
+            'partner_id' => 'non-existent-user-id',
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '入力されたIDのユーザーが見つかりません',
+            ]);
+
+        $this->assertDatabaseCount('couples', 0);
+        $this->assertNull($this->user->fresh()->couple_id);
+    }
+
+    /**
+     * 異常系 - entry：自分自身のuser_idをpartner_idに指定した場合に404を返す
+     */
+    public function test_entry_returns_404_when_partner_id_is_self(): void
+    {
+        $response = $this->postJson('/api/partner-setting', [
+            'partner_id' => $this->user->user_id,
+        ]);
+
+        $response->assertStatus(404)
+            ->assertJson([
+                'status' => false,
+                'message' => '入力されたIDのユーザーが見つかりません',
+            ]);
+
+        $this->assertDatabaseCount('couples', 0);
+        $this->assertNull($this->user->fresh()->couple_id);
     }
 }
