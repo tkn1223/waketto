@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Api;
 
-use App\Http\Middleware\CognitoJwtAuth;
 use App\Models\Budget;
 use App\Models\Category;
 use App\Models\Couple;
