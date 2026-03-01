@@ -44,7 +44,7 @@ class UserControllerTest extends TestCase
     /**
      * 正常系 - getUserInfo：単独ユーザーの場合、partner_user_id / partner_id が null で返る
      */
-    public function test_getUserInfo_returns_null_partner_ids_when_single_user(): void
+    public function test_get_user_info_returns_null_partner_ids_when_single_user(): void
     {
         $response = $this->getJson('/api/user');
 
@@ -62,7 +62,7 @@ class UserControllerTest extends TestCase
     /**
      * 正常系 - getUserInfo：パートナー設定済みの場合、partner_user_id / partner_id が相手の値で返る
      */
-    public function test_getUserInfo_returns_partner_ids_when_couple_set(): void
+    public function test_get_user_info_returns_partner_ids_when_couple_set(): void
     {
         $this->createCoupleForUserAndPartner();
 
@@ -99,7 +99,7 @@ class UserControllerTest extends TestCase
     /**
      * 正常系 - updateProfile：name を送信すると名前が更新され、メッセージと data が返る
      */
-    public function test_updateProfile_updates_name_and_returns_message_and_data(): void
+    public function test_update_profile_updates_name_and_returns_message_and_data(): void
     {
         $newName = '更新後の名前';
 
@@ -128,6 +128,31 @@ class UserControllerTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $this->user->id,
             'name' => $newName,
+        ]);
+    }
+
+    /**
+     * 異常系 - updateProfile：name が空の場合 422 と errors が返る
+     */
+    public function test_update_profile_returns_422_when_name_empty(): void
+    {
+        $response = $this->putJson('/api/profile', [
+            'name' => '',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJson([
+                'message' => 'バリデーションエラーが発生しました',
+            ])
+            ->assertJsonStructure([
+                'errors' => [
+                    'name',
+                ],
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $this->user->id,
+            'name' => $this->user->name,
         ]);
     }
 }
