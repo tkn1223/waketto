@@ -3,8 +3,14 @@
 namespace Tests\Feature\Api;
 
 use App\Http\Middleware\CognitoJwtAuth;
+use App\Models\Budget;
+use App\Models\Category;
 use App\Models\Couple;
+use App\Models\Payment;
+use App\Models\Subscription;
 use App\Models\User;
+use Database\Seeders\CategoriesSeeder;
+use Database\Seeders\CategoryGroupsTableSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Common\MocksCognitoAuth;
 use Tests\TestCase;
@@ -22,10 +28,27 @@ class SettingControllerTest extends TestCase
     {
         parent::setUp();
 
+        $this->seed(CategoryGroupsTableSeeder::class);
+        $this->seed(CategoriesSeeder::class);
+
         $this->user = User::factory()->create();
         $this->partner = User::factory()->create();
 
         $this->mockCognitoAuth($this->user);
+    }
+
+    /**
+     * user と partner を Couple で紐づけ、その Couple を返す（reset テスト用）
+     */
+    private function createCoupleForUserAndPartner(): Couple
+    {
+        $couple = Couple::create([
+            'name' => $this->user->user_id.' & '.$this->partner->user_id,
+        ]);
+        $this->user->update(['couple_id' => $couple->id]);
+        $this->partner->update(['couple_id' => $couple->id]);
+
+        return $couple;
     }
 
     /**
@@ -167,5 +190,78 @@ class SettingControllerTest extends TestCase
 
         $this->assertDatabaseCount('couples', 0);
         $this->assertNull($this->user->fresh()->couple_id);
+    }
+
+    /**
+     * 正常系 - reset：パートナー解除が成功し、双方のcouple_idがnullになりCoupleレコードが削除される
+     */
+    public function test_reset_succeeds_and_clears_both_users_couple_id(): void
+    {
+        $couple = $this->createCoupleForUserAndPartner();
+
+        $response = $this->deleteJson('/api/partner-setting/reset');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'パートナーを解除しました',
+            ]);
+
+        $this->user->refresh();
+        $this->partner->refresh();
+        $this->assertNull($this->user->couple_id);
+        $this->assertNull($this->partner->couple_id);
+
+        $this->assertDatabaseMissing('couples', ['id' => $couple->id]);
+    }
+
+    /**
+     * 正常系 - reset：Couple削除時に外部キーCASCADEでSubscription/Payment/Budgetの関連レコードが削除される
+     */
+    public function test_reset_cascades_deletion_to_related_subscription_payment_budget(): void
+    {
+        $couple = $this->createCoupleForUserAndPartner();
+
+        $subscription = Subscription::create([
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $couple->id,
+            'service_name' => 'テストサブスク',
+            'amount' => 980,
+            'billing_interval' => 'monthly',
+            'start_date' => '2025-01-01',
+            'finish_date' => '2025-12-31',
+        ]);
+
+        $categoryId = Category::first()->id;
+        $payment = Payment::create([
+            'category_id' => $categoryId,
+            'paid_by_user_id' => $this->user->id,
+            'recorded_by_user_id' => $this->user->id,
+            'couple_id' => $couple->id,
+            'payment_date' => now()->format('Y-m-d'),
+            'amount' => 1000,
+        ]);
+
+        $budget = Budget::create([
+            'couple_id' => $couple->id,
+            'recorded_by_user_id' => $this->user->id,
+            'category_id' => $categoryId,
+            'period' => 1,
+            'period_type' => 'monthly',
+            'amount' => 5000,
+        ]);
+
+        $response = $this->deleteJson('/api/partner-setting/reset');
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => true,
+                'message' => 'パートナーを解除しました',
+            ]);
+
+        $this->assertDatabaseMissing('couples', ['id' => $couple->id]);
+        $this->assertDatabaseMissing('subscriptions', ['id' => $subscription->id]);
+        $this->assertDatabaseMissing('payments', ['id' => $payment->id]);
+        $this->assertDatabaseMissing('budgets', ['id' => $budget->id]);
     }
 }
